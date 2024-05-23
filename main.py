@@ -41,8 +41,8 @@ def setup_db(bot):
                     upsert = True
                 )
 
-    for x in usersCol.find({},{ "_id": 1, "member_id": 1, "guild_id": 1, "coins": 1, "last_daily": 1 }):
-        print(x)
+    """for x in usersCol.find({},{ "_id": 1, "member_id": 1, "guild_id": 1, "coins": 1, "last_daily": 1 }):
+        print(x)"""
      
 # Load cogs
 for filename in os.listdir('./cogs'):

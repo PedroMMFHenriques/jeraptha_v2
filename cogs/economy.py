@@ -14,12 +14,9 @@ myClient = pymongo.MongoClient(os.getenv("CLIENT"))
 myDB = myClient[os.getenv("DB")]
 usersCol = myDB[os.getenv("USERS_COL")]
 
-class Economy(commands.Cog): # create a class for our cog that inherits from commands.Cog
-    # this class is used to create a cog, which is a module that can be added to the bot
-
-    def __init__(self, bot): # this is a special method that is called when the cog is loaded
+class Economy(commands.Cog): 
+    def __init__(self, bot): 
         self.bot = bot
-
 
     # WALLET
     @discord.slash_command(name="wallet", description="Check your wallet.")
