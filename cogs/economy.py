@@ -57,20 +57,22 @@ class Economy(commands.Cog): # create a class for our cog that inherits from com
         # Get leaderboard
         embedString = ""
         for user in myLeaderboard:
-            user_name = self.bot.get_user(user["member_id"]).name
-            user_coins = user["coins"]
-            embedString += user_name + ": " + user_coins + "\n"
+            user_name = str(user["member_id"])
+            user_coins = str(user["coins"])
+            embedString += "<@" + user_name + ">: " + user_coins + "\n"
 
         # Generate embed
-        embed = discord.Embed(title="Coins Leaderboard",
-                      description="Check out the richest dudes!",
+        embed = discord.Embed(description="Check out the richest dudes!",
                       colour=0x009900)
+        
+        embed.set_author(name="Wallet Leaderboard",
+                        icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
         
         embed.add_field(name="Most Coins:",
                         value=embedString,
                         inline=False)
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, silent=True)
 
 
     # INIT NEW USER

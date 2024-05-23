@@ -33,10 +33,10 @@ def setup_db(bot):
             if not member.bot:
                 usersCol.update_one(
                     {
-                        "member_id": member.id
+                        "member_id": member.id, "guild_id": guild.id
                     }, 
                     {
-                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": init_coins, "last_daily": datetime.datetime(2000, 1, 1)}
+                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime.datetime(2000, 1, 1)}
                     },
                     upsert = True
                 )
