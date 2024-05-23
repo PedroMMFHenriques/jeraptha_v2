@@ -7,11 +7,22 @@
 # sudo service mongod stop
 # sudo service mongod status
 
+import os
+from dotenv import load_dotenv
+
 import pymongo
 
-myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-mydb = myclient["mydatabase"]
-mycol = mydb["customers"]
+load_dotenv() # Load vars
+
+# Init vars
+init_coins = os.getenv("INIT_COINS")
+
+# Setup database
+myClient = pymongo.MongoClient(os.getenv("CLIENT"))
+myDB = myClient[os.getenv("DB")]
+usersCol = myDB[os.getenv("USERS_COL")]
+
+#usersCol.drop()
 
 #insert
 """mydict = { "name": "John", "address": "Highway 37" }
@@ -41,5 +52,5 @@ newvalues = { "$set": { "name": "Minnie" } } # {'$inc': {'item': X}} to incremen
 
 x = mycol.update_many(myquery, newvalues)"""
 
-myclient.drop_database("mydatabase")
-print(myclient.list_database_names())
+"""myclient.drop_database("mydatabase")
+print(myclient.list_database_names())"""
