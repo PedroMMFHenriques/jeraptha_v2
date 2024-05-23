@@ -11,16 +11,6 @@ class Basic(commands.Cog): # create a class for our cog that inherits from comma
     async def hello(self, ctx: discord.ApplicationContext):
         await ctx.respond("Hey!")
 
-    """@discord.slash_command(name="gtn", description="Play a Guess-the-Number game")
-    async def gtn(self, ctx: discord.ApplicationContext):
-        await ctx.respond('Guess a number between 1 and 10.')
-        guess = await self.bot.wait_for('message', check=lambda message: message.author == ctx.author)
-
-        if int(guess.content) == 5:
-            await ctx.send('You guessed it!')
-        else:
-            await ctx.send('Nope, try again.')"""
-
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Basic(bot)) # add the cog to the bot
 
