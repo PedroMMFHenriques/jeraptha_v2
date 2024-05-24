@@ -30,8 +30,11 @@ class Wager(commands.Cog):
     #DISPLAY UNIQUE ID + nome da wager, para saber qual dar update e qual dar settle
     #SÓ MOSTRAR AS ABERTAS
 
+    #MUDAR DURATION PARA O DATATIME EM Q ACABA
+
     #USAR wagersSub_id = wagersSubCol.count_documents({})
-    # wagersub: id sub wager, guild id, id da wager, o id membro, em qual apostou e quanto -> NÃO DEIXAR APOSTAR EM OPÇÕES DIFERENTES
+    # wagersub: id sub wager, guild id, id da wager, o id membro, em qual apostou e quanto 
+    # -> NÃO DEIXAR APOSTAR EM OPÇÕES DIFERENTES E TMB QUANDO ACABA O TEMPO E DEPOIS DE TER SIDO SETTLED
 
     #bet #deixar varias vezes
     #info: a pool de cada opção e payouts possiveis
