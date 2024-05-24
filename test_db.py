@@ -21,8 +21,13 @@ init_coins = os.getenv("INIT_COINS")
 myClient = pymongo.MongoClient(os.getenv("CLIENT"))
 myDB = myClient[os.getenv("DB")]
 usersCol = myDB[os.getenv("USERS_COL")]
+wagersCol = myDB["Wagers"]
+
+"""for x in wagersCol.find({},{}):
+  print(x)"""
 
 #usersCol.drop()
+#wagersCol.drop()
 
 #insert
 """mydict = { "name": "John", "address": "Highway 37" }
