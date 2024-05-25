@@ -26,23 +26,9 @@ class Wager(commands.Cog):
             await ctx.respond("You don't have the necessary role!", ephemeral=True)"""
     
     wager = discord.SlashCommandGroup("wager", "Wager related commands.")
-
-    #DISPLAY UNIQUE ID + nome da wager, para saber qual dar update e qual dar settle
-    #SÓ MOSTRAR AS ABERTAS
-
-    #MUDAR DURATION PARA O DATATIME EM Q ACABA
-
-    #USAR wagersSub_id = wagersSubCol.count_documents({})
-    # wagersub: id sub wager, guild id, id da wager, o id membro, em qual apostou e quanto 
-    # -> NÃO DEIXAR APOSTAR EM OPÇÕES DIFERENTES E TMB QUANDO ACABA O TEMPO E DEPOIS DE TER SIDO SETTLED
-
-    #bet #deixar varias vezes
-    #info: a pool de cada opção e payouts possiveis
-    #settle #só admin ou quem criou
-    #cancel #só admin ou quem criou
-    #history?
     
-    @wager.command(name="start", description="Start wager. Default duration is 10 minutes")
+    # wager start
+    @wager.command(name="start", description="Start wager. Default duration is 10 minutes.")
     @discord.option("title", description="Title of the wager.", required=True)
     @discord.option("option_a", description="Description of the first option.", required=True)
     @discord.option("option_b", description="Description of the second option.", required=True)
@@ -56,15 +42,15 @@ class Wager(commands.Cog):
             duration_minutes = 10
 
         duration_s = duration_hours*3600 + duration_minutes*60 + duration_seconds
-        end_wager = duration_s + math.floor(time.time())
+        end_wager_time = duration_s + math.floor(time.time())
 
         # wager: wager id, guild id, quem criou, duração, title, descrição das opções
         wager_id = wagersCol.count_documents({})
-        wagersCol.insert_one({"_id": wager_id, "guild_id": ctx.guild.id, "author_id": ctx.author.id, "duration_s": duration_s, "title": title, "option_a": option_a, "option_b": option_b, "option_c": option_c, "option_d": option_d})
+        wagersCol.insert_one({"_id": wager_id, "guild_id": ctx.guild.id, "author_id": ctx.author.id, "settled": False, "end_wager": end_wager_time, "title": title, "option_a": option_a, "option_b": option_b, "option_c": option_c, "option_d": option_d})
 
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
-        embed = discord.Embed(title=title,
-                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> just started a wager with **ID " + str(wager_id) + "**.\nBetting will end <t:" + str(end_wager) + ":R>!",
+        embed = discord.Embed(title="Bet Started: " + title,
+                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> just started a wager with **ID " + str(wager_id) + "**.\nBetting will end <t:" + str(end_wager_time) + ":R>!",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -77,25 +63,145 @@ class Wager(commands.Cog):
                         value=option_string,
                         inline=False)
 
-        embed.set_footer(text="Wager ID " + str(wager_id))
+        embed.set_footer(text="Wager ID: " + str(wager_id),
+                         icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
 
         await ctx.send(embed=embed)
-    
 
-    
-    """@discord.slash_command(name="add_coins", description="Adds coins.", hidden=True)
-    async def add_coins(self, ctx: discord.ApplicationContext, n_coins: int):
-        role = discord.utils.get(ctx.author.roles, name=AdminRole) #Check if user has the correct role
-        if role is None:
-            await ctx.respond("You don't have the necessary role!", ephemeral=True)
+
+
+    # wager bet
+    @wager.command(name="bet", description="Bet in a wager.")
+    @discord.option("wager_id", description="ID of the wager.", required=True)
+    @discord.option("bet_option", description="Choose what option to bet on.", required=True, choices=['option_a', 'option_b', 'option_c', 'option_d'])
+    @discord.option("bet_amount", description="Bet amount.", required=True)
+    async def bet(self, ctx: discord.ApplicationContext, wager_id: int, bet_option: str, bet_amount: int):
+
+        # Checks
+        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "settled": 1, "end_wager": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        if(wagerCheck is None): 
+            await ctx.respond("That wager doesn't exist!", ephemeral=True)
+            return
         
-        else:
+        elif(wagerCheck["settled"] == True): 
+            await ctx.respond("The wager was already settled!", ephemeral=True)
+            return
+        
+        elif(wagerCheck["end_wager"] < math.floor(time.time())): 
+            await ctx.respond("The betting interval is over!", ephemeral=True)
+            return
+        elif((wagerCheck["option_c"] == "" and bet_option == "option_c") or (wagerCheck["option_d"] == "" and bet_option == "option_d")): 
+            await ctx.respond("That option isn't available!", ephemeral=True)
+            return
+        
+        wagerSubCheck = wagersSubCol.find_one({"wager_id": wager_id, "member_id": ctx.author.id},{"_id": 0, "bet_option": 1})
+        if(wagerSubCheck is not None):
+            if(wagerSubCheck["bet_option"] is not None and wagerSubCheck["bet_option"] != bet_option): 
+                await ctx.respond("You already bet in another option!", ephemeral=True)
+                return
+
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+        if(userCheck["coins"] < bet_amount): 
+            await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
+            return
+
+        # If already bet, increase bet
+        if(wagerSubCheck is not None):
+            #remove from wallet
+            remove_coins = 0 - bet_amount
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-            newValues = {'$inc': {'coins': n_coins}}
-
+            newValues = {'$inc': {'coins': int(remove_coins)}}
             usersCol.update_one(myQuery, newValues)
-            await ctx.respond('Coins added!', ephemeral=True)"""
 
+            #add to bet
+            myQuery = {"wager_id": wager_id, "member_id": ctx.author.id}
+            newValues = {'$inc': {'total_bet': int(bet_amount)}}
+            wagersSubCol.update_one(myQuery, newValues)
+            
+            total_bet = wagersSubCol.find_one({"wager_id": wager_id, "member_id": ctx.author.id},{"_id": 0, "total_bet": 1})["total_bet"]
+            await ctx.respond("<@"+ str(ctx.author.id) + "> increased their bet on **" + wagerCheck["title"] + "** in option **" + wagerCheck[bet_option] + "**, totalling **" + str(total_bet) + "** coins!")
+        
+        # New bet
+        else:
+            # wagersub: id sub wager, id da wager, o id membro, em qual apostou e quanto 
+            wagersSubCol.insert_one({"wager_id": wager_id, "member_id": ctx.author.id, "bet_option": bet_option, "total_bet": int(bet_amount)})
+            await ctx.respond("<@" + str(ctx.author.id) + "> bet on **" + wagerCheck["title"] + "** in option **" + wagerCheck[bet_option] + "** with **" + str(bet_amount) + "** coins!")
+    
+    
+    #wager settle
+    @wager.command(name="settle", description="Settle the wager.", hidden=True)
+    @discord.option("wager_id", description="ID of the wager.", required=True)
+    @discord.option("winning_option", description="What option won the bet.", required=True, choices=['option_a', 'option_b', 'option_c', 'option_d'])
+    async def settle(self, ctx: discord.ApplicationContext, wager_id: int, winning_option: str):
+
+        # Checks
+        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        
+        if(wagerCheck is None): 
+            await ctx.respond("That wager doesn't exist!", ephemeral=True)
+            return
+        elif(wagerCheck["settled"] == True): 
+            await ctx.respond("The wager was already settled!", ephemeral=True)
+            return
+
+        role = discord.utils.get(ctx.author.roles, name=AdminRole)
+        if(role is None and wagerCheck["author_id"] != ctx.author.id):
+            await ctx.respond("You didn't start this bet, so you can't settle!", ephemeral=True)
+            return
+
+        if((wagerCheck["option_c"] == "" and winning_option == "option_c") or (wagerCheck["option_d"] == "" and winning_option == "option_d")):
+            await ctx.respond("That option isn't available!", ephemeral=True)
+            return
+
+
+        # Settle
+        myQuery= {"_id": wager_id}
+        newValues = {'$set': {"settled": True}}
+        wagersCol.update_one(myQuery, newValues)
+        
+        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
+
+        option_wager = {"option_a": 0, "option_b": 0, "option_c": 0, "option_d": 0}
+        winners_list = []
+        for bettor in wagersSub_bettors:
+            option_wager[bettor["bet_option"]] += bettor["total_bet"]
+            if(bettor["bet_option"] == winning_option): winners_list.append({"id": bettor["member_id"], "bet": bettor["total_bet"]})
+        
+        winning_bet = option_wager[winning_option]
+        total_bet = option_wager["option_a"] + option_wager["option_b"] + option_wager["option_c"] + option_wager["option_d"] 
+        winnings_embed = ""
+        for winner in winners_list:
+            winnings = 0.99 * winner["bet"] * total_bet / winning_bet
+
+            myQuery= {"member_id": int(winner["id"]), "guild_id": ctx.guild.id}
+            newValues = {'$inc': {'coins': math.floor(winnings)}}
+            usersCol.update_one(myQuery, newValues)
+
+            winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winnings)) + "** coins!\n"
+
+        if(winnings_embed == ""): winning_msg = "Nobody won, suckers!"
+        else: winning_msg = "Here are the winners, congrats!"
+
+        # Embed
+        wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
+        embed = discord.Embed(title="Bet Settled: " + wagerCheck["title"],
+                      description="<@&" + str(wagerRoleId) + ">\nWinning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "** coins!",
+                      colour=0x009900,
+                      timestamp=datetime.now())
+
+        embed.add_field(name=winning_msg,
+                        value=winnings_embed,
+                        inline=False)
+
+        embed.set_footer(text="Wager ID: " + str(wager_id),
+                        icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
+
+        await ctx.send(embed=embed)
+
+
+    #info: a pool de cada opção e pools + odds
+    #cancel #só admin ou quem criou
+    #history?
 
 
 def setup(bot):

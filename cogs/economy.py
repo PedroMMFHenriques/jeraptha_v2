@@ -22,7 +22,7 @@ class Economy(commands.Cog):
     @discord.slash_command(name="wallet", description="Check your wallet.")
     async def wallet(self, ctx: discord.ApplicationContext):
         myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
-        await ctx.respond(f"<@{ctx.author.id}> has {myWallet} coins.")
+        await ctx.respond(f"You have {myWallet} coins.", ephemeral=True)
 
 
     # DAILY
