@@ -3,12 +3,13 @@ import math
 import discord
 from discord.ext import commands
 
+from numpy import random
+
 import pymongo
 
 from datetime import datetime, timedelta, date
 
 init_coins = os.getenv("INIT_COINS")
-daily_coins = os.getenv("DAILY_COINS")
 
 myClient = pymongo.MongoClient(os.getenv("CLIENT"))
 myDB = myClient[os.getenv("DB")]
@@ -30,7 +31,11 @@ class Economy(commands.Cog):
     async def daily(self, ctx: discord.ApplicationContext):
         myLastDaily = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_daily": 1})["last_daily"]
 
+        median = 500
+        std = 80
+
         if(date.today() >= myLastDaily.date() + timedelta(days=1)):
+            daily_coins = random.normal(loc=median, scale=std, size = (1))[0]
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
             newValues = {"$set": {"last_daily": datetime.now()},'$inc': {'coins': int(daily_coins)}}
             usersCol.update_one(myQuery, newValues)
@@ -69,7 +74,7 @@ class Economy(commands.Cog):
                         value=embedString,
                         inline=False)
 
-        await ctx.send(embed=embed, silent=True)
+        await ctx.respond(embed=embed, silent=True)
 
 
     # INIT NEW USER
@@ -84,7 +89,7 @@ class Economy(commands.Cog):
             },
             upsert = True
         )
-        await member.send("Welcome to the server!")
+        await member.respond("Welcome to the server!")
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Economy(bot)) # add the cog to the bot

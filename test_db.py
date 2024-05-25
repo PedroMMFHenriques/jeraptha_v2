@@ -22,12 +22,14 @@ myClient = pymongo.MongoClient(os.getenv("CLIENT"))
 myDB = myClient[os.getenv("DB")]
 usersCol = myDB[os.getenv("USERS_COL")]
 wagersCol = myDB["Wagers"]
+wagersSubCol = myDB["WagersSub"]
 
 """for x in wagersCol.find({},{}):
   print(x)"""
 
 #usersCol.drop()
 #wagersCol.drop()
+#wagersSubCol.drop()
 
 #insert
 """mydict = { "name": "John", "address": "Highway 37" }
