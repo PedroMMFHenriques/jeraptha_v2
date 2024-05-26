@@ -103,6 +103,15 @@ class Wager(commands.Cog):
                 return
 
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+
+        if(bet_amount <= 0):
+            await ctx.respond("<@" + str(ctx.author.id) + "> tried to cheat, what a clown! 🤡")
+            try:
+                await ctx.author.edit(nick=ctx.author.display_name + " 🤡", reason="Tried to cheat Jeraptha")
+            except:
+                pass
+            return
+
         if(userCheck["coins"] < bet_amount): 
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
             return
@@ -236,16 +245,16 @@ class Wager(commands.Cog):
         total_bet = option_wager["option_a"] + option_wager["option_b"] + option_wager["option_c"] + option_wager["option_d"]
 
         if(option_wager["option_a"] == 0): option_a_odds = "N/A"
-        else: option_a_odds = 0.99 * total_bet / option_wager["option_a"]
+        else: option_a_odds = round(0.99 * total_bet / option_wager["option_a"], 2)
 
         if(option_wager["option_b"] == 0): option_b_odds = "N/A"
-        else: option_b_odds = 0.99 * total_bet / option_wager["option_b"]
+        else: option_b_odds = round(0.99 * total_bet / option_wager["option_b"], 2)
 
         if(option_wager["option_c"] == 0): option_c_odds = "N/A"
-        else: option_c_odds = 0.99 * total_bet / option_wager["option_c"]
+        else: option_c_odds = round(0.99 * total_bet / option_wager["option_c"], 2)
 
         if(option_wager["option_d"] == 0): option_d_odds = "N/A"
-        else: option_d_odds = 0.99 * total_bet / option_wager["option_d"]
+        else: option_d_odds = round(0.99 * total_bet / option_wager["option_d"], 2)
 
         description_embed = ""
         if(wagerCheck["canceled"]): description_embed = "**CANCELED**\n"
@@ -253,12 +262,12 @@ class Wager(commands.Cog):
         elif(wagerCheck["end_wager"] < math.floor(time.time())): description_embed = "Betting ended <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         else: description_embed = "Betting will end <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         
-        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + " coins, " + str(round(option_a_odds,2)) + " odds\n"
-        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + " coins, " + str(round(option_b_odds,2)) + " odds\n"
+        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + " coins, " + str(option_a_odds) + " odds\n"
+        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + " coins, " + str(option_b_odds) + " odds\n"
         if(wagerCheck["option_c"] != ""):
-            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + " coins, " + str(round(option_c_odds,2)) + " odds\n"
+            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + " coins, " + str(option_c_odds) + " odds\n"
         if(wagerCheck["option_d"] != ""):
-            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + " coins, " + str(round(option_d_odds,2)) + " odds\n"
+            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + " coins, " + str(option_d_odds) + " odds\n"
 
         embed = discord.Embed(title="Bet Info: " + wagerCheck["title"],
                       description=description_embed,

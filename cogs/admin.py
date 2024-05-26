@@ -27,6 +27,7 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
+    # RENAME
     @discord.slash_command(name="reload", description="[ADMIN] Reload extensions.", hidden=True)
     async def reload(self, ctx: discord.ApplicationContext):
         role = discord.utils.get(ctx.author.roles, name=AdminRole) #Check if user has the correct role
@@ -42,18 +43,35 @@ class Admin(commands.Cog):
             await ctx.respond('Extensions reloaded!', ephemeral=True)
 
     
-    # RENAME
+    # SET WALLET
     @discord.command(name="set_wallet", description="[ADMIN] Set a user's wallet.")
-    @discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
+    #@discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
+    @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_balance", description="Choose their new balance.", required=True)
     async def set_wallet(self, ctx: discord.ApplicationContext, user: str, new_balance: int):
-        user_change = discord.utils.get(ctx.guild.members, name=user)
+        
+        try:
+            user_change = user.split("@")[1][:-1]
+            user_change = ctx.guild.get_member(int(user_change))
+        except:
+            await ctx.respond("Wrong user argument! Make sure you @ an user.", ephemeral=True)
+            return
+
+        if user_change.bot:
+            await ctx.respond("Can't change a bot's wallet!", ephemeral=True)
+            return
+        
+        if(new_balance < 0):
+            await ctx.respond("The balance can't be negative!", ephemeral=True)
+            return
         
         myQuery= {"member_id": user_change.id, "guild_id": ctx.guild.id}
         newValues = {'$set': {'coins': int(new_balance)}}
         usersCol.update_one(myQuery, newValues)
 
         await ctx.respond("You set " + user + "'s balance to " + str(new_balance) + " coins!", ephemeral=True)
+
+    
 
 
 

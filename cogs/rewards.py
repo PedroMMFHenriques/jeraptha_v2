@@ -34,7 +34,8 @@ class Rewards(commands.Cog):
 
     # RENAME
     @discord.command(name="rename", description="Rename an user. Costs " + str(rename_cost) + " coins.")
-    @discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
+    #@discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
+    @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
     async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
@@ -42,8 +43,19 @@ class Rewards(commands.Cog):
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
             return
         
-        user_change = discord.utils.get(ctx.guild.members, name=user)
+        #Check user argument
+        try:
+            user_change = user.split("@")[1][:-1]
+            user_change = ctx.guild.get_member(int(user_change))
+        except:
+            await ctx.respond("Wrong user argument! Make sure you @ an user.", ephemeral=True)
+            return
 
+        if user_change.bot:
+            await ctx.respond("Can't change a bot's nickname!", ephemeral=True)
+            return
+
+        #Check perms
         try:
             await user_change.edit(nick=new_nick, reason=reason)
         except:
