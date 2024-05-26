@@ -32,9 +32,9 @@ class Rewards(commands.Cog):
     def __init__(self, bot): 
         self.bot = bot
 
-    """# RENAME
+    # RENAME
     @discord.command(name="rename", description="Rename an user. Costs " + str(rename_cost) + " coins.")
-    @discord.option("user", description="Choose what user to target.", required=True, autocomplete=discord.utils.basic_autocomplete(get_all_members))
+    @discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
     @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
     async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
@@ -42,17 +42,22 @@ class Rewards(commands.Cog):
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
             return
         
+
+        user_split = user.split("#")
+        user_change = discord.utils.get(ctx.guild.members, name=user_split[0], discriminator=user_split[1])
+
+        try:
+            await user_change.edit(nick=new_nick, reason=reason)
+        except:
+            await ctx.respond("You can't change " + user + "'s nick!", ephemeral=True)
+            return
+        
         remove_coins = 0 - rename_cost
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)
-        
-        user_split = user.split("#")
-        user_change = discord.utils.get(ctx.guild.members, name=user_split[0], discriminator=user_split[1])
 
-        await discord.user_change.edit(nick=new_nick, reason=reason)
-
-        await ctx.respond("You changed " + user + "'s nick!", ephemeral=True)"""
+        await ctx.respond("You changed " + user + "'s nick!", ephemeral=True)
 
 
 
