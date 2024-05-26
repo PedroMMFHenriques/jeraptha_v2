@@ -22,7 +22,7 @@ async def get_all_members(ctx: discord.AutocompleteContext):
         all_members_list = []
         for member in members_list:
             if not member.bot:
-                all_members_list.append(member.name + "#" + member.discriminator)
+                all_members_list.append(member.name)
 
         return sorted([i for i in all_members_list if i.startswith(ctx.value.lower())])
 
@@ -42,9 +42,7 @@ class Rewards(commands.Cog):
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
             return
         
-
-        user_split = user.split("#")
-        user_change = discord.utils.get(ctx.guild.members, name=user_split[0], discriminator=user_split[1])
+        user_change = discord.utils.get(ctx.guild.members, name=user)
 
         try:
             await user_change.edit(nick=new_nick, reason=reason)

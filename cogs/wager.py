@@ -212,7 +212,7 @@ class Wager(commands.Cog):
     @discord.option("wager_id", description="ID of the wager.", required=True)
     async def start(self, ctx: discord.ApplicationContext, wager_id: int):
 
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1, "end_wager": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
         
         if(wagerCheck is None): 
             await ctx.respond("That wager doesn't exist!", ephemeral=True)
@@ -250,6 +250,7 @@ class Wager(commands.Cog):
         description_embed = ""
         if(wagerCheck["canceled"]): description_embed = "**CANCELED**\n"
         elif(wagerCheck["settled"]): description_embed = "**SETTLED**\nWinning option: **" + wagerCheck["winning_option"] + "**\n"
+        else: description_embed = "Betting will end <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         
         description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + " coins, " + str(round(option_a_odds,2)) + " odds\n"
         description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + " coins, " + str(round(option_b_odds,2)) + " odds\n"
