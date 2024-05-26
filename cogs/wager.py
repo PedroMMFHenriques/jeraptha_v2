@@ -355,7 +355,7 @@ class Wager(commands.Cog):
         # Embed
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Canceled: " + wagerCheck["title"],
-                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> canceled the bet!\nThe bets have been returned.",
+                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> canceled the bet!\nThe coins have been returned.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
