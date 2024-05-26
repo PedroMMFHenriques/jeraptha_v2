@@ -27,9 +27,9 @@ wagersSubCol = myDB["WagersSub"]
 """for x in wagersCol.find({},{}):
   print(x)"""
 
-#usersCol.drop()
-#wagersCol.drop()
-#wagersSubCol.drop()
+"""usersCol.drop()
+wagersCol.drop()
+wagersSubCol.drop()"""
 
 #insert
 """mydict = { "name": "John", "address": "Highway 37" }

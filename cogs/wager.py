@@ -21,10 +21,6 @@ class Wager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    """role = discord.utils.get(ctx.author.roles, name=AdminRole) #Check if user has the correct role
-        if role is None:
-            await ctx.respond("You don't have the necessary role!", ephemeral=True)"""
-    
     wager = discord.SlashCommandGroup("wager", "Wager related commands.")
     
     # wager start
@@ -250,17 +246,17 @@ class Wager(commands.Cog):
 
         if(option_wager["option_d"] == 0): option_d_odds = "N/A"
         else: option_d_odds = 0.99 * total_bet / option_wager["option_d"]
-        
+
         description_embed = ""
         if(wagerCheck["canceled"]): description_embed = "**CANCELED**\n"
         elif(wagerCheck["settled"]): description_embed = "**SETTLED**\nWinning option: **" + wagerCheck["winning_option"] + "**\n"
         
-        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + " coins, " + str(option_a_odds) + " odds\n"
-        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + " coins, " + str(option_b_odds) + " odds\n"
+        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + " coins, " + str(round(option_a_odds,2)) + " odds\n"
+        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + " coins, " + str(round(option_b_odds,2)) + " odds\n"
         if(wagerCheck["option_c"] != ""):
-            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + " coins, " + str(option_c_odds) + " odds\n"
+            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + " coins, " + str(round(option_c_odds,2)) + " odds\n"
         if(wagerCheck["option_d"] != ""):
-            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + " coins, " + str(option_d_odds) + " odds\n"
+            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + " coins, " + str(round(option_d_odds,2)) + " odds\n"
 
         embed = discord.Embed(title="Bet Info: " + wagerCheck["title"],
                       description=description_embed,
