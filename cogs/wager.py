@@ -48,7 +48,7 @@ class Wager(commands.Cog):
 
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Started: " + title,
-                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> just started a wager with **ID " + str(wager_id) + "**.\nBetting will end <t:" + str(end_wager_time) + ":R>!",
+                      description="<@" + str(ctx.author.id) + "> just started a wager with **ID " + str(wager_id) + "**.\nBetting will end <t:" + str(end_wager_time) + ":R>!",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -64,7 +64,7 @@ class Wager(commands.Cog):
         embed.set_footer(text="Wager ID: " + str(wager_id),
                          icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
 
-        await ctx.respond(embed=embed)
+        await ctx.respond(content="<@&" + str(wagerRoleId) + ">\n", embed=embed, allowed_mentions=discord.AllowedMentions())
 
 
 
@@ -212,7 +212,7 @@ class Wager(commands.Cog):
         embed.set_footer(text="Wager ID: " + str(wager_id),
                         icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
 
-        await ctx.respond(embed=embed)
+        await ctx.respond(content="<@&" + str(wagerRoleId) + ">\n", embed=embed, allowed_mentions=discord.AllowedMentions())
 
 
 
@@ -362,7 +362,7 @@ class Wager(commands.Cog):
         embed.set_footer(text="Wager ID: " + str(wager_id),
                         icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
 
-        await ctx.respond(embed=embed)
+        await ctx.respond(content="<@&" + str(wagerRoleId) + ">\n", embed=embed, allowed_mentions=discord.AllowedMentions())
 
 
 def setup(bot):
