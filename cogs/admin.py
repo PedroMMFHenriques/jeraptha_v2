@@ -27,12 +27,13 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    # RENAME
+    # RELOAD
     @discord.slash_command(name="reload", description="[ADMIN] Reload extensions.", hidden=True)
     async def reload(self, ctx: discord.ApplicationContext):
         role = discord.utils.get(ctx.author.roles, name=AdminRole) #Check if user has the correct role
         if role is None:
             await ctx.respond("You don't have the necessary role!", ephemeral=True)
+            return
         
         else:
             for filename in os.listdir('./cogs'):
@@ -41,6 +42,22 @@ class Admin(commands.Cog):
                     self.bot.load_extension(f"cogs.{filename[:-3]}")
                     print(f'{filename} successfully re-loaded')
             await ctx.respond('Extensions reloaded!', ephemeral=True)
+
+    
+
+    # SEND_FILE
+    @discord.slash_command(name="send_file", description="[ADMIN] Sends file.", hidden=True)
+    async def send_file(self, ctx: discord.ApplicationContext):
+        role = discord.utils.get(ctx.author.roles, name=AdminRole) #Check if user has the correct role
+        if role is None:
+            await ctx.respond("You don't have the necessary role!", ephemeral=True)
+            return
+        
+        else:
+            with open('images/roulette/roulette_0.gif', 'rb') as f:
+                picture = discord.File(f)
+                await ctx.respond(file=picture)
+    
 
     
     # SET WALLET

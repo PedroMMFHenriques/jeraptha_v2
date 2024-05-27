@@ -34,11 +34,20 @@ class Wager(commands.Cog):
     @discord.option("duration_minutes", description="Duration of the wager in minutes.", required=False, default=0)
     @discord.option("duration_hours", description="Duration of the wager in hours.", required=False, default=0)
     async def start(self, ctx: discord.ApplicationContext, title: str, option_a: str, option_b: str, option_c: str, option_d: str, duration_seconds: int, duration_minutes: int, duration_hours: int):
+        if(duration_hours < 0 or duration_minutes < 0 or duration_seconds):
+            await ctx.respond("I can't travel back in time!", ephemeral=True)
+            return
+
+        
         if(duration_hours == 0 and duration_minutes == 0 and duration_seconds == 0):
             duration_minutes = 10
 
         duration_s = duration_hours*3600 + duration_minutes*60 + duration_seconds
+        if(duration_s < 0):
+            await ctx.respond("I can't travel back in time!", ephemeral=True)
+            return
         end_wager_time = duration_s + math.floor(time.time())
+        
 
         # wager: wager id, guild id, quem criou, duração, title, descrição das opções
         wager_id = wagersCol.count_documents({})
@@ -102,8 +111,6 @@ class Wager(commands.Cog):
                 await ctx.respond("You already bet in another option!", ephemeral=True)
                 return
 
-        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
-
         if(bet_amount <= 0):
             await ctx.respond("<@" + str(ctx.author.id) + "> tried to cheat, what a clown! 🤡")
             try:
@@ -112,18 +119,21 @@ class Wager(commands.Cog):
                 pass
             return
 
+
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+
         if(userCheck["coins"] < bet_amount): 
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
             return
 
+        #remove from wallet
+        remove_coins = 0 - bet_amount
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$inc': {'coins': int(remove_coins)}}
+        usersCol.update_one(myQuery, newValues)
+
         # If already bet, increase bet
         if(wagerSubCheck is not None):
-            #remove from wallet
-            remove_coins = 0 - bet_amount
-            myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-            newValues = {'$inc': {'coins': int(remove_coins)}}
-            usersCol.update_one(myQuery, newValues)
-
             #add to bet
             myQuery = {"wager_id": wager_id, "member_id": ctx.author.id}
             newValues = {'$inc': {'total_bet': int(bet_amount)}}

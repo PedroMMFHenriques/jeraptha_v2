@@ -52,14 +52,14 @@ class Rewards(commands.Cog):
             return
 
         if user_change.bot:
-            await ctx.respond("Can't change a bot's nickname!", ephemeral=True)
+            await ctx.respond("You can't change a bot's nickname!", ephemeral=True)
             return
 
         #Check perms
         try:
             await user_change.edit(nick=new_nick, reason=reason)
         except:
-            await ctx.respond("You can't change " + user + "'s nick!", ephemeral=True)
+            await ctx.respond("You can't change " + user + "'s nickame!", ephemeral=True)
             return
         
         remove_coins = 0 - rename_cost
@@ -67,7 +67,7 @@ class Rewards(commands.Cog):
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)
 
-        await ctx.respond("You changed " + user + "'s nick!", ephemeral=True)
+        await ctx.respond("You changed " + user + "'s nickname!", ephemeral=True)
 
 
 
