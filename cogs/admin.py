@@ -45,7 +45,7 @@ class Admin(commands.Cog):
 
     
 
-    # SEND_FILE
+    """# SEND_FILE
     @discord.slash_command(name="send_file", description="[ADMIN] Sends file.", hidden=True)
     async def send_file(self, ctx: discord.ApplicationContext):
         role = discord.utils.get(ctx.author.roles, name=AdminRole) #Check if user has the correct role
@@ -56,7 +56,7 @@ class Admin(commands.Cog):
         else:
             with open('images/roulette/roulette_0.gif', 'rb') as f:
                 picture = discord.File(f)
-                await ctx.respond(file=picture)
+                await ctx.respond(file=picture)"""
     
 
     
@@ -66,7 +66,7 @@ class Admin(commands.Cog):
     @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_balance", description="Choose their new balance.", required=True)
     async def set_wallet(self, ctx: discord.ApplicationContext, user: str, new_balance: int):
-        
+
         try:
             user_change = user.split("@")[1][:-1]
             user_change = ctx.guild.get_member(int(user_change))

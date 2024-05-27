@@ -23,6 +23,8 @@ class Economy(commands.Cog):
     @discord.slash_command(name="wallet", description="Check your wallet.")
     async def wallet(self, ctx: discord.ApplicationContext):
         myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
+        if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+
         await ctx.respond(f"You have {myWallet} coins.", ephemeral=True)
 
 
@@ -30,6 +32,7 @@ class Economy(commands.Cog):
     @discord.slash_command(name="daily", description="Get your free daily reward!")
     async def daily(self, ctx: discord.ApplicationContext):
         myLastDaily = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_daily": 1})["last_daily"]
+        if(myLastDaily  is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
 
         median = 500
         std = 80
@@ -41,6 +44,8 @@ class Economy(commands.Cog):
             usersCol.update_one(myQuery, newValues)
 
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
+            if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+
             await ctx.respond(f"<@{ctx.author.id}> used daily and got {int(daily_coins)} coins, totalling {myWallet}.")
         
         else:
@@ -55,6 +60,8 @@ class Economy(commands.Cog):
     @discord.slash_command(name="leaderboard", description="Check coins leaderboard.")
     async def leaderboard(self, ctx: discord.ApplicationContext):
         myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1}).sort("coins", -1)
+        if(myLeaderboard is None):
+            await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
         
         # Get leaderboard
         embedString = ""

@@ -39,6 +39,9 @@ class Rewards(commands.Cog):
     @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
     async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+        if(userCheck is None):
+            await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+
         if(userCheck["coins"] < rename_cost): 
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
             return
