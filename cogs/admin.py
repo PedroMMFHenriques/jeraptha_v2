@@ -13,7 +13,7 @@ myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
 
-AdminRole = os.getenv("ADMIN_ROLE")
+AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
 
 
 async def get_all_members(ctx: discord.AutocompleteContext):
