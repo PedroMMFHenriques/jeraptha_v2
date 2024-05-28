@@ -3,7 +3,9 @@ import math
 import discord
 from discord.ext import commands
 
-from numpy import random
+import random
+
+import numpy as np
 
 import pymongo
 
@@ -38,7 +40,16 @@ class Economy(commands.Cog):
         std = 80
 
         if(date.today() >= myLastDaily.date() + timedelta(days=1)):
-            daily_coins = random.normal(loc=median, scale=std, size = (1))[0]
+            daily_coins = np.random.normal(loc=median, scale=std, size = (1))[0]
+
+            extra_msg = ""
+            if(random.SystemRandom().randint(1, 101) == 100): 
+                daily_coins = daily_coins*3
+                extra_msg = "a **CRIT**, winning "
+            elif(random.SystemRandom().randint(1, 101) == 1):
+                daily_coins = daily_coins/3
+                extra_msg = "a **CRIT FAILURE**, winning only "
+
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
             newValues = {"$set": {"last_daily": datetime.now()},'$inc': {'coins': int(daily_coins)}}
             usersCol.update_one(myQuery, newValues)
@@ -46,7 +57,7 @@ class Economy(commands.Cog):
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
             if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
 
-            await ctx.respond(f"<@{ctx.author.id}> used daily and got {int(daily_coins)} coins, totalling {myWallet}.")
+            await ctx.respond(f"<@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} coins, totalling {myWallet}.")
         
         else:
             timeLeft = (datetime.combine(date.today() + timedelta(days=1), datetime.min.time()) - datetime.now())

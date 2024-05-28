@@ -88,7 +88,7 @@ class Roulette(commands.Cog):
                 await ctx.send(file=picture)
         
         # Suspense
-        await asyncio.sleep(10)
+        await asyncio.sleep(8)
 
         # Award winners (if any)
         bets_check = rouletteUserCol.find({"guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet": 1, "bet_numbers": 1})
