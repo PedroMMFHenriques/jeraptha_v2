@@ -178,11 +178,11 @@ class Roulette(commands.Cog):
 
     @staticmethod
     def getNumberString(self, sub_option):
-        if sub_option == "Red":
-            return "1,3,5,7,9,12,14,16,18,21,23,25,17,28,30,32,34,36"
+        if sub_option == "Black":
+            return "1,3,5,7,9,12,14,15,16,18,19,21,23,25,27,30,34,36"
         
-        elif sub_option == "Black":
-            return "2,4,6,8,10,11,13,15,17,19,20,22,24,26,29,31,33,35"
+        elif sub_option == "Red":
+            return "2,4,6,8,10,11,13,17,20,22,24,26,28,29,31,32,33,35"
         
         elif sub_option == "Odd":
             return "1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35"
@@ -239,7 +239,11 @@ class Roulette(commands.Cog):
     @discord.option("list_numbers", description="[sub_option Numbers] List numbers 0-36 separated by ','", required=False)
     async def bet(self, ctx: discord.ApplicationContext, amount: int, option: str, sub_option: str, list_numbers: str):
         rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1, "rolling": 1})
-        if(rouletteGameCheck["running"] == False or rouletteGameCheck is None):
+        if(rouletteGameCheck is None):
+            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
+            return
+
+        if(rouletteGameCheck["running"] == False):
             await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
             return
         
