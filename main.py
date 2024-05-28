@@ -8,15 +8,21 @@ import datetime
 
 import pymongo
 
-load_dotenv() # Load vars
+import json
+
+# Load vars
+global_json = json.load(open('global.json'))
+load_dotenv() 
 
 # Init vars
-init_coins = os.getenv("INIT_COINS")
+init_coins = global_json["VARS"]["INIT_COINS"]
 
 # Setup database
-myClient = pymongo.MongoClient(os.getenv("CLIENT"))
-myDB = myClient[os.getenv("DB")]
-usersCol = myDB[os.getenv("USERS_COL")]
+db = global_json["DB"]
+myClient = pymongo.MongoClient(db["CLIENT"])
+myDB = myClient[db["DB"]]
+usersCol = myDB[db["USERS_COL"]]
+rewardsCol = myDB[db["REWARDS_COL"]]
 
 
 bot = discord.Bot(intents = discord.Intents.all())
@@ -37,6 +43,16 @@ def setup_db(bot):
                     }, 
                     {
                         "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime.datetime(2000, 1, 1)}
+                    },
+                    upsert = True
+                )
+
+                rewardsCol.update_one(
+                    {
+                        "member_id": member.id, "guild_id": guild.id
+                    }, 
+                    {
+                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "daily_boost_tier": "TIER_0", "daily_crit_tier": "TIER_0"}
                     },
                     upsert = True
                 )

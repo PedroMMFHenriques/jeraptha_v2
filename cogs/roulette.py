@@ -10,15 +10,19 @@ import pymongo
 import asyncio
 import random
 
+import json
+global_json = json.load(open('global.json'))
+
 # Setup database
-myClient = pymongo.MongoClient(os.getenv("CLIENT"))
-myDB = myClient[os.getenv("DB")]
-usersCol = myDB[os.getenv("USERS_COL")]
+db = global_json["DB"]
+myClient = pymongo.MongoClient(db["CLIENT"])
+myDB = myClient[db["DB"]]
+usersCol = myDB[db["USERS_COL"]]
 rouletteGameCol = myDB["RouletteGame"] #ONLY 1 GAME AT A TIME IN THE GUILD
 rouletteUserCol = myDB["RouletteUser"]
 
-AdminRole = os.getenv("ADMIN_ROLE")
-#WagerRole = os.getenv("WAGER_ROLE")
+#AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
+#WagerRole = global_json["ROLES"]["WAGER_ROLE"]
 
 class Roulette(commands.Cog):
     def __init__(self, bot):
@@ -281,7 +285,7 @@ class Roulette(commands.Cog):
 
         # Check wallet
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
-        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
         if(userCheck["coins"] < amount): 
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)

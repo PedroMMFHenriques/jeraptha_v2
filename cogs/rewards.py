@@ -6,15 +6,17 @@ import pymongo
 
 from datetime import datetime, timedelta, date
 
-init_coins = os.getenv("INIT_COINS")
+import json
+global_json = json.load(open('global.json'))
 
-myClient = pymongo.MongoClient(os.getenv("CLIENT"))
-myDB = myClient[os.getenv("DB")]
-usersCol = myDB[os.getenv("USERS_COL")]
+# Setup database
+db = global_json["DB"]
+myClient = pymongo.MongoClient(db["CLIENT"])
+myDB = myClient[db["DB"]]
+usersCol = myDB[db["USERS_COL"]]
 
 reason = "Jeraptha punishment"
-rename_cost = 1000
-
+punishments = global_json["PUNISHMENTS"]
 
 async def get_all_members(ctx: discord.AutocompleteContext):
         members_list = await ctx.interaction.guild.fetch_members(limit=100).flatten()
@@ -33,16 +35,16 @@ class Rewards(commands.Cog):
         self.bot = bot
 
     # RENAME
-    @discord.command(name="rename", description="Rename an user. Costs " + str(rename_cost) + " coins.")
+    @discord.command(name="rename", description="Rename an user. Costs " + str(punishments["RENAME_COST"]) + " coins.")
     #@discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
     @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
     async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
         if(userCheck is None):
-            await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-        if(userCheck["coins"] < rename_cost): 
+        if(userCheck["coins"] < punishments["RENAME_COST"]): 
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
             return
         
@@ -65,7 +67,7 @@ class Rewards(commands.Cog):
             await ctx.respond("You can't change " + user + "'s nickame!", ephemeral=True)
             return
         
-        remove_coins = 0 - rename_cost
+        remove_coins = 0 - punishments["RENAME_COST"]
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)

@@ -4,10 +4,14 @@ from discord.ext import commands
 
 import pymongo
 
+import json
+global_json = json.load(open('global.json'))
+
 # Setup database
-myClient = pymongo.MongoClient(os.getenv("CLIENT"))
-myDB = myClient[os.getenv("DB")]
-usersCol = myDB[os.getenv("USERS_COL")]
+db = global_json["DB"]
+myClient = pymongo.MongoClient(db["CLIENT"])
+myDB = myClient[db["DB"]]
+usersCol = myDB[db["USERS_COL"]]
 
 AdminRole = os.getenv("ADMIN_ROLE")
 
@@ -89,8 +93,6 @@ class Admin(commands.Cog):
         await ctx.respond("You set " + user + "'s balance to " + str(new_balance) + " coins!", ephemeral=True)
 
     
-
-
 
 def setup(bot):
     bot.add_cog(Admin(bot))

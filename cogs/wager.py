@@ -7,15 +7,20 @@ from datetime import datetime
 
 import pymongo
 
+import json
+global_json = json.load(open('global.json'))
+
 # Setup database
-myClient = pymongo.MongoClient(os.getenv("CLIENT"))
-myDB = myClient[os.getenv("DB")]
-usersCol = myDB[os.getenv("USERS_COL")]
+db = global_json["DB"]
+myClient = pymongo.MongoClient(db["CLIENT"])
+myDB = myClient[db["DB"]]
+usersCol = myDB[db["USERS_COL"]]
+
 wagersCol = myDB["Wagers"]
 wagersSubCol = myDB["WagersSub"]
 
-AdminRole = os.getenv("ADMIN_ROLE")
-WagerRole = os.getenv("WAGER_ROLE")
+AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
+WagerRole = global_json["ROLES"]["WAGER_ROLE"]
 
 class Wager(commands.Cog):
     def __init__(self, bot):
@@ -121,7 +126,7 @@ class Wager(commands.Cog):
 
 
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
-        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
         
 
         if(userCheck["coins"] < bet_amount): 

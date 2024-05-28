@@ -11,11 +11,17 @@ import pymongo
 
 from datetime import datetime, timedelta, date
 
-init_coins = os.getenv("INIT_COINS")
+import json
+global_json = json.load(open('global.json'))
 
-myClient = pymongo.MongoClient(os.getenv("CLIENT"))
-myDB = myClient[os.getenv("DB")]
-usersCol = myDB[os.getenv("USERS_COL")]
+global_vars = global_json["VARS"]
+
+# Setup database
+db = global_json["DB"]
+myClient = pymongo.MongoClient(db["CLIENT"])
+myDB = myClient[db["DB"]]
+usersCol = myDB[db["USERS_COL"]]
+rewardsCol = myDB[db["REWARDS_COL"]]
 
 class Economy(commands.Cog): 
     def __init__(self, bot): 
@@ -25,7 +31,7 @@ class Economy(commands.Cog):
     @discord.slash_command(name="wallet", description="Check your wallet.")
     async def wallet(self, ctx: discord.ApplicationContext):
         myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
-        if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+        if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
         await ctx.respond(f"You have {myWallet} coins.", ephemeral=True)
 
@@ -33,29 +39,31 @@ class Economy(commands.Cog):
     # DAILY
     @discord.slash_command(name="daily", description="Get your free daily reward!")
     async def daily(self, ctx: discord.ApplicationContext):
-        myLastDaily = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_daily": 1})["last_daily"]
-        if(myLastDaily  is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+        checkUser = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_daily": 1})
+        checkRewards = rewardsCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "daily_boost_tier": 1, "daily_crit_tier": 1})
+        if(checkUser is None or checkRewards is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-        median = 500
-        std = 80
+        # Check if already did /daily today
+        if(date.today() >= checkUser["last_daily"].date() + timedelta(days=1)):
+            daily_coins = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
 
-        if(date.today() >= myLastDaily.date() + timedelta(days=1)):
-            daily_coins = np.random.normal(loc=median, scale=std, size = (1))[0]
+            daily_boost_tier = global_json["TIERED_REWARDS"]["DAILY_BOOST"][checkRewards["daily_boost_tier"]]
+            daily_crit_tier = global_json["TIERED_REWARDS"]["DAILY_CRIT"][checkRewards["daily_crit_tier"]]
 
-            extra_msg = ""
-            if(random.SystemRandom().randint(1, 101) == 100): 
+            daily_coins = daily_coins * daily_boost_tier["MULT"]
+            if(random.SystemRandom().randint(1, 101) >= 101 - daily_crit_tier["CHANCE"]): 
                 daily_coins = daily_coins*3
                 extra_msg = "a **CRIT**, winning "
-            elif(random.SystemRandom().randint(1, 101) == 1):
+            elif(random.SystemRandom().randint(1, 101) <= 5 and checkUser["coins"] > 1000):
                 daily_coins = daily_coins/3
                 extra_msg = "a **CRIT FAILURE**, winning only "
-
+            
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
             newValues = {"$set": {"last_daily": datetime.now()},'$inc': {'coins': int(daily_coins)}}
             usersCol.update_one(myQuery, newValues)
 
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
-            if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+            if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
             await ctx.respond(f"<@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} coins, totalling {myWallet}.")
         
@@ -72,7 +80,7 @@ class Economy(commands.Cog):
     async def leaderboard(self, ctx: discord.ApplicationContext):
         myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1}).sort("coins", -1)
         if(myLeaderboard is None):
-            await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
         
         # Get leaderboard
         embedString = ""
@@ -103,10 +111,19 @@ class Economy(commands.Cog):
                 "member_id": member.id, "guild_id": member.guild.id
             }, 
             {
-                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": init_coins, "last_daily": datetime.datetime(2000, 1, 1)}
+                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_vars["INIT_COINS"], "last_daily": datetime.datetime(2000, 1, 1)}
             },
             upsert = True
         )
+        rewardsCol.update_one(
+                    {
+                        "member_id": member.id, "guild_id": member.guild.id
+                    }, 
+                    {
+                        "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "daily_boost_tier": "TIER_0", "daily_crit_tier": "TIER_0"}
+                    },
+                    upsert = True
+                )
         await member.respond("Welcome to the server!")
 
 def setup(bot): # this is called by Pycord to setup the cog

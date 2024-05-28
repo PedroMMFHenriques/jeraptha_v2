@@ -1,0 +1,84 @@
+{
+    "DB":
+    {
+        "CLIENT": "mongodb://localhost:27017/",
+        "DB": "JerapthaV2",
+        "USERS_COL": "Users",
+        "REWARDS_COL": "Rewards"
+    },
+
+    "ROLES":
+    {
+        "ADMIN_ROLE": "JerapthaAdmin",
+        "WAGER_ROLE": "Jerapthino"
+    },
+
+    "VARS":
+    {
+        "INIT_COINS": 5000,
+        "DAILY_MEAN": 500,
+        "DAILY_STD": 80
+    },
+
+    "PUNISHMENTS":
+    {
+        "RENAME_COST": 1000
+    },
+
+    "TIERED_REWARDS":
+    {
+        "DAILY_BOOST":
+        {
+            "TIER_0":
+            {
+                "COST": 0,
+                "MULT": 1
+            },
+
+            "TIER_1":
+            {
+                "COST": 1000,
+                "MULT": 1.2
+            },
+
+            "TIER_2":
+            {
+                "COST": 2000,
+                "MULT": 1.4
+            },
+
+            "TIER_3":
+            {
+                "COST": 3000,
+                "MULT": 1.6
+            }
+        },
+
+        "DAILY_CRIT":
+        {
+            "TIER_0":
+            {
+                "COST": 0,
+                "CHANCE": 5 
+            },
+
+            "TIER_1":
+            {
+                "COST": 1000,
+                "CHANCE": 10 
+            },
+
+            "TIER_2":
+            {
+                "COST": 2000,
+                "CHANCE": 20
+            },
+
+            "TIER_3":
+            {
+                "COST": 3000,
+                "CHANCE": 30
+            }
+        }
+    }
+}
