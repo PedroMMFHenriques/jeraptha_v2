@@ -14,13 +14,16 @@ import pymongo
 
 load_dotenv() # Load vars
 
-# Init vars
-init_coins = os.getenv("INIT_COINS")
+import json
+
+# Load vars
+global_json = json.load(open('global.json'))
 
 # Setup database
-myClient = pymongo.MongoClient(os.getenv("CLIENT"))
-myDB = myClient[os.getenv("DB")]
-usersCol = myDB[os.getenv("USERS_COL")]
+db = global_json["DB"]
+myClient = pymongo.MongoClient(db["CLIENT"])
+myDB = myClient[db["DB"]]
+usersCol = myDB[db["USERS_COL"]]
 wagersCol = myDB["Wagers"]
 wagersSubCol = myDB["WagersSub"]
 

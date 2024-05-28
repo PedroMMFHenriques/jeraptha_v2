@@ -85,7 +85,7 @@ class Roulette(commands.Cog):
         newValues = {'$set': {"running": True, "rolling": True}}
         rouletteGameCol.update_one(myQuery, newValues)
         
-        winning_number = random.SystemRandom().randint(0, 37)
+        winning_number = random.SystemRandom().randint(0, 36)
 
         with open("images/roulette/roulette_" + str(winning_number) + ".gif", 'rb') as f:
                 picture = discord.File(f)
