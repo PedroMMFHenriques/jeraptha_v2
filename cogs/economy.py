@@ -112,7 +112,7 @@ class Economy(commands.Cog):
                 "member_id": member.id, "guild_id": member.guild.id
             }, 
             {
-                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_vars["INIT_COINS"], "last_daily": datetime.datetime(2000, 1, 1)}
+                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_vars["INIT_COINS"], "last_daily": datetime(2000, 1, 1)}
             },
             upsert = True
         )

@@ -4,7 +4,7 @@ import os
 import discord
 from dotenv import load_dotenv
 
-import datetime
+from datetime import datetime
 
 import pymongo
 
@@ -42,7 +42,7 @@ def setup_db(bot):
                         "member_id": member.id, "guild_id": guild.id
                     }, 
                     {
-                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime.datetime(2000, 1, 1)}
+                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime(2000, 1, 1)}
                     },
                     upsert = True
                 )
