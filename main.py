@@ -1,6 +1,5 @@
 # source bot_env/bin/activate
 
-# await asyncio.sleep(10)
 import os
 import discord
 from dotenv import load_dotenv

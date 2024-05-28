@@ -3,9 +3,12 @@ import discord
 from discord.ext import commands
 
 import time, math
-from datetime import datetime, timedelta, date
+from datetime import datetime
 
 import pymongo
+
+import asyncio
+import random
 
 # Setup database
 myClient = pymongo.MongoClient(os.getenv("CLIENT"))
@@ -17,20 +20,28 @@ rouletteUserCol = myDB["RouletteUser"]
 AdminRole = os.getenv("ADMIN_ROLE")
 #WagerRole = os.getenv("WAGER_ROLE")
 
-#rouletteGameCol = 
-
 class Roulette(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    #roulette = discord.SlashCommandGroup("roulette", "Roulette related commands.")
+    roulette = discord.SlashCommandGroup("roulette", "Roulette related commands.")
+
+    @staticmethod
+    def find_index(lst, key, value):
+        for i, dic in enumerate(lst):
+            if dic[key] == value:
+                return i
+        return -1
     
     # roulette start
-    """@roulette.command(name="start", description="Start a game of roulette.")
-    @discord.option("betting_time", description="Duration of the betting time in seconds.", required=False, default=0)
+    @roulette.command(name="start", description="Start a game of roulette.")
+    @discord.option("betting_time", description="Duration of the betting time in seconds (max 120).", required=False, default=30)
     async def start(self, ctx: discord.ApplicationContext, betting_time: int):
         rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1})
-        if(rouletteGameCheck["running"]):
+        if(rouletteGameCheck is None):
+            rouletteGameCol.insert_one({"guild_id": ctx.guild.id, "author_id": ctx.author.id, "running": True, "rolling": False})
+
+        elif(rouletteGameCheck["running"]):
             await ctx.respond("A roulette game is already running!", ephemeral=True)
             return
         
@@ -38,16 +49,18 @@ class Roulette(commands.Cog):
             await ctx.respond("I can't travel back in time!", ephemeral=True)
             return
 
+        if(betting_time > 120):
+            await ctx.respond("Max betting time is 120 seconds!", ephemeral=True)
+            return
+
         end_betting_time = betting_time + math.floor(time.time())
 
-        if(rouletteGameCheck is None):
-            rouletteGameCol.insert_one({"guild_id": ctx.guild.id, "author_id": ctx.author.id, "running": True, "rolling": False, "end_betting": end_betting_time})
-        else:
-            myQuery= {"guild_id": ctx.guild.id}
-            newValues = {'$set': {"author_id": ctx.author.id, "running": True, "rolling": False, "end_betting": end_betting_time}}
-            rouletteGameCol.update_one(myQuery, newValues)
 
-        embed = discord.Embed(title="Roulette Started !",
+        myQuery= {"guild_id": ctx.guild.id}
+        newValues = {'$set': {"author_id": ctx.author.id, "running": True, "rolling": False, "end_betting": end_betting_time}}
+        rouletteGameCol.update_one(myQuery, newValues)
+
+        embed = discord.Embed(title="Roulette Started!",
                       description="<@" + str(ctx.author.id) + "> just started a roulette!\nBetting will end <t:" + str(end_betting_time) + ":R>!\nDo '/roulette bet' to join.",
                       colour=0x009900,
                       timestamp=datetime.now())
@@ -58,115 +71,64 @@ class Roulette(commands.Cog):
         embed.set_footer(text="Roulette",
                          icon_url="https://www.pamp.com/sites/pamp/files/2023-02/roulette_rev.png")
 
-        await ctx.respond(embed=embed, file=file, allowed_mentions=discord.AllowedMentions())"""
+        await ctx.respond(embed=embed, file=file, allowed_mentions=discord.AllowedMentions())
 
+        # Waiting for bets
+        await asyncio.sleep(betting_time)
 
-    #color, parity, duzia, half, numeros    #CHECK SE NÃO FEZ BET EM NENHUM NÚMERO
-    # roulette bet
-    """@roulette.command(name="bet", description="Bet in the roulette game.")
-    @discord.option("bet_amount", description="Bet amount.", required=True)
-    @discord.option("bet_option", description="Choose what option to bet on.", required=False, choices=['option_a', 'option_b', 'option_c', 'option_d'])
-    async def bet(self, ctx: discord.ApplicationContext, bet_amount: int):
-        rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1, "rolling": 1})
-        if(rouletteGameCheck["running"] == False):
-            await ctx.respond("Start a roulette game first with . '/roulette start'.", ephemeral=True)
-            return
+        # Close bets
+        myQuery= {"guild_id": ctx.guild.id}
+        newValues = {'$set': {"running": True, "rolling": True}}
+        rouletteGameCol.update_one(myQuery, newValues)
         
-        if(rouletteGameCheck["rolling"] == True):
-            await ctx.respond("Too late! You have to wait for the previous game to end.", ephemeral=True)
-            return
+        winning_number = random.SystemRandom().randint(0, 37)
+
+        with open("images/roulette/roulette_" + str(winning_number) + ".gif", 'rb') as f:
+                picture = discord.File(f)
+                await ctx.send(file=picture)
         
-        if(bet_amount <= 0):
-            await ctx.respond("<@" + str(ctx.author.id) + "> tried to cheat, what a clown! 🤡")
-            try:
-                await ctx.author.edit(nick=ctx.author.display_name + " 🤡", reason="Tried to cheat Jeraptha")
-            except:
-                pass
-            return
+        # Suspense
+        await asyncio.sleep(10)
 
+        # Award winners (if any)
+        bets_check = rouletteUserCol.find({"guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet": 1, "bet_numbers": 1})
 
-        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+        bettors_list = []
+        bets_list = []
+        for bet in bets_check:
+            bettors_list.append(bet["member_id"])
+            bets_list.append(bet)
+        bettors_list = list(dict.fromkeys(bettors_list)) # Get non-duplicate bettors
 
-        if(userCheck["coins"] < bet_amount): 
-            await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
-            return
-        
-        #remove from wallet
-        remove_coins = 0 - bet_amount
-        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-        newValues = {'$inc': {'coins': int(remove_coins)}}
-        usersCol.update_one(myQuery, newValues)
-        
-        #bet_numbers convert to str of numbers separated by /
-        rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "total_bet": int(bet_amount), "bet_numbers": bet_numbers_str})
-        await ctx.respond("<@" + str(ctx.author.id) + "> bet on the roulette with **" + str(bet_amount) + "** coins!")"""
-
-    #color, parity, duzia, half, numeros    
-    #!!!!!!!!!!! FAZER DROP DE rouletteUserCol EM CANCEL E QND ACABA O JOGO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
-    #wager settle
-    """@wager.command(name="settle", description="Settle a wager.")
-    @discord.option("wager_id", description="ID of the wager.", required=True)
-    @discord.option("winning_option", description="What option won the bet.", required=True, choices=['option_a', 'option_b', 'option_c', 'option_d'])
-    async def settle(self, ctx: discord.ApplicationContext, wager_id: int, winning_option: str):
-
-        # Checks
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
-        
-        if(wagerCheck is None): 
-            await ctx.respond("That wager doesn't exist!", ephemeral=True)
-            return
-        
-        elif(wagerCheck["canceled"] == True): 
-            await ctx.respond("That wager has been canceled!", ephemeral=True)
-            return
-
-        elif(wagerCheck["settled"] == True): 
-            await ctx.respond("That wager was already settled!", ephemeral=True)
-            return
-
-        role = discord.utils.get(ctx.author.roles, name=AdminRole)
-        if(role is None and wagerCheck["author_id"] != ctx.author.id):
-            await ctx.respond("You didn't start this bet, so you can't settle!", ephemeral=True)
-            return
-
-        if((wagerCheck["option_c"] == "" and winning_option == "option_c") or (wagerCheck["option_d"] == "" and winning_option == "option_d")):
-            await ctx.respond("That option isn't available!", ephemeral=True)
-            return
-
-
-        # Settle
-        myQuery= {"_id": wager_id}
-        newValues = {'$set': {"settled": True, "winning_option": winning_option}}
-        wagersCol.update_one(myQuery, newValues)
-        
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
-
-        option_wager = {"option_a": 0, "option_b": 0, "option_c": 0, "option_d": 0}
         winners_list = []
-        for bettor in wagersSub_bettors:
-            option_wager[bettor["bet_option"]] += bettor["total_bet"]
-            if(bettor["bet_option"] == winning_option): winners_list.append({"id": bettor["member_id"], "bet": bettor["total_bet"]})
-        
-        winning_bet = option_wager[winning_option]
-        total_bet = option_wager["option_a"] + option_wager["option_b"] + option_wager["option_c"] + option_wager["option_d"] 
+        for bettor in bettors_list:
+            winners_list.append({"id": bettor, "winnings": 0})
+
+        for bet in bets_list:
+            number_list = bet["bet_numbers"].split(",")
+
+            for number in number_list:
+                if(int(number) == winning_number):
+                    idx = self.find_index(winners_list, "id", bet["member_id"])
+                    winners_list[idx]["winnings"] += bet["bet"] * 36 / len(number_list)
+                    break
+
         winnings_embed = ""
         for winner in winners_list:
-            winnings = 0.99 * winner["bet"] * total_bet / winning_bet
+            if(winner["winnings"] > 0):
+                myQuery= {"member_id": int(winner["id"]), "guild_id": ctx.guild.id}
+                newValues = {'$inc': {'coins': math.floor(winner["winnings"])}}
+                usersCol.update_one(myQuery, newValues)
 
-            myQuery= {"member_id": int(winner["id"]), "guild_id": ctx.guild.id}
-            newValues = {'$inc': {'coins': math.floor(winnings)}}
-            usersCol.update_one(myQuery, newValues)
-
-            winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winnings)) + "** coins!\n"
-
+                winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winner["winnings"])) + "** coins!\n"
+            
         if(winnings_embed == ""): winning_msg = "Nobody won, suckers!"
         else: winning_msg = "Here are the winners, congrats!"
 
+
         # Embed
-        wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
-        embed = discord.Embed(title="Bet Settled: " + wagerCheck["title"],
-                      description="<@&" + str(wagerRoleId) + ">\nWinning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "** coins!",
+        embed = discord.Embed(title="Roulette Ended!",
+                      description="Winning number: **" + str(winning_number) + "**\n",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -174,112 +136,165 @@ class Roulette(commands.Cog):
                         value=winnings_embed,
                         inline=False)
 
-        embed.set_footer(text="Wager ID: " + str(wager_id),
-                        icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
+        embed.set_footer(text="Roulette",
+                         icon_url="https://www.pamp.com/sites/pamp/files/2023-02/roulette_rev.png")
 
-        await ctx.respond(content="<@&" + str(wagerRoleId) + ">\n", embed=embed, allowed_mentions=discord.AllowedMentions())"""
+        await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions())
+
+
+        # Reset vars
+        myQuery= {"guild_id": ctx.guild.id}
+        newValues = {'$set': {"running": False, "rolling": False}}
+        rouletteGameCol.update_one(myQuery, newValues)
+
+        rouletteUserCol.drop()
 
 
 
-    # wager info
-    """@wager.command(name="info", description="Get info on the wager.")
-    @discord.option("wager_id", description="ID of the wager.", required=True)
-    async def start(self, ctx: discord.ApplicationContext, wager_id: int):
-
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1, "end_wager": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+    # Helper functions for /roulette bet
+    async def betOptionAutocomplete(ctx: discord.AutocompleteContext):
+        option = ctx.options["option"]
+        if option == "Color":
+            return ["Red", "Black"]
         
-        if(wagerCheck is None): 
-            await ctx.respond("That wager doesn't exist!", ephemeral=True)
+        elif option ==  "Parity":
+            return ["Odd", "Even"]
+        
+        elif option ==  "Half":
+            return ["1st Half", "2nd Half"]
+        
+        elif option ==  "Dozen":
+            return ["1st Dozen", "2nd Dozen", "3rd Dozen"]
+        
+        elif option ==  "Line":
+            return ["1st Line", "2nd Line", "3rd Line"]
+        
+        elif option ==  "Numbers":
+            return ["Choose: 'list_numbers'"]
+
+        else:
+            return ["OOPS"]
+            
+
+    @staticmethod
+    def getNumberString(self, sub_option):
+        if sub_option == "Red":
+            return "1,3,5,7,9,12,14,16,18,21,23,25,17,28,30,32,34,36"
+        
+        elif sub_option == "Black":
+            return "2,4,6,8,10,11,13,15,17,19,20,22,24,26,29,31,33,35"
+        
+        elif sub_option == "Odd":
+            return "1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35"
+        
+        elif sub_option == "Even":
+            return "2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36"
+        
+        elif sub_option == "1st Half":
+            return "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18"
+        
+        elif sub_option == "2nd Half":
+            return "19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"
+        
+        elif sub_option == "1st Dozen":
+            return "1,2,3,4,5,6,7,8,9,10,11,12"
+        
+        elif sub_option == "2nd Dozen":
+            return "13,14,15,16,17,18,19,20,21,22,23,24"
+        
+        elif sub_option == "3rd Dozen":
+            return "25,26,27,28,29,30,31,32,33,34,35,36"
+        
+        elif sub_option == "1st Line":
+            return "1,4,7,10,13,16,19,22,25,28,31,34"
+        
+        elif sub_option == "2nd Line":
+            return "2,5,8,11,14,17,20,23,26,29,32,35"
+        
+        elif sub_option == "3rd Line":
+            return "3,6,9,12,15,18,21,24,27,30,33,36"
+        
+        else:
+            return ["OOPS"]
+    
+    @staticmethod
+    def checkNumbers(self, list_numbers):
+        number_list = list_numbers.split(",")
+
+        if(len(number_list) != len(set(number_list))):
+            return False
+
+        for number in number_list:
+            try:
+                if(int(number) < 0 or int(number) > 36): return False
+            except:
+                return False
+        return True
+
+    # roulette bet
+    @roulette.command(name="bet", description="Bet in the roulette game.")
+    @discord.option("amount", description="Bet amount.", required=True)
+    @discord.option("option", description="Choose what option to bet on.", required=True, choices=['Color', 'Parity', 'Half', 'Dozen', 'Line', 'Numbers'])
+    @discord.option("sub_option", description="Specify the option.", required=True, autocomplete=discord.utils.basic_autocomplete(betOptionAutocomplete))
+    @discord.option("list_numbers", description="[sub_option Numbers] List numbers 0-36 separated by ','", required=False)
+    async def bet(self, ctx: discord.ApplicationContext, amount: int, option: str, sub_option: str, list_numbers: str):
+        rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1, "rolling": 1})
+        if(rouletteGameCheck["running"] == False or rouletteGameCheck is None):
+            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
             return
         
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
-
-        option_wager = {"option_a": 0, "option_b": 0, "option_c": 0, "option_d": 0}
-        option_a_embed = ""
-        option_b_embed = ""
-        option_c_embed = ""
-        option_d_embed = ""
-        for bettor in wagersSub_bettors:
-            option_wager[bettor["bet_option"]] += bettor["total_bet"]
-            string_embed = "<@" + str(bettor["member_id"]) + "> bet " +  str(bettor["total_bet"]) + " coins."
-            if(bettor["bet_option"] == "option_a"): option_a_embed += string_embed
-            elif(bettor["bet_option"] == "option_b"): option_b_embed += string_embed
-            elif(bettor["bet_option"] == "option_c"): option_c_embed += string_embed
-            elif(bettor["bet_option"] == "option_d"): option_d_embed += string_embed
+        if(rouletteGameCheck["rolling"] == True):
+            await ctx.respond("Too late! You have to wait for the previous game to end.", ephemeral=True)
+            return
         
-        total_bet = option_wager["option_a"] + option_wager["option_b"] + option_wager["option_c"] + option_wager["option_d"]
+        if(amount <= 0):
+            await ctx.respond("<@" + str(ctx.author.id) + "> tried to cheat, what a clown! 🤡")
+            try:
+                await ctx.author.edit(nick=ctx.author.display_name + " 🤡", reason="Tried to cheat Jeraptha")
+            except:
+                pass
+            return
 
-        if(option_wager["option_a"] == 0): option_a_odds = "N/A"
-        else: option_a_odds = round(0.99 * total_bet / option_wager["option_a"], 2)
+        # Check number list
+        if(sub_option != "Choose: 'list_numbers'" and list_numbers is not None):
+            await ctx.respond("You can only input this option if you choose the sub_option 'Numbers'.", ephemeral=True)
+            return
+        elif(sub_option == "Choose: 'list_numbers'" and list_numbers is None):
+            await ctx.respond("If you choose the sub_option 'Numbers' you must list them in option 'list_numbers'.", ephemeral=True)
+            return
 
-        if(option_wager["option_b"] == 0): option_b_odds = "N/A"
-        else: option_b_odds = round(0.99 * total_bet / option_wager["option_b"], 2)
+        if(sub_option != "Choose: 'list_numbers'"):
+            numbers_str = self.getNumberString(self, sub_option=sub_option)
+            print_msg = sub_option
 
-        if(option_wager["option_c"] == 0): option_c_odds = "N/A"
-        else: option_c_odds = round(0.99 * total_bet / option_wager["option_c"], 2)
-
-        if(option_wager["option_d"] == 0): option_d_odds = "N/A"
-        else: option_d_odds = round(0.99 * total_bet / option_wager["option_d"], 2)
-
-        description_embed = ""
-        if(wagerCheck["canceled"]): description_embed = "**CANCELED**\n"
-        elif(wagerCheck["settled"]): description_embed = "**SETTLED**\nWinning option: **" + wagerCheck["winning_option"] + "**\n"
-        elif(wagerCheck["end_wager"] < math.floor(time.time())): description_embed = "Betting ended <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
-        else: description_embed = "Betting will end <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
+        elif(not self.checkNumbers(self, list_numbers=list_numbers)):
+            await ctx.respond("Invalid number list! Separate by ','. Example: 0,1,5,10,36", ephemeral=True)
+            return
         
-        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + " coins, " + str(option_a_odds) + " odds\n"
-        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + " coins, " + str(option_b_odds) + " odds\n"
-        if(wagerCheck["option_c"] != ""):
-            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + " coins, " + str(option_c_odds) + " odds\n"
-        if(wagerCheck["option_d"] != ""):
-            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + " coins, " + str(option_d_odds) + " odds\n"
+        else: 
+            numbers_str = list_numbers
+            print_msg = list_numbers
 
-        embed = discord.Embed(title="Bet Info: " + wagerCheck["title"],
-                      description=description_embed,
-                      colour=0x009900,
-                      timestamp=datetime.now())
+        # Check wallet
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
 
-        if(option_wager["option_a"] == 0): option_a_embed_name = "Nobody bet on **" + wagerCheck["option_a"] + "**!"
-        else: option_a_embed_name = "Bettors on **" + wagerCheck["option_a"] + "**:"
-
-        if(option_wager["option_b"] == 0): option_b_embed_name = "Nobody bet on **" + wagerCheck["option_b"] + "**!"
-        else: option_b_embed_name = "Bettors on **" + wagerCheck["option_b"] + "**:"
-
-        if(wagerCheck["option_c"] != ""):
-            if(option_wager["option_c"] == 0): option_c_embed_name = "Nobody bet on **" + wagerCheck["option_c"] + "**!"
-            else: option_c_embed_name = "Bettors on **" + wagerCheck["option_c"] + "**:"
+        if(userCheck["coins"] < amount): 
+            await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
+            return
         
-        if(wagerCheck["option_d"] != ""):
-            if(option_wager["option_d"] == 0): option_d_embed_name = "Nobody bet on **" + wagerCheck["option_d"] + "**!"
-            else: option_d_embed_name = "Bettors on **" + wagerCheck["option_d"] + "**:"
-
-        embed.add_field(name=option_a_embed_name,
-                        value=option_a_embed,
-                        inline=False)
+        # Remove from wallet
+        remove_coins = 0 - amount
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$inc': {'coins': int(remove_coins)}}
+        usersCol.update_one(myQuery, newValues)
         
-        embed.add_field(name=option_b_embed_name,
-                        value=option_b_embed,
-                        inline=False)
-        
-        if(wagerCheck["option_c"] != ""):
-            embed.add_field(name=option_c_embed_name,
-                            value=option_c_embed,
-                            inline=False)
+        rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})
 
-        
-        if(wagerCheck["option_d"] != ""):
-            embed.add_field(name=option_d_embed_name,
-                            value=option_d_embed,
-                            inline=False)
-
-        embed.set_footer(text="Wager ID: " + str(wager_id),
-                         icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
-
-        await ctx.respond(embed=embed)"""
+        await ctx.respond("<@" + str(ctx.author.id) + "> bet on **" + print_msg + "** on the roulette with **" + str(amount) + "** coins!")
 
 
-
-    #wager cancel
+    #roulette cancel ?????????????????????????????????????????????????????
     """@wager.command(name="cancel", description="Cancel a wager.")
     @discord.option("wager_id", description="ID of the wager.", required=True)
     async def cancel(self, ctx: discord.ApplicationContext, wager_id: int):

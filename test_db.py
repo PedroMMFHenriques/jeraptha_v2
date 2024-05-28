@@ -31,6 +31,11 @@ wagersSubCol = myDB["WagersSub"]
 wagersCol.drop()
 wagersSubCol.drop()"""
 
+rouletteGameCol = myDB["RouletteGame"] #ONLY 1 GAME AT A TIME IN THE GUILD
+rouletteUserCol = myDB["RouletteUser"]
+rouletteGameCol.drop()
+rouletteUserCol.drop()
+
 #insert
 """mydict = { "name": "John", "address": "Highway 37" }
 mycol.insert_one(mydict)"""

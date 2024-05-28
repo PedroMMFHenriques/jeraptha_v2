@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 import time, math
-from datetime import datetime, timedelta, date
+from datetime import datetime
 
 import pymongo
 
@@ -121,8 +121,7 @@ class Wager(commands.Cog):
 
 
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
-        if(userCheck is None):
-            await ctx.respond(f"OOPS! This user isn't in the database!", ephemeral=True)
+        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database!", ephemeral=True)
         
 
         if(userCheck["coins"] < bet_amount): 
