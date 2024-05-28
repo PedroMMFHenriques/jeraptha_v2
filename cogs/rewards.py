@@ -18,17 +18,6 @@ usersCol = myDB[db["USERS_COL"]]
 reason = "Jeraptha punishment"
 punishments = global_json["PUNISHMENTS"]
 
-async def get_all_members(ctx: discord.AutocompleteContext):
-        members_list = await ctx.interaction.guild.fetch_members(limit=100).flatten()
-
-        all_members_list = []
-        for member in members_list:
-            if not member.bot:
-                all_members_list.append(member.name)
-
-        return sorted([i for i in all_members_list if i.startswith(ctx.value.lower())])
-
-
 
 class Rewards(commands.Cog): 
     def __init__(self, bot): 
@@ -36,7 +25,6 @@ class Rewards(commands.Cog):
 
     # RENAME
     @discord.command(name="rename", description="Rename an user. Costs " + str(punishments["RENAME_COST"]) + " coins.")
-    #@discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
     @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
     async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):

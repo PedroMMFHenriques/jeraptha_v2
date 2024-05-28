@@ -16,17 +16,6 @@ usersCol = myDB[db["USERS_COL"]]
 AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
 
 
-async def get_all_members(ctx: discord.AutocompleteContext):
-        members_list = await ctx.interaction.guild.fetch_members(limit=100).flatten()
-
-        all_members_list = []
-        for member in members_list:
-            if not member.bot:
-                all_members_list.append(member.name)
-
-        return sorted([i for i in all_members_list if i.startswith(ctx.value.lower())])
-
-
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -66,7 +55,6 @@ class Admin(commands.Cog):
     
     # SET WALLET
     @discord.command(name="set_wallet", description="[ADMIN] Set a user's wallet.")
-    #@discord.option("user", description="Choose what user to target.", required=True, autocomplete=get_all_members)
     @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_balance", description="Choose their new balance.", required=True)
     async def set_wallet(self, ctx: discord.ApplicationContext, user: str, new_balance: int):

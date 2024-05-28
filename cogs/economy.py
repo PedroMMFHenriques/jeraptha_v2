@@ -51,6 +51,7 @@ class Economy(commands.Cog):
             daily_crit_tier = global_json["TIERED_REWARDS"]["DAILY_CRIT"][checkRewards["daily_crit_tier"]]
 
             daily_coins = daily_coins * daily_boost_tier["MULT"]
+            extra_msg = ""
             if(random.SystemRandom().randint(1, 101) >= 101 - daily_crit_tier["CHANCE"]): 
                 daily_coins = daily_coins*3
                 extra_msg = "a **CRIT**, winning "
@@ -65,7 +66,7 @@ class Economy(commands.Cog):
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
             if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-            await ctx.respond(f"<@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} coins, totalling {myWallet}.")
+            await ctx.respond(f"[Daily] <@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} coins, totalling {myWallet}.")
         
         else:
             timeLeft = (datetime.combine(date.today() + timedelta(days=1), datetime.min.time()) - datetime.now())

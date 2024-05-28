@@ -153,7 +153,7 @@ class Wager(commands.Cog):
         else:
             # wagersub: id sub wager, id da wager, o id membro, em qual apostou e quanto 
             wagersSubCol.insert_one({"wager_id": wager_id, "member_id": ctx.author.id, "bet_option": bet_option, "total_bet": int(bet_amount)})
-            await ctx.respond("<@" + str(ctx.author.id) + "> bet on **" + wagerCheck["title"] + "** in option **" + wagerCheck[bet_option] + "** with **" + str(bet_amount) + "** coins!")
+            await ctx.respond("[Wager] <@" + str(ctx.author.id) + "> bet on **" + wagerCheck["title"] + "** in option **" + wagerCheck[bet_option] + "** with **" + str(bet_amount) + "** coins!")
     
     
     #wager settle

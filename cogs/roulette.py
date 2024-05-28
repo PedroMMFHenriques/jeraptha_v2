@@ -129,10 +129,14 @@ class Roulette(commands.Cog):
         if(winnings_embed == ""): winning_msg = "Nobody won, suckers!"
         else: winning_msg = "Here are the winners, congrats!"
 
+        if(winning_number == 0): winning_color = " (Green)"
+        elif(winning_number in [1,3,5,7,9,12,14,15,16,18,19,21,23,25,27,30,34,36]): winning_color = " (Black)"
+        else: winning_color = " (Red)"
+
 
         # Embed
         embed = discord.Embed(title="Roulette Ended!",
-                      description="Winning number: **" + str(winning_number) + "**\n",
+                      description="Winning number: **" + str(winning_number) + winning_color + "**\n",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -218,8 +222,11 @@ class Roulette(commands.Cog):
         elif sub_option == "3rd Line":
             return "3,6,9,12,15,18,21,24,27,30,33,36"
         
+        elif sub_option == "Choose: 'list_numbers'":
+            return "JOE"
+        
         else:
-            return ["OOPS"]
+            return "MISTAKE"
     
     @staticmethod
     def checkNumbers(self, list_numbers):
@@ -270,6 +277,10 @@ class Roulette(commands.Cog):
         elif(sub_option == "Choose: 'list_numbers'" and list_numbers is None):
             await ctx.respond("If you choose the sub_option 'Numbers' you must list them in option 'list_numbers'.", ephemeral=True)
             return
+        elif(self.getNumberString(self, sub_option=sub_option) == "MISTAKE"):
+            await ctx.respond("Invalid sub option!", ephemeral=True)
+            return
+
 
         if(sub_option != "Choose: 'list_numbers'"):
             numbers_str = self.getNumberString(self, sub_option=sub_option)
@@ -299,7 +310,7 @@ class Roulette(commands.Cog):
         
         rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})
 
-        await ctx.respond("<@" + str(ctx.author.id) + "> bet on **" + print_msg + "** on the roulette with **" + str(amount) + "** coins!")
+        await ctx.respond("[Roulette] <@" + str(ctx.author.id) + "> bet on **" + print_msg + "** with **" + str(amount) + "** coins!")
 
 
     #roulette cancel ?????????????????????????????????????????????????????
