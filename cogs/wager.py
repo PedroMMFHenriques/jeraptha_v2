@@ -28,7 +28,7 @@ class Wager(commands.Cog):
     
     wager = discord.SlashCommandGroup("wager", "Wager related commands.")
     
-    # wager start
+    # WAGER START
     @wager.command(name="start", description="Start wager. Default duration is 10 minutes.")
     @discord.option("title", description="Title of the wager.", required=True)
     @discord.option("option_a", description="Description of the first option.", required=True)
@@ -82,7 +82,7 @@ class Wager(commands.Cog):
 
 
 
-    # wager bet
+    # WAGER BET
     @wager.command(name="bet", description="Bet in a wager.")
     @discord.option("wager_id", description="ID of the wager.", required=True)
     @discord.option("bet_option", description="Choose what option to bet on.", required=True, choices=['option_a', 'option_b', 'option_c', 'option_d'])
@@ -126,7 +126,9 @@ class Wager(commands.Cog):
 
 
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
-        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+        if(userCheck is None): 
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            return
         
 
         if(userCheck["coins"] < bet_amount): 
@@ -156,7 +158,7 @@ class Wager(commands.Cog):
             await ctx.respond("[Wager] <@" + str(ctx.author.id) + "> bet on **" + wagerCheck["title"] + "** in option **" + wagerCheck[bet_option] + "** with **" + str(bet_amount) + "** coins!")
     
     
-    #wager settle
+    #WAGER SETTLE
     @wager.command(name="settle", description="Settle a wager.")
     @discord.option("wager_id", description="ID of the wager.", required=True)
     @discord.option("winning_option", description="What option won the bet.", required=True, choices=['option_a', 'option_b', 'option_c', 'option_d'])
@@ -233,7 +235,7 @@ class Wager(commands.Cog):
 
 
 
-    # wager info
+    # WAGER INFO
     @wager.command(name="info", description="Get info on the wager.")
     @discord.option("wager_id", description="ID of the wager.", required=True)
     async def start(self, ctx: discord.ApplicationContext, wager_id: int):
@@ -331,7 +333,7 @@ class Wager(commands.Cog):
 
 
 
-    #wager cancel
+    #WAGER CANCEL
     @wager.command(name="cancel", description="Cancel a wager.")
     @discord.option("wager_id", description="ID of the wager.", required=True)
     async def cancel(self, ctx: discord.ApplicationContext, wager_id: int):

@@ -37,7 +37,7 @@ class Roulette(commands.Cog):
                 return i
         return -1
     
-    # roulette start
+    # ROULETTE START
     @roulette.command(name="start", description="Start a game of roulette.")
     @discord.option("betting_time", description="Duration of the betting time in seconds (max 120).", required=False, default=30)
     async def start(self, ctx: discord.ApplicationContext, betting_time: int):
@@ -242,7 +242,7 @@ class Roulette(commands.Cog):
                 return False
         return True
 
-    # roulette bet
+    # ROULETTE BET
     @roulette.command(name="bet", description="Bet in the roulette game.")
     @discord.option("amount", description="Bet amount.", required=True)
     @discord.option("option", description="Choose what option to bet on.", required=True, choices=['Color', 'Parity', 'Half', 'Dozen', 'Line', 'Numbers'])
@@ -296,7 +296,9 @@ class Roulette(commands.Cog):
 
         # Check wallet
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
-        if(userCheck is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+        if(userCheck is None): 
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            return
 
         if(userCheck["coins"] < amount): 
             await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)

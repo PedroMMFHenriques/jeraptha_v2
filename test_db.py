@@ -39,6 +39,9 @@ rouletteUserCol = myDB["RouletteUser"]
 rouletteGameCol.drop()
 rouletteUserCol.drop()"""
 
+"""rewardsCol = myDB[db["REWARDS_COL"]]
+rewardsCol.drop()"""
+
 #insert
 """mydict = { "name": "John", "address": "Highway 37" }
 mycol.insert_one(mydict)"""
