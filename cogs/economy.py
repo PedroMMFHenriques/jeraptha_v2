@@ -104,7 +104,7 @@ class Economy(commands.Cog):
                         value=embedString,
                         inline=False)
 
-        await ctx.respond(embed=embed, ephemeral=True)
+        await ctx.respond(embed=embed)
 
 
     # INIT NEW USER
