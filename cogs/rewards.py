@@ -141,7 +141,7 @@ class Rewards(commands.Cog):
 
 
     # RENAME
-    @discord.command(name="rename", description="Rename an user. Costs " + str(punishments["RENAME_COST"]) + " <:beets:1245404199852834897>.")
+    @discord.command(name="rename", description="Rename an user. Costs " + str(punishments["RENAME_COST"]) + " beets.")
     @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
     async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):

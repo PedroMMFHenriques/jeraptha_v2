@@ -216,7 +216,7 @@ class Wager(commands.Cog):
             newValues = {'$inc': {'coins': math.floor(winnings)}}
             usersCol.update_one(myQuery, newValues)
 
-            winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winnings)) + "** <:beets:1245404199852834897>!\n"
+            winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winnings)) + "**<:beets:1245404199852834897>!\n"
 
         if(winnings_embed == ""): winning_msg = "Nobody won, suckers!"
         else: winning_msg = "Here are the winners, congrats!"
@@ -224,7 +224,7 @@ class Wager(commands.Cog):
         # Embed
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Settled: " + wagerCheck["title"],
-                      description="<@&" + str(wagerRoleId) + ">\nWinning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "** <:beets:1245404199852834897>!",
+                      description="<@&" + str(wagerRoleId) + ">\nWinning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "**<:beets:1245404199852834897>!",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -259,7 +259,7 @@ class Wager(commands.Cog):
         option_d_embed = ""
         for bettor in wagersSub_bettors:
             option_wager[bettor["bet_option"]] += bettor["total_bet"]
-            string_embed = "<@" + str(bettor["member_id"]) + "> bet " +  str(bettor["total_bet"]) + " <:beets:1245404199852834897>."
+            string_embed = "<@" + str(bettor["member_id"]) + "> bet " +  str(bettor["total_bet"]) + "<:beets:1245404199852834897>."
             if(bettor["bet_option"] == "option_a"): option_a_embed += string_embed
             elif(bettor["bet_option"] == "option_b"): option_b_embed += string_embed
             elif(bettor["bet_option"] == "option_c"): option_c_embed += string_embed
@@ -285,12 +285,12 @@ class Wager(commands.Cog):
         elif(wagerCheck["end_wager"] < math.floor(time.time())): description_embed = "Betting ended <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         else: description_embed = "Betting will end <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         
-        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + " <:beets:1245404199852834897>, " + str(option_a_odds) + " odds\n"
-        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + " <:beets:1245404199852834897>, " + str(option_b_odds) + " odds\n"
+        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + "<:beets:1245404199852834897>, " + str(option_a_odds) + " odds\n"
+        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + "<:beets:1245404199852834897>, " + str(option_b_odds) + " odds\n"
         if(wagerCheck["option_c"] != ""):
-            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + " <:beets:1245404199852834897>, " + str(option_c_odds) + " odds\n"
+            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + "<:beets:1245404199852834897>, " + str(option_c_odds) + " odds\n"
         if(wagerCheck["option_d"] != ""):
-            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + " <:beets:1245404199852834897>, " + str(option_d_odds) + " odds\n"
+            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + "<:beets:1245404199852834897>, " + str(option_d_odds) + " odds\n"
 
         embed = discord.Embed(title="Bet Info: " + wagerCheck["title"],
                       description=description_embed,

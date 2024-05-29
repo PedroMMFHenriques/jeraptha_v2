@@ -128,7 +128,7 @@ class Roulette(commands.Cog):
                 newValues = {'$inc': {'coins': math.floor(winner["winnings"])}}
                 usersCol.update_one(myQuery, newValues)
 
-                winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winner["winnings"])) + "** <:beets:1245404199852834897>!\n"
+                winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winner["winnings"])) + "**<:beets:1245404199852834897>!\n"
             
         if(winnings_embed == ""): winning_msg = "Nobody won, suckers!"
         else: winning_msg = "Here are the winners, congrats!"
@@ -316,7 +316,7 @@ class Roulette(commands.Cog):
         
         rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})
 
-        await ctx.respond("[Roulette] <@" + str(ctx.author.id) + "> bet on **" + print_msg + "** with **" + str(amount) + "** <:beets:1245404199852834897>!")
+        await ctx.respond("[Roulette] <@" + str(ctx.author.id) + "> bet on **" + print_msg + "** with **" + str(amount) + "**<:beets:1245404199852834897>!")
 
 
     #roulette cancel ?????????????????????????????????????????????????????

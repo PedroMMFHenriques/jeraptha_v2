@@ -80,7 +80,7 @@ class Economy(commands.Cog):
     
 
     # LEADERBOARD
-    @discord.slash_command(name="leaderboard", description="Check <:beets:1245404199852834897> leaderboard.")
+    @discord.slash_command(name="leaderboard", description="Check beets leaderboard.")
     async def leaderboard(self, ctx: discord.ApplicationContext):
         myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1}).sort("coins", -1)
         if(myLeaderboard is None):
@@ -100,7 +100,7 @@ class Economy(commands.Cog):
         embed.set_author(name="Wallet Leaderboard",
                         icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
         
-        embed.add_field(name="Most <:beets:1245404199852834897>:",
+        embed.add_field(name="Most beets <:beets:1245404199852834897>:",
                         value=embedString,
                         inline=False)
 
