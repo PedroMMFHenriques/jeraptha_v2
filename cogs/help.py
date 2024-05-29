@@ -37,10 +37,13 @@ class Help(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+    
+    async def get_cogs(self):
+        return [cog for cog in self.bot.cogs]
 
 
     @discord.slash_command(name="help", description="Shows all modules and commands.")
-    @discord.option("module", description="Get info on a particular command.", required=False)
+    @discord.option("module", description="Get info on a particular command.", required=False, choices=get_cogs)
     async def help(self, ctx: discord.ApplicationContext, module: str):
         # General Command
         if module is None:
