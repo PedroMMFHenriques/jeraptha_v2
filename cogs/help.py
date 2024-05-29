@@ -115,7 +115,7 @@ class Help(commands.Cog):
                                 description="I don't know how you got here. But I didn't see this coming at all.\n",
                                 color=discord.Color.red())
 
-        await ctx.respind(embed=emb)
+        await ctx.respond(embed=emb)
 
 
 def setup(bot):
