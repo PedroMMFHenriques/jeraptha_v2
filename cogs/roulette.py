@@ -69,7 +69,7 @@ class Roulette(commands.Cog):
         rouletteGameCol.update_one(myQuery, newValues)
 
         embed = discord.Embed(title="Roulette Started!",
-                      description="<@" + str(ctx.author.id) + "> just started a roulette!\nBetting will end <t:" + str(end_betting_time) + ":R>!\nDo '/roulette bet' to join.",
+                      description="<@" + str(ctx.author.id) + "> just started a roulette!\nBetting will end <t:" + str(end_betting_time) + ":R>!\nDo `/roulette bet` to join.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -254,11 +254,11 @@ class Roulette(commands.Cog):
     async def bet(self, ctx: discord.ApplicationContext, amount: int, option: str, sub_option: str):
         rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1, "rolling": 1})
         if(rouletteGameCheck is None):
-            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
+            await ctx.respond("Start a roulette game first with `/roulette start`.", ephemeral=True)
             return
 
         if(rouletteGameCheck["running"] == False):
-            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
+            await ctx.respond("Start a roulette game first with `/roulette start`.", ephemeral=True)
             return
         
         if(rouletteGameCheck["rolling"] == True):
