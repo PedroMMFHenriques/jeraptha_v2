@@ -80,7 +80,10 @@ class Help(commands.Cog):
                     # getting commands from cog
                     for command in self.bot.get_cog(cog).walk_commands():
                         # if cog is not hidden
-                        emb.add_field(name=f"`/{command.name}`", value=command.description, inline=False)
+                        extra_field = ""
+                        if(command.parent is not None):
+                            extra_field = command.parent.name + " "
+                        emb.add_field(name=f"`/{extra_field}{command.name}`", value=command.description, inline=False)
                     # found cog - breaking loop
                     break
 

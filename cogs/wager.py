@@ -240,7 +240,7 @@ class Wager(commands.Cog):
 
 
     # WAGER INFO
-    @wager.command(name="info", description="Get info on the wager.")
+    @wager.command(name="info", description="Get info on a wager.")
     @discord.option("wager_id", description="ID of the wager.", required=True)
     async def start(self, ctx: discord.ApplicationContext, wager_id: int):
 
