@@ -41,20 +41,13 @@ class Help(commands.Cog):
         self.bot = bot
 
     @discord.slash_command()
-    # @commands.bot_has_permissions(add_reactions=True,embed_links=True)
-    async def help(self, ctx, *input):
+    @discord.option("input", description="Get info on a particular command.", choices=[x.name for x in discord.commands], required=False)
+    async def help(self, ctx: discord.ApplicationContext, input: str):
         """Shows all modules of that bot"""
 
         # checks if cog parameter was given
         # if not: sending all modules and commands not associated with a cog
-        if not input:
-            # checks if owner is on this server - used to 'tag' owner
-            try:
-                owner = ctx.guild.get_member(owner).mention
-
-            except AttributeError as e:
-                owner = owner
-
+        if input is None:
             # starting to build embed
             emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
                                 description=f'Use `/help <module>` to gain more information about that module '
