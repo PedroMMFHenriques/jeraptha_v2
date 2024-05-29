@@ -40,8 +40,9 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
     @discord.slash_command()
-    @discord.option("input", description="Get info on a particular command.", choices=[x.name for x in discord.commands], required=False)
+    @discord.option("input", description="Get info on a particular command.", required=False)
     async def help(self, ctx: discord.ApplicationContext, input: str):
         """Shows all modules of that bot"""
 
