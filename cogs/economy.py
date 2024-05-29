@@ -36,7 +36,7 @@ class Economy(commands.Cog):
         myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
         if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-        await ctx.respond(f"You have {myWallet} <:beets:1245404199852834897>.", ephemeral=True)
+        await ctx.respond(f"You have {myWallet} <:beets:1245409413284499587>.", ephemeral=True)
 
 
     # DAILY
@@ -69,7 +69,7 @@ class Economy(commands.Cog):
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
             if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-            await ctx.respond(f"[Daily] <@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} <:beets:1245404199852834897>, totalling {myWallet}.")
+            await ctx.respond(f"[Daily] <@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} <:beets:1245409413284499587>, totalling {myWallet}.")
         
         else:
             timeLeft = (datetime.combine(date.today() + timedelta(days=1), datetime.min.time()) - datetime.now())
@@ -100,7 +100,7 @@ class Economy(commands.Cog):
         embed.set_author(name="Wallet Leaderboard",
                         icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
         
-        embed.add_field(name="Most beets <:beets:1245404199852834897>:",
+        embed.add_field(name="Most beets <:beets:1245409413284499587>:",
                         value=embedString,
                         inline=False)
 
@@ -128,7 +128,7 @@ class Economy(commands.Cog):
                     },
                     upsert = True
                 )
-        await member.respond("Welcome to the server!")
+        await member.send("Welcome to the server!")
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Economy(bot)) # add the cog to the bot
