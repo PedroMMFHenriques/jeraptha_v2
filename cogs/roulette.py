@@ -276,15 +276,16 @@ class Roulette(commands.Cog):
 
         # Check number list
         numbers_str = self.getNumberString(self, sub_option=sub_option)
-        if(numbers_str == "MISTAKE"):
+        if(numbers_str == "MISTAKE" and option != "Numbers"): # Wrote something on sub_option instead of choosing
             await ctx.respond("Invalid sub option!", ephemeral=True)
             return
-        elif(numbers_str == "NUMBER_MISTAKE"):
+        elif(numbers_str == "NUMBER_MISTAKE"): # Clicked the sub_option instead of writing the number list
             await ctx.respond("Don't choose the sub_option, just write the number list!", ephemeral=True)
             return
-
-        if(option == "Numbers"):
-            if(not self.checkNumbers(self, list_numbers=sub_option)):
+        elif(option == "Numbers"):
+            if(self.checkNumbers(self, list_numbers=sub_option)): # Valid number list
+                numbers_str = sub_option
+            else:
                 await ctx.respond("Invalid number list! Numbers 0-36 separated by ','. Example: 0,1,5,10,36", ephemeral=True)
                 return
 
