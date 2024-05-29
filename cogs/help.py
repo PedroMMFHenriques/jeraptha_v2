@@ -57,7 +57,8 @@ class Help(commands.Cog):
             # iterating trough cogs, gathering descriptions
             cogs_desc = ''
             for cog in self.bot.cogs:
-                cogs_desc += f'`{cog}` {self.bot.cogs[cog].__doc__}\n'
+                if(cog != "Admin"):
+                    cogs_desc += f'`{cog}` {self.bot.cogs[cog].__doc__}\n'
 
             # adding 'list' of cogs to embed
             emb.add_field(name='Modules', value=cogs_desc, inline=False)
@@ -67,7 +68,7 @@ class Help(commands.Cog):
             for command in self.bot.walk_application_commands():
                 # if cog not in a cog
                 # listing command if cog name is None and command isn't hidden
-                if not command.cog_name and not command.hidden:
+                if not command.cog:
                     commands_desc += f'{command.name} - {command.help}\n'
 
             # adding those commands to embed
@@ -82,7 +83,7 @@ class Help(commands.Cog):
             # iterating trough cogs
             for cog in self.bot.cogs:
                 # check if cog is the matching one
-                if cog.lower() == input[0].lower():
+                if cog.lower() == input[0].lower() and cog.lower() != "admin":
 
                     # making title - getting description from doc-string below class
                     emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
