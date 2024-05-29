@@ -53,7 +53,7 @@ class Rewards(commands.Cog):
 
             elif(reward_name == "DAILY_CRIT"):
                 user_tier = userCheck["daily_crit_tier"]
-                reward_description = "Increase the % chance of a CRIT /daily, gaining 3x <:beets:1245409413284499587>.\n"
+                reward_description = "Increase the % chance of a CRIT /daily, gaining 3x<:beets:1245409413284499587>.\n"
                 
             else:
                 await ctx.respond("Invalid reward name!", ephemeral=True)
@@ -68,7 +68,7 @@ class Rewards(commands.Cog):
                 if(tier_num < user_tier_num): continue #Skip previous tiers to the user's tier
                 elif(tier_num == user_tier_num):
                     reward_value = list(tier_info.values())[1]
-                    reward_title = reward_name + " (" + user_tier + ": " + list(tier_info.keys())[1] + " = " + str(reward_value) + ")"
+                    reward_title = "`" + reward_name + "` (" + user_tier + ":  " + list(tier_info.keys())[1] + " = " + str(reward_value) + ")"
                     if(user_tier_num + 1 >= n_tiers):
                         reward_description += "**MAX TIER**"
                 else:

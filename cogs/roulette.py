@@ -69,7 +69,7 @@ class Roulette(commands.Cog):
         rouletteGameCol.update_one(myQuery, newValues)
 
         embed = discord.Embed(title="Roulette Started!",
-                      description="<@" + str(ctx.author.id) + "> just started a roulette!\nBetting will end <t:" + str(end_betting_time) + ":R>!\nDo '/roulette bet' to join.",
+                      description="<@" + str(ctx.author.id) + "> just started a roulette!\nBetting will end <t:" + str(end_betting_time) + ":R>!\nDo `/roulette bet` to join.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -182,7 +182,7 @@ class Roulette(commands.Cog):
             return ["1st Line", "2nd Line", "3rd Line"]
         
         elif option ==  "Numbers":
-            return ["Choose: 'list_numbers'"]
+            return ["[DONT CLICK] List numbers 0-36 separated by ','. Example: 0,1,5,10,36"]
 
         else:
             return ["OOPS"]
@@ -226,8 +226,8 @@ class Roulette(commands.Cog):
         elif sub_option == "3rd Line":
             return "3,6,9,12,15,18,21,24,27,30,33,36"
         
-        elif sub_option == "Choose: 'list_numbers'":
-            return "JOE"
+        elif sub_option == "[DONT CLICK] List numbers 0-36 separated by ','. Example: 0,1,5,10,36":
+            return "NUMBER_MISTAKE"
         
         else:
             return "MISTAKE"
@@ -251,15 +251,14 @@ class Roulette(commands.Cog):
     @discord.option("amount", description="Bet amount.", required=True)
     @discord.option("option", description="Choose what option to bet on.", required=True, choices=['Color', 'Parity', 'Half', 'Dozen', 'Line', 'Numbers'])
     @discord.option("sub_option", description="Specify the option.", required=True, autocomplete=discord.utils.basic_autocomplete(betOptionAutocomplete))
-    @discord.option("list_numbers", description="[sub_option Numbers] List numbers 0-36 separated by ','", required=False)
-    async def bet(self, ctx: discord.ApplicationContext, amount: int, option: str, sub_option: str, list_numbers: str):
+    async def bet(self, ctx: discord.ApplicationContext, amount: int, option: str, sub_option: str):
         rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1, "rolling": 1})
         if(rouletteGameCheck is None):
-            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
+            await ctx.respond("Start a roulette game first with `/roulette start`.", ephemeral=True)
             return
 
         if(rouletteGameCheck["running"] == False):
-            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
+            await ctx.respond("Start a roulette game first with `/roulette start`.", ephemeral=True)
             return
         
         if(rouletteGameCheck["rolling"] == True):
@@ -274,29 +273,23 @@ class Roulette(commands.Cog):
                 pass
             return
 
+
         # Check number list
-        if(sub_option != "Choose: 'list_numbers'" and list_numbers is not None):
-            await ctx.respond("You can only input this option if you choose the sub_option 'Numbers'.", ephemeral=True)
-            return
-        elif(sub_option == "Choose: 'list_numbers'" and list_numbers is None):
-            await ctx.respond("If you choose the sub_option 'Numbers' you must list them in option 'list_numbers'.", ephemeral=True)
-            return
-        elif(self.getNumberString(self, sub_option=sub_option) == "MISTAKE"):
+        numbers_str = self.getNumberString(self, sub_option=sub_option)
+        if(numbers_str == "MISTAKE" and option != "Numbers"): # Wrote something on sub_option instead of choosing
             await ctx.respond("Invalid sub option!", ephemeral=True)
             return
-
-
-        if(sub_option != "Choose: 'list_numbers'"):
-            numbers_str = self.getNumberString(self, sub_option=sub_option)
-            print_msg = sub_option
-
-        elif(not self.checkNumbers(self, list_numbers=list_numbers)):
-            await ctx.respond("Invalid number list! Separate by ','. Example: 0,1,5,10,36", ephemeral=True)
+        elif(numbers_str == "NUMBER_MISTAKE"): # Clicked the sub_option instead of writing the number list
+            await ctx.respond("Don't choose the sub_option, just write the number list!", ephemeral=True)
             return
-        
-        else: 
-            numbers_str = list_numbers
-            print_msg = list_numbers
+        elif(option == "Numbers"):
+            if(self.checkNumbers(self, list_numbers=sub_option)): # Valid number list
+                numbers_str = sub_option
+            else:
+                await ctx.respond("Invalid number list! Numbers 0-36 separated by ','. Example: 0,1,5,10,36", ephemeral=True)
+                return
+
+        print_msg = sub_option
 
         # Check wallet
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
@@ -311,7 +304,7 @@ class Roulette(commands.Cog):
         # Remove from wallet
         remove_coins = 0 - amount
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-        newValues = {'$inc': {'coins': int(remove_coins)}}
+        newValues = {'$inc': {'coins': int(remove_coins), 'coins_bet': int(amount)}}
         usersCol.update_one(myQuery, newValues)
         
         rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})

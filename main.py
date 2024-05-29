@@ -44,7 +44,7 @@ def setup_db(bot):
                         "member_id": member.id, "guild_id": guild.id
                     }, 
                     {
-                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime(2000, 1, 1)}
+                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime(2000, 1, 1), "coins_bet": 0}
                     },
                     upsert = True
                 )
