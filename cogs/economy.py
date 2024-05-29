@@ -23,7 +23,10 @@ myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
 rewardsCol = myDB[db["REWARDS_COL"]]
 
-class Economy(commands.Cog): 
+class Economy(commands.Cog):
+    """
+    Check wallets and daily rewards.
+    """
     def __init__(self, bot): 
         self.bot = bot
 
@@ -101,7 +104,7 @@ class Economy(commands.Cog):
                         value=embedString,
                         inline=False)
 
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, ephemeral=True)
 
 
     # INIT NEW USER

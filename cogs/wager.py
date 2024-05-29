@@ -23,6 +23,10 @@ AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
 WagerRole = global_json["ROLES"]["WAGER_ROLE"]
 
 class Wager(commands.Cog):
+    """
+    Set, bet and settle user-made wagers.
+    """
+        
     def __init__(self, bot):
         self.bot = bot
     
@@ -236,7 +240,7 @@ class Wager(commands.Cog):
 
 
     # WAGER INFO
-    @wager.command(name="info", description="Get info on the wager.")
+    @wager.command(name="info", description="Get info on a wager.")
     @discord.option("wager_id", description="ID of the wager.", required=True)
     async def start(self, ctx: discord.ApplicationContext, wager_id: int):
 

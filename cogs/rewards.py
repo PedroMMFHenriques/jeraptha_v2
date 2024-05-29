@@ -19,22 +19,26 @@ rewardsCol = myDB[db["REWARDS_COL"]]
 reason = "Jeraptha punishment"
 punishments = global_json["PUNISHMENTS"]
 
-upgrade_list = ["DAILY_BOOST", "DAILY_CRIT"]
+perk_list = ["DAILY_BOOST", "DAILY_CRIT"]
 
 class Rewards(commands.Cog): 
+    """
+    Check and upgrade perks.
+    """
+        
     def __init__(self, bot): 
         self.bot = bot
 
-    # UPGRADE_INFO
-    @discord.slash_command(name="upgrade_info", description="Info about the upgrades.")
-    async def upgrade_info(self, ctx: discord.ApplicationContext):
+    # PERKS_INFO
+    @discord.slash_command(name="perks_info", description="Info about the perks and their upgrades.")
+    async def perks_info(self, ctx: discord.ApplicationContext):
         userCheck = rewardsCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "daily_boost_tier": 1, "daily_crit_tier": 1})
         if(userCheck is None): 
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
 
-        embed = discord.Embed(title="Upgrade Info",
-                            description="Upgrade with '/upgrade <upgrade_name>'",
+        embed = discord.Embed(title="Perks Info",
+                            description="Upgrade with `/upgrade <perk_name>`",
                             colour=0x009900)
         
         rewards_list = global_json["TIERED_REWARDS"]
@@ -68,7 +72,7 @@ class Rewards(commands.Cog):
                     if(user_tier_num + 1 >= n_tiers):
                         reward_description += "**MAX TIER**"
                 else:
-                    if(tier_num == user_tier_num + 1): reward_description += "**NEXT**: "
+                    if(tier_num == user_tier_num + 1): reward_description += "**NEXT** "
                     reward_description += tier + ": " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ", costs " + str(list(tier_info.values())[0]) + " coins.\n"
 
 
@@ -85,9 +89,9 @@ class Rewards(commands.Cog):
 
     
     # UPGRADE
-    @discord.slash_command(name="upgrade", description="Upgrade your money acquisition perks.")
-    @discord.option("name", description="Choose what upgrade to do.", required=True, choices=upgrade_list)
-    async def upgrade(self, ctx: discord.ApplicationContext, name: str):
+    @discord.slash_command(name="upgrade", description="Upgrade your perks.")
+    @discord.option("perk", description="Choose what perk to upgrade.", required=True, choices=perk_list)
+    async def upgrade(self, ctx: discord.ApplicationContext, perk: str):
         rewardsCheck = rewardsCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "daily_boost_tier": 1, "daily_crit_tier": 1})
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
         if(rewardsCheck is None or userCheck is None): 
@@ -95,26 +99,26 @@ class Rewards(commands.Cog):
             return
 
         rewards_dict = global_json["TIERED_REWARDS"]
-        if(name == "DAILY_BOOST"):
+        if(perk == "DAILY_BOOST"):
             userTier = rewardsCheck["daily_boost_tier"]
             reward_db = "daily_boost_tier"
 
-        elif(name == "DAILY_CRIT"):
+        elif(perk == "DAILY_CRIT"):
             userTier = rewardsCheck["daily_crit_tier"]
             reward_db = "daily_crit_tier"
 
         else:
-            await ctx.respond("Invalid upgrade name!", ephemeral=True)
+            await ctx.respond("Invalid perk name!", ephemeral=True)
             return
 
-        n_tiers = len(list(rewards_dict[name].keys()))
+        n_tiers = len(list(rewards_dict[perk].keys()))
         user_tier_int = int(userTier.split("_")[1])
         if(user_tier_int + 1 >= n_tiers):
             await ctx.respond("You have reached the max tier!", ephemeral=True)
             return
 
         next_tier = "TIER_" + str(user_tier_int + 1)
-        cost = rewards_dict[name][next_tier]["COST"]
+        cost = rewards_dict[perk][next_tier]["COST"]
 
         # Check wallet
         if(userCheck["coins"] < cost): 
@@ -132,7 +136,7 @@ class Rewards(commands.Cog):
         newValues = {'$set': {reward_db: next_tier}}
         rewardsCol.update_one(myQuery, newValues)
 
-        await ctx.respond("[Upgrade] <@" + str(ctx.author.id) + "> upgraded **" + name + "** to **" + next_tier + "**!")
+        await ctx.respond("[Perk] <@" + str(ctx.author.id) + "> upgraded **" + perk + "** to **" + next_tier + "**!")
 
 
 

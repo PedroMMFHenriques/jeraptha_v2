@@ -17,6 +17,10 @@ AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
 
 
 class Admin(commands.Cog):
+    """
+    Admin commands.
+    """
+        
     def __init__(self, bot):
         self.bot = bot
     

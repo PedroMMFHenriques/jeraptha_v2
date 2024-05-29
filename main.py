@@ -2,6 +2,8 @@
 
 import os
 import discord
+from discord.ext import commands
+
 from dotenv import load_dotenv
 
 from datetime import datetime
@@ -31,6 +33,7 @@ async def on_ready():
     setup_db(bot)
     print(f"{bot.user} is ready and online!")
     await bot.change_presence(activity=discord.CustomActivity(name="Gambling 🎲"))
+
 
 # Check for new users and add to database
 def setup_db(bot):

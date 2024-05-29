@@ -25,6 +25,10 @@ rouletteUserCol = myDB["RouletteUser"]
 #WagerRole = global_json["ROLES"]["WAGER_ROLE"]
 
 class Roulette(commands.Cog):
+    """
+    Start or bet on a roulette game.
+    """
+        
     def __init__(self, bot):
         self.bot = bot
     
