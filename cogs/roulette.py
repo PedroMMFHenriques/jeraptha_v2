@@ -128,7 +128,7 @@ class Roulette(commands.Cog):
                 newValues = {'$inc': {'coins': math.floor(winner["winnings"])}}
                 usersCol.update_one(myQuery, newValues)
 
-                winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winner["winnings"])) + "** coins!\n"
+                winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winner["winnings"])) + "**<:beets:1245404199852834897>!\n"
             
         if(winnings_embed == ""): winning_msg = "Nobody won, suckers!"
         else: winning_msg = "Here are the winners, congrats!"
@@ -305,7 +305,7 @@ class Roulette(commands.Cog):
             return
 
         if(userCheck["coins"] < amount): 
-            await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
+            await ctx.respond("You don't have enough <:beets:1245404199852834897>, scrub!", ephemeral=True)
             return
         
         # Remove from wallet
@@ -316,7 +316,7 @@ class Roulette(commands.Cog):
         
         rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})
 
-        await ctx.respond("[Roulette] <@" + str(ctx.author.id) + "> bet on **" + print_msg + "** with **" + str(amount) + "** coins!")
+        await ctx.respond("[Roulette] <@" + str(ctx.author.id) + "> bet on **" + print_msg + "** with **" + str(amount) + "**<:beets:1245404199852834897>!")
 
 
     #roulette cancel ?????????????????????????????????????????????????????
@@ -360,7 +360,7 @@ class Roulette(commands.Cog):
         # Embed
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Canceled: " + wagerCheck["title"],
-                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> canceled the bet!\nThe coins have been returned.",
+                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> canceled the bet!\nThe <:beets:1245404199852834897> have been returned.",
                       colour=0x009900,
                       timestamp=datetime.now())
 

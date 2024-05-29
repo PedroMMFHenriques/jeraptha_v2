@@ -82,7 +82,7 @@ class Admin(commands.Cog):
         newValues = {'$set': {'coins': int(new_balance)}}
         usersCol.update_one(myQuery, newValues)
 
-        await ctx.respond("You set " + user + "'s balance to " + str(new_balance) + " coins!", ephemeral=True)
+        await ctx.respond("You set " + user + "'s balance to " + str(new_balance) + " <:beets:1245404199852834897>!", ephemeral=True)
 
     
 
