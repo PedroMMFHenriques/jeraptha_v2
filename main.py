@@ -32,6 +32,37 @@ async def on_ready():
     print(f"{bot.user} is ready and online!")
     await bot.change_presence(activity=discord.CustomActivity(name="Gambling 🎲"))
 
+
+
+@bot.slash_command(name="help", description="This is a test")
+async def help(ctx: discord.ApplicationContext, args: discord.Option(discord.SlashCommandOptionType.string, "args", required=False, default=None)): 
+    help_embed = discord.Embed(title="My Bot's Help!") 
+    command_names_list = [x.name for x in bot.commands]
+    if not args:
+        help_embed.add_field(
+            name="List of supported commands:",
+            value="\n".join([str(i+1)+". "+x.name for i,x in enumerate(bot.commands)]),
+            inline=False
+        )
+        help_embed.add_field(
+        name="Details",
+        value="Type `.help <command name>` for more details about each command.",
+        inline=False
+    )
+
+    elif args in command_names_list:
+        help_embed.add_field(
+        name=args,
+        value=bot.get_command(args).description
+    )
+    else:
+        help_embed.add_field(
+        name="Oh, no!",
+        value="I didn't find command :("
+    )
+    await ctx.send(embed=help_embed)
+
+
 # Check for new users and add to database
 def setup_db(bot):
     for guild in bot.guilds:
