@@ -76,29 +76,30 @@ class Help(commands.Cog):
                 emb.add_field(name='Not belonging to a module', value=commands_desc, inline=False)
 
 
-        # iterating trough cogs
-        for cog in self.bot.cogs:
-            # check if cog is the matching one
-            if cog.lower() == module[0].lower() and cog.lower() != "admin":
-
-                # making title - getting description from doc-string below class
-                emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
-                                    color=discord.Color.green())
-
-                # getting commands from cog
-                for command in self.bot.get_cog(cog).get_commands():
-                    # if cog is not hidden
-                    if not command.hidden:
-                        emb.add_field(name=f"`/{command.name}`", value=command.help, inline=False)
-                # found cog - breaking loop
-                break
-
-        # if module not found
-        # yes, for-loops have an else statement, it's called when no 'break' was issued
         else:
-            emb = discord.Embed(title="What's that?!",
-                                description=f"I've never heard from a module called `{input[0]}` before :scream:",
-                                color=discord.Color.orange())
+            # iterating trough cogs
+            for cog in self.bot.cogs:
+                # check if cog is the matching one
+                if cog.lower() == module.lower() and module.lower() != "admin":
+
+                    # making title - getting description from doc-string below class
+                    emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
+                                        color=discord.Color.green())
+
+                    # getting commands from cog
+                    for command in self.bot.get_cog(cog).get_commands():
+                        # if cog is not hidden
+                        if not command.hidden:
+                            emb.add_field(name=f"`/{command.name}`", value=command.help, inline=False)
+                    # found cog - breaking loop
+                    break
+
+            # if module not found
+            # yes, for-loops have an else statement, it's called when no 'break' was issued
+            else:
+                emb = discord.Embed(title="What's that?!",
+                                    description=f"I've never heard from a module called `{module[0]}` before :scream:",
+                                    color=discord.Color.orange())
 
 
         await ctx.respond(embed=emb, ephemeral=True)
