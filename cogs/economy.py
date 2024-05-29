@@ -128,7 +128,6 @@ class Economy(commands.Cog):
                     },
                     upsert = True
                 )
-        await member.send("Welcome to the server!")
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Economy(bot)) # add the cog to the bot
