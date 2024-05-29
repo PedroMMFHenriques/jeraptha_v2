@@ -20,7 +20,7 @@ class Help(commands.Cog):
 
 
     @discord.slash_command(name="help", description="Shows all modules and commands.")
-    @discord.option("module", description="Get info on a particular command.", required=True, choices=cogs_list)
+    @discord.option("module", description="Get info on a particular command.", required=False, choices=cogs_list)
     async def help(self, ctx: discord.ApplicationContext, module: str):
         # General Command
         if module is None:

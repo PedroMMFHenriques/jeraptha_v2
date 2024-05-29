@@ -36,7 +36,7 @@ class Economy(commands.Cog):
         myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
         if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-        await ctx.respond(f"You have {myWallet} <:beets:1245409413284499587>.", ephemeral=True)
+        await ctx.respond(f"You have {myWallet}<:beets:1245409413284499587>.", ephemeral=True)
 
 
     # DAILY
