@@ -53,7 +53,7 @@ class Rewards(commands.Cog):
 
             elif(reward_name == "DAILY_CRIT"):
                 user_tier = userCheck["daily_crit_tier"]
-                reward_description = "Increase the % chance of a CRIT /daily, gaining 3x coins.\n"
+                reward_description = "Increase the % chance of a CRIT /daily, gaining 3x <:beets:1245402688565411841>.\n"
                 
             else:
                 await ctx.respond("Invalid reward name!", ephemeral=True)
@@ -73,7 +73,7 @@ class Rewards(commands.Cog):
                         reward_description += "**MAX TIER**"
                 else:
                     if(tier_num == user_tier_num + 1): reward_description += "**NEXT** "
-                    reward_description += tier + ": " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ", costs " + str(list(tier_info.values())[0]) + " coins.\n"
+                    reward_description += tier + ": " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ", costs " + str(list(tier_info.values())[0]) + " <:beets:1245402688565411841>.\n"
 
 
             embed.add_field(name=reward_title,
@@ -122,7 +122,7 @@ class Rewards(commands.Cog):
 
         # Check wallet
         if(userCheck["coins"] < cost): 
-            await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
+            await ctx.respond("You don't have enough <:beets:1245402688565411841>, scrub!", ephemeral=True)
             return
         
         # Remove from wallet
@@ -141,7 +141,7 @@ class Rewards(commands.Cog):
 
 
     # RENAME
-    @discord.command(name="rename", description="Rename an user. Costs " + str(punishments["RENAME_COST"]) + " coins.")
+    @discord.command(name="rename", description="Rename an user. Costs " + str(punishments["RENAME_COST"]) + " <:beets:1245402688565411841>.")
     @discord.option("user", description="@ the target user.", required=True)
     @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
     async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):
@@ -151,7 +151,7 @@ class Rewards(commands.Cog):
             return
 
         if(userCheck["coins"] < punishments["RENAME_COST"]): 
-            await ctx.respond("You don't have enough coins, scrub!", ephemeral=True)
+            await ctx.respond("You don't have enough <:beets:1245402688565411841>, scrub!", ephemeral=True)
             return
         
         #Check user argument

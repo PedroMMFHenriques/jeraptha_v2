@@ -36,7 +36,7 @@ class Economy(commands.Cog):
         myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
         if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-        await ctx.respond(f"You have {myWallet} coins.", ephemeral=True)
+        await ctx.respond(f"You have {myWallet} <:beets:1245402688565411841>.", ephemeral=True)
 
 
     # DAILY
@@ -69,7 +69,7 @@ class Economy(commands.Cog):
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
             if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-            await ctx.respond(f"[Daily] <@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} coins, totalling {myWallet}.")
+            await ctx.respond(f"[Daily] <@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} <:beets:1245402688565411841>, totalling {myWallet}.")
         
         else:
             timeLeft = (datetime.combine(date.today() + timedelta(days=1), datetime.min.time()) - datetime.now())
@@ -80,7 +80,7 @@ class Economy(commands.Cog):
     
 
     # LEADERBOARD
-    @discord.slash_command(name="leaderboard", description="Check coins leaderboard.")
+    @discord.slash_command(name="leaderboard", description="Check <:beets:1245402688565411841> leaderboard.")
     async def leaderboard(self, ctx: discord.ApplicationContext):
         myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1}).sort("coins", -1)
         if(myLeaderboard is None):
@@ -100,7 +100,7 @@ class Economy(commands.Cog):
         embed.set_author(name="Wallet Leaderboard",
                         icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
         
-        embed.add_field(name="Most Coins:",
+        embed.add_field(name="Most <:beets:1245402688565411841>:",
                         value=embedString,
                         inline=False)
 
