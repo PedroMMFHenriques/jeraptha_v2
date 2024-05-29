@@ -42,13 +42,13 @@ class Help(commands.Cog):
 
 
     @discord.slash_command()
-    @discord.option("input", description="Get info on a particular command.", required=False)
-    async def help(self, ctx: discord.ApplicationContext, input: str):
+    @discord.option("module", description="Get info on a particular command.", required=False)
+    async def help(self, ctx: discord.ApplicationContext, module: str):
         """Shows all modules of that bot"""
 
         # checks if cog parameter was given
         # if not: sending all modules and commands not associated with a cog
-        if input is None:
+        if module is None:
             # starting to build embed
             emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
                                 description=f'Use `/help <module>` to gain more information about that module '
@@ -76,46 +76,32 @@ class Help(commands.Cog):
                 emb.add_field(name='Not belonging to a module', value=commands_desc, inline=False)
 
 
-        # block called when one cog-name is given
-        # trying to find matching cog and it's commands
-        elif len(input) == 1:
+        # iterating trough cogs
+        for cog in self.bot.cogs:
+            # check if cog is the matching one
+            if cog.lower() == module[0].lower() and cog.lower() != "admin":
 
-            # iterating trough cogs
-            for cog in self.bot.cogs:
-                # check if cog is the matching one
-                if cog.lower() == input[0].lower() and cog.lower() != "admin":
+                # making title - getting description from doc-string below class
+                emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
+                                    color=discord.Color.green())
 
-                    # making title - getting description from doc-string below class
-                    emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
-                                        color=discord.Color.green())
+                # getting commands from cog
+                for command in self.bot.get_cog(cog).get_commands():
+                    # if cog is not hidden
+                    if not command.hidden:
+                        emb.add_field(name=f"`/{command.name}`", value=command.help, inline=False)
+                # found cog - breaking loop
+                break
 
-                    # getting commands from cog
-                    for command in self.bot.get_cog(cog).get_commands():
-                        # if cog is not hidden
-                        if not command.hidden:
-                            emb.add_field(name=f"`/{command.name}`", value=command.help, inline=False)
-                    # found cog - breaking loop
-                    break
-
-            # if input not found
-            # yes, for-loops have an else statement, it's called when no 'break' was issued
-            else:
-                emb = discord.Embed(title="What's that?!",
-                                    description=f"I've never heard from a module called `{input[0]}` before :scream:",
-                                    color=discord.Color.orange())
-
-        # too many cogs requested - only one at a time allowed
-        elif len(input) > 1:
-            emb = discord.Embed(title="That's too much.",
-                                description="Please request only one module at once :sweat_smile:",
+        # if module not found
+        # yes, for-loops have an else statement, it's called when no 'break' was issued
+        else:
+            emb = discord.Embed(title="What's that?!",
+                                description=f"I've never heard from a module called `{input[0]}` before :scream:",
                                 color=discord.Color.orange())
 
-        else:
-            emb = discord.Embed(title="It's a magical place.",
-                                description="I don't know how you got here. But I didn't see this coming at all.\n",
-                                color=discord.Color.red())
 
-        await ctx.respond(embed=emb)
+        await ctx.respond(embed=emb, ephemeral=True)
 
 
 def setup(bot):
