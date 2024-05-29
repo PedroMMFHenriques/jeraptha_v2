@@ -29,8 +29,7 @@ wagersSubCol = myDB["WagersSub"]
 
 usersCol.update_many({},
                 {"$set" : {"coins_bet": 0}},
-                upsert = False,
-                multi = True
+                upsert = False
               )
 
 """for x in wagersCol.find({},{}):
