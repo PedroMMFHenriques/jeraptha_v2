@@ -83,10 +83,6 @@ class Economy(commands.Cog):
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
     @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
-        myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1, "coins_bet": 1})
-        if(myLeaderboard is None):
-            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
-        
         if(option == "Wallet"):
             check_value = "coins"
             embed_title = "Check out the richest dudes!"
@@ -96,9 +92,13 @@ class Economy(commands.Cog):
             embed_title = "Check out the problem gamblers!"
             embed_subtitle = "Most beets <:beets:1245409413284499587> bet:"
 
+        myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value : 1}).sort(check_value, -1)
+        if(myLeaderboard is None):
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+
         # Get leaderboard
         embedString = ""
-        for user in list(myLeaderboard[check_value]).sort(check_value, -1):
+        for user in myLeaderboard:
             user_name = str(user["member_id"])
             user_value = str(user[check_value])
             embedString += "<@" + user_name + ">: " + user_value + "\n"
