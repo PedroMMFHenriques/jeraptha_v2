@@ -25,7 +25,7 @@ rewardsCol = myDB[db["REWARDS_COL"]]
 
 class Economy(commands.Cog):
     """
-    Basic economy commands: check wallet, leaderboard and daily rewards.
+    Check wallets and daily rewards.
     """
     def __init__(self, bot): 
         self.bot = bot
@@ -104,7 +104,7 @@ class Economy(commands.Cog):
                         value=embedString,
                         inline=False)
 
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, ephemeral=True)
 
 
     # INIT NEW USER

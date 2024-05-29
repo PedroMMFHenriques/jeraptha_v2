@@ -39,11 +39,9 @@ class Help(commands.Cog):
         self.bot = bot
 
 
-    @discord.slash_command()
+    @discord.slash_command(name="help", description="Shows all modules and commands.")
     @discord.option("module", description="Get info on a particular command.", required=False)
     async def help(self, ctx: discord.ApplicationContext, module: str):
-        """Shows all modules of that bot"""
-
         # General Command
         if module is None:
             # starting to build embed
@@ -76,11 +74,11 @@ class Help(commands.Cog):
                 if cog.lower() == module.lower() and module.lower() != "admin":
 
                     # making title - getting description from doc-string below class
-                    emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
+                    emb = discord.Embed(title=f'{cog} Commands', description=self.bot.cogs[cog].__doc__,
                                         color=0x009900)
 
                     # getting commands from cog
-                    for command in self.bot.get_cog(cog).get_commands():
+                    for command in self.bot.get_cog(cog).walk_commands():
                         # if cog is not hidden
                         emb.add_field(name=f"`/{command.name}`", value=command.description, inline=False)
                     # found cog - breaking loop
