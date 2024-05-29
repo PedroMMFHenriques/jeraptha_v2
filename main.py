@@ -38,7 +38,7 @@ async def on_ready():
 async def help(ctx: discord.ApplicationContext, command: str):
     help_embed = discord.Embed(title="My Bot's Help!") 
     command_names_list = [x.name for x in bot.commands]
-    if not args:
+    if not command:
         help_embed.add_field(
             name="List of supported commands:",
             value="\n".join([str(i+1)+". "+x.name for i,x in enumerate(bot.commands)]),
@@ -50,10 +50,10 @@ async def help(ctx: discord.ApplicationContext, command: str):
         inline=False
     )
 
-    elif args in command_names_list:
+    elif command in command_names_list:
         help_embed.add_field(
-        name=args,
-        value=bot.get_command(args).description
+        name=command,
+        value=bot.get_command(command).description
     )
     else:
         help_embed.add_field(
