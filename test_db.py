@@ -27,6 +27,12 @@ usersCol = myDB[db["USERS_COL"]]
 wagersCol = myDB["Wagers"]
 wagersSubCol = myDB["WagersSub"]
 
+usersCol.update({},
+                {"$set" : {"coins_bet": 0}},
+                upsert = False,
+                multi = True
+              )
+
 """for x in wagersCol.find({},{}):
   print(x)"""
 
