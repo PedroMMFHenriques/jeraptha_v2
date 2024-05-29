@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-
-
 """@bot.slash_command(name="help", description="Get info about the commands.")
 @discord.option("command", description="Get info on a particular command.", choices=[x.name for x in bot.commands], required=False)
 async def help(ctx: discord.ApplicationContext, command: str):
@@ -34,7 +32,7 @@ async def help(ctx: discord.ApplicationContext, command: str):
 
 class Help(commands.Cog):
     """
-    Sends this help message
+    Displays help message.
     """
 
     def __init__(self, bot):
@@ -46,24 +44,19 @@ class Help(commands.Cog):
     async def help(self, ctx: discord.ApplicationContext, module: str):
         """Shows all modules of that bot"""
 
-        # checks if cog parameter was given
-        # if not: sending all modules and commands not associated with a cog
+        # General Command
         if module is None:
             # starting to build embed
-            emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
-                                description=f'Use `/help <module>` to gain more information about that module '
-                                            f':smiley:\n')
+            emb = discord.Embed(title='All Modules', color=0x009900,
+                                description=f'Use `/help <module>` to get more information about a particular module.')
 
-            # iterating trough cogs, gathering descriptions
-            cogs_desc = ''
+            # iterating through cogs
             for cog in self.bot.cogs:
                 if(cog != "Admin"):
-                    cogs_desc += f'`{cog}` {self.bot.cogs[cog].__doc__}\n'
+                    emb.add_field(name=f'`{cog}`', value=f'{self.bot.cogs[cog].__doc__}\n', inline=False)
+ 
 
-            # adding 'list' of cogs to embed
-            emb.add_field(name='Modules', value=cogs_desc, inline=False)
-
-            # integrating trough uncategorized commands
+            # itegrating through uncategorized commands
             commands_desc = ''
             for command in self.bot.walk_application_commands():
                 # if cog not in a cog
@@ -73,18 +66,18 @@ class Help(commands.Cog):
 
             # adding those commands to embed
             if commands_desc:
-                emb.add_field(name='Not belonging to a module', value=commands_desc, inline=False)
+                emb.add_field(name='Not belonging to a module:', value=commands_desc, inline=False)
 
 
-        else:
-            # iterating trough cogs
+        else: # Particular command
+            # iterating through cogs
             for cog in self.bot.cogs:
                 # check if cog is the matching one
                 if cog.lower() == module.lower() and module.lower() != "admin":
 
                     # making title - getting description from doc-string below class
                     emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
-                                        color=discord.Color.green())
+                                        color=0x009900)
 
                     # getting commands from cog
                     for command in self.bot.get_cog(cog).get_commands():

@@ -23,7 +23,10 @@ myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
 rewardsCol = myDB[db["REWARDS_COL"]]
 
-class Economy(commands.Cog): 
+class Economy(commands.Cog):
+    """
+    Basic economy commands: check wallet, leaderboard and daily rewards.
+    """
     def __init__(self, bot): 
         self.bot = bot
 

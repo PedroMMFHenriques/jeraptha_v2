@@ -23,6 +23,10 @@ AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
 WagerRole = global_json["ROLES"]["WAGER_ROLE"]
 
 class Wager(commands.Cog):
+    """
+    Set, bet and settle user-made wagers.
+    """
+        
     def __init__(self, bot):
         self.bot = bot
     
