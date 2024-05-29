@@ -33,9 +33,9 @@ async def on_ready():
     await bot.change_presence(activity=discord.CustomActivity(name="Gambling 🎲"))
 
 
-
-@bot.slash_command(name="help", description="This is a test")
-async def help(ctx: discord.ApplicationContext, args: discord.Option(discord.SlashCommandOptionType.string, "args", required=False, default=None)): 
+@bot.slash_command(name="help", description="Get info about the commands.")
+@discord.option("command", description="Get info on a particular command.", required=False)
+async def help(ctx: discord.ApplicationContext, command: str):
     help_embed = discord.Embed(title="My Bot's Help!") 
     command_names_list = [x.name for x in bot.commands]
     if not args:
