@@ -64,7 +64,7 @@ class Help(commands.Cog):
 
             # integrating trough uncategorized commands
             commands_desc = ''
-            for command in self.bot.walk_commands():
+            for command in self.bot.walk_application_commands():
                 # if cog not in a cog
                 # listing command if cog name is None and command isn't hidden
                 if not command.cog_name and not command.hidden:
