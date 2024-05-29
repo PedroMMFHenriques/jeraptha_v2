@@ -98,7 +98,7 @@ class Economy(commands.Cog):
 
         # Get leaderboard
         embedString = ""
-        for user in myLeaderboard[check_value].sort(check_value, -1):
+        for user in list(myLeaderboard[check_value]).sort(check_value, -1):
             user_name = str(user["member_id"])
             user_value = str(user[check_value])
             embedString += "<@" + user_name + ">: " + user_value + "\n"
@@ -107,7 +107,7 @@ class Economy(commands.Cog):
         embed = discord.Embed(description=embed_title,
                       colour=0x009900)
         
-        embed.set_author(name="Wallet Leaderboard",
+        embed.set_author(name="Leaderboard",
                         icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
         
         embed.add_field(name=embed_subtitle,

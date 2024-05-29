@@ -95,7 +95,7 @@ class Admin(commands.Cog):
 
         with open("images/money-printer.gif", "rb") as fh:
             file = discord.File(fh, filename="money-printer.gif")
-        await ctx.respond(content="<@" + ctx.author.id + "> asked daddy J. Pow for a small loan of a million <:beets:1245409413284499587>!", file=file)
+        await ctx.respond(content="<@" + str(ctx.author.id) + "> asked daddy J. Pow for a small loan of a million <:beets:1245409413284499587>!", file=file)
     
 
 def setup(bot):
