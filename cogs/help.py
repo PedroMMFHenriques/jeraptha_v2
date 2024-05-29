@@ -1,34 +1,11 @@
+import os
 import discord
 from discord.ext import commands
 
-"""@bot.slash_command(name="help", description="Get info about the commands.")
-@discord.option("command", description="Get info on a particular command.", choices=[x.name for x in bot.commands], required=False)
-async def help(ctx: discord.ApplicationContext, command: str):
-    help_embed = discord.Embed(title="Commands Info") 
-    command_names_list = [x.name for x in bot.commands]
-    if not command:
-        help_embed.add_field(
-            name="List of supported commands:",
-            value="\n".join([". /"+x.name for _,x in enumerate(bot.commands)]),
-            inline=False
-        )
-        help_embed.add_field(
-        name="Details",
-        value="Type `/help <command name>` for more details about each command.",
-        inline=False
-    )
-
-    elif command in command_names_list:
-        help_embed.add_field(
-        name=command,
-        value=bot.get_command(command).description
-    )
-    else:
-        help_embed.add_field(
-        name="Oh, no!",
-        value="I didn't find command :("
-    )
-    await ctx.respond(embed=help_embed, ephemeral=True)"""
+cogs_list = []
+for filename in os.listdir('./cogs'):
+      if filename.endswith('.py'):
+            cogs_list.append(f"{filename[:-3]}")
 
 class Help(commands.Cog):
     """
@@ -43,7 +20,7 @@ class Help(commands.Cog):
 
 
     @discord.slash_command(name="help", description="Shows all modules and commands.")
-    @discord.option("module", description="Get info on a particular command.", required=False, choices=get_cogs())
+    @discord.option("module", description="Get info on a particular command.", required=False, choices=cogs_list)
     async def help(self, ctx: discord.ApplicationContext, module: str):
         # General Command
         if module is None:
