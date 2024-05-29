@@ -32,8 +32,7 @@ bot = discord.Bot(intents = discord.Intents.all())
 async def on_ready():
     setup_db(bot)
     print(f"{bot.user} is ready and online!")
-    await bot.change_presence(activity=discord.CustomActivity(name="Gambling 🎲"))
-
+    await bot.change_presence(activity=discord.CustomActivity(name="Gambling 🎲 | /help"))
 
 # Check for new users and add to database
 def setup_db(bot):
