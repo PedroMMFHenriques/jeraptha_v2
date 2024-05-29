@@ -304,7 +304,7 @@ class Roulette(commands.Cog):
         # Remove from wallet
         remove_coins = 0 - amount
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-        newValues = {'$inc': {'coins': int(remove_coins)}}
+        newValues = {'$inc': {'coins': int(remove_coins)}, "coins_bet": int(amount)}
         usersCol.update_one(myQuery, newValues)
         
         rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})

@@ -142,7 +142,7 @@ class Wager(commands.Cog):
         #remove from wallet
         remove_coins = 0 - bet_amount
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-        newValues = {'$inc': {'coins': int(remove_coins)}}
+        newValues = {'$inc': {'coins': int(remove_coins)}, "coins_bet": int(bet_amount)}
         usersCol.update_one(myQuery, newValues)
 
         # If already bet, increase bet

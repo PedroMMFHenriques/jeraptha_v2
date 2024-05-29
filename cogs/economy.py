@@ -80,27 +80,37 @@ class Economy(commands.Cog):
     
 
     # LEADERBOARD
-    @discord.slash_command(name="leaderboard", description="Check beets leaderboard.")
-    async def leaderboard(self, ctx: discord.ApplicationContext):
-        myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1}).sort("coins", -1)
+    @discord.slash_command(name="leaderboard", description="Check leaderboards.")
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet'])
+    async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
+        myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1, "coins_bet": 1})
         if(myLeaderboard is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
         
+        if(option == "Wallet"):
+            check_value = "coins"
+            embed_title = "Check out the richest dudes!"
+            embed_subtitle = "Most beets <:beets:1245409413284499587>:"
+        elif(option == "Total Bet"):
+            check_value = "coins_bet"
+            embed_title = "Check out the problem gamblers!"
+            embed_subtitle = "Most beets <:beets:1245409413284499587> bet:"
+
         # Get leaderboard
         embedString = ""
-        for user in myLeaderboard:
+        for user in myLeaderboard[check_value].sort(check_value, -1):
             user_name = str(user["member_id"])
-            user_coins = str(user["coins"])
-            embedString += "<@" + user_name + ">: " + user_coins + "\n"
+            user_value = str(user[check_value])
+            embedString += "<@" + user_name + ">: " + user_value + "\n"
 
         # Generate embed
-        embed = discord.Embed(description="Check out the richest dudes!",
+        embed = discord.Embed(description=embed_title,
                       colour=0x009900)
         
         embed.set_author(name="Wallet Leaderboard",
                         icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
         
-        embed.add_field(name="Most beets <:beets:1245409413284499587>:",
+        embed.add_field(name=embed_subtitle,
                         value=embedString,
                         inline=False)
 
