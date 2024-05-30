@@ -37,19 +37,19 @@
 
             "TIER_1":
             {
-                "COST": 1000,
+                "COST": 2000,
                 "MULT": 1.2
             },
 
             "TIER_2":
             {
-                "COST": 2000,
+                "COST": 5000,
                 "MULT": 1.4
             },
 
             "TIER_3":
             {
-                "COST": 3000,
+                "COST": 13000,
                 "MULT": 1.6
             }
         },
@@ -59,25 +59,29 @@
             "TIER_0":
             {
                 "COST": 0,
-                "CHANCE": 5 
+                "CHANCE": 5,
+                "MULT": 1    
             },
 
             "TIER_1":
             {
-                "COST": 1000,
-                "CHANCE": 10 
+                "COST": 2000,
+                "CHANCE": 15,
+                "MULT": 1
             },
 
             "TIER_2":
             {
-                "COST": 2000,
-                "CHANCE": 20
+                "COST": 5000,
+                "CHANCE": 15,
+                "MULT": 1.5
             },
 
             "TIER_3":
             {
-                "COST": 3000,
-                "CHANCE": 30
+                "COST": 13000,
+                "CHANCE": 25,
+                "MULT": 1.5
             }
         }
     }
