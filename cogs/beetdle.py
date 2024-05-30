@@ -74,7 +74,7 @@ class Beetdle(commands.Cog):
             seed = datetime_today - datetime.combine(date(1970, 1, 1), datetime.min.time()) # Current day's seed
             random.seed(seed)
             wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
-            beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": guess})
+            beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": ""})
         
         else:
             # Check if it is the first guess of a non-daily
@@ -106,13 +106,13 @@ class Beetdle(commands.Cog):
             reward = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
 
             if(daily):
-                emb_title = "You got it! The daily beetdle is **" + word + "**!"
+                emb_title = "You got it! The daily beetdle is **" + word.upper() + "**!"
                 emb_description = "It took you " + str(n_tries) + " tries."
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
             else:
                 reward = reward / 10
-                emb_title = "<@" + str(ctx.author.id) + "> got the beetdle **" + word + "**!"
+                emb_title = "<@" + str(ctx.author.id) + "> got the beetdle **" + word.upper() + "**!"
                 emb_description = "It took them " + str(n_tries) + " tries."
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
@@ -129,39 +129,52 @@ class Beetdle(commands.Cog):
                     word_count[letter] = 1
                 else: word_count[letter] += 1
 
-            correction = "" #C correct, S correct wrong space, X incorrect
+            # First check exactly correct letters
+            correction = "" #C correct, P possible correct wrong space, X incorrect
             for letter_g, letter_word in zip(guess, word):
                 if(not letter_g in word_count): # Wrong letter
                     correction += "X"
                 elif(letter_g == letter_word): # Correct letter in correct space
                     correction += "C" 
                     word_count[letter_g] -= 1
-                elif(word_count[letter_g] >= 1): # Correct letter in wrong space
+                else: # Possible correct letter in wrong space
                     correction += "S"
+
+            """elif(word_count[letter_g] >= 1): # Correct letter in wrong space
+                    correction += "S"
+                    word_count[letter_g] -= 1"""
+            # Now check correct letters in wrong places
+            #C correct, S correct wrong space, X incorrect
+            final_correction = ""
+            for letter_g, letter_c in zip(guess, correction):
+                if(letter_c == "X" or letter_c == "C"): # Wrong letter or correct letter
+                    final_correction += letter_c
+                elif(word_count[letter_g] >= 1): # Correct letter in wrong space
+                    final_correction += "S"
                     word_count[letter_g] -= 1
-                else: # The letter is there, but there are too many already
-                    correction += "X"
+                else:
+                    final_correction += "X"
 
             guess_correction = ""
-            for letter_g, letter_c in zip(guess, correction):
+            for letter_g, letter_c in zip(guess, final_correction):
                 if(letter_c == "C"): cor = "**"
                 elif(letter_c == "S"): cor = "__"
                 else: cor = "~~"
                 guess_correction += cor + letter_g.upper() + cor + " "
 
-            guesses = prev_guesses + str(n_tries) + ") " + guess_correction
+            guesses = prev_guesses + str(n_tries) + ") " + guess_correction + "\n"
             if(n_tries >= 6): # Lost, end game
                 myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
                 newValues = {'$set': {"ended": True, "won": False, "guesses": guesses}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
 
                 if(daily):
-                    emb_title = "You lost... The daily beetdle was **" + word + "**."
+                    emb_title = "You lost... The daily beetdle was **" + word.upper() + "**."
                     emb_description = ""
                     emb_field_name = "Your tries:"
                     emb_ephemeral = True
                 else:
-                    emb_title = "<@" + str(ctx.author.id) + "> lost... The beetdle was **" + word + "**."
+                    emb_title = "<@" + str(ctx.author.id) + "> lost... The beetdle was **" + word.upper() + "**."
                     emb_description = ""
                     emb_field_name = "Their tries:"
                     emb_ephemeral = False
@@ -171,7 +184,7 @@ class Beetdle(commands.Cog):
                 newValues = {'$set': {"guesses": guesses}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
 
-                emb_title = "[Try " + str(n_tries) + "] " + guess + " wasn't correct."
+                emb_title = "[Try " + str(n_tries) + "] " + guess.upper() + " wasn't correct."
                 emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n\n"
                 emb_description += "You have **" + str(6 - n_tries) + "** more tries."
                 emb_field_name = "Your tries:"
