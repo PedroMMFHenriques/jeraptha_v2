@@ -159,9 +159,9 @@ class Roulette(commands.Cog):
         newValues = {'$set': {"running": False, "rolling": False}}
         rouletteGameCol.update_one(myQuery, newValues)
 
-        # Remove all bets from guild
+        # Delete all bets from guild
         myQuery= {"guild_id": ctx.guild.id}
-        rouletteGameCol.remove_many(myQuery)
+        rouletteUserCol.delete_many(myQuery)
 
 
 
