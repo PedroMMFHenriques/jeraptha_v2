@@ -82,7 +82,7 @@ class Economy(commands.Cog):
 
     # LEADERBOARD
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
-    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet', 'Beetle Daily', 'Beetle Total'])
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet', 'Beetdle Daily', 'Beetdle Total'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
         if(option == "Wallet" or option == "Total Bet"): 
             if(option == "Wallet"):
@@ -108,13 +108,13 @@ class Economy(commands.Cog):
                 embedString += "<@" + user_name + ">: " + user_value + "\n"
 
 
-        elif(option == "Beetle Daily" or option == "Beetle Total"):
-            if(option == "Beetle Daily"):
+        elif(option == "Beetdle Daily" or option == "Beetdle Total"):
+            if(option == "Beetdle Daily"):
                 gamesList = beetdleCol.find({"daily": True, "ended": True, "won": True},{"_id": 0, "member_id": 1})
                 embed_title = "Check out the most dedicated beetdlers!"
                 embed_subtitle = "Most daily beetdle wins:"
             
-            elif(option == "Beetle Total"):
+            elif(option == "Beetdle Total"):
                 gamesList = beetdleCol.find({"ended": True, "won": True},{"_id": 0, "member_id": 1})
                 embed_title = "Check out the problem beetdlers!"
                 embed_subtitle = "Most total beetdle wins:"
