@@ -216,7 +216,7 @@ class Beetdle(commands.Cog):
 
         if(daily and game_over):
             if(game_won):
-                await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries!")
+                await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries and won " + str(int(reward)) + "<:beets:1245409413284499587>!")
             else:
                 await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> didn't get the daily beetdle correctly...")
 
