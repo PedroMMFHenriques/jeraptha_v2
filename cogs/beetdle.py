@@ -113,13 +113,13 @@ class Beetdle(commands.Cog):
             reward = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
 
             if(daily):
-                emb_title = "[Daily Beetle] You got it! The daily beetdle is '" + word + "'!"
+                emb_title = "[Daily Beetdle] You got it! The daily beetdle is '" + word + "'!"
                 emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
             else:
                 reward = reward / 10
-                emb_title = "[Non-Daily Beetle] You got the beetdle '" + word + "'!"
+                emb_title = "[Non-Daily Beetdle] You got the beetdle '" + word + "'!"
                 emb_description = "It took <@" + str(ctx.author.id) + "> " + str(n_tries) + " tries.\nThey won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
@@ -176,12 +176,12 @@ class Beetdle(commands.Cog):
                 beetdleCol.update_one(myQuery, newValues)
 
                 if(daily):
-                    emb_title = "[Daily Beetle] You lost... The daily beetdle was '" + word + "'."
+                    emb_title = "[Daily Beetdle] You lost... The daily beetdle was '" + word + "'."
                     emb_description = "You didn't win any <:beets:1245409413284499587>..."
                     emb_field_name = "Your tries:"
                     emb_ephemeral = True
                 else:
-                    emb_title = "[Non-Daily Beetle] You lost... The beetdle was '" + word + "'."
+                    emb_title = "[Non-Daily Beetdle] You lost... The beetdle was '" + word + "'."
                     emb_description = "<@" + str(ctx.author.id) + "> didn't win any <:beets:1245409413284499587>..."
                     emb_field_name = "Their tries:"
                     emb_ephemeral = False
@@ -192,9 +192,9 @@ class Beetdle(commands.Cog):
                 beetdleCol.update_one(myQuery, newValues)
 
                 if(daily):
-                    emb_title = "[Daily Beetle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
+                    emb_title = "[Daily Beetdle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
                 else:
-                    emb_title = "[Non-Daily Beetle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
+                    emb_title = "[Non-Daily Beetdle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
                 emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n"
                 emb_description += "You have **" + str(6 - n_tries) + "** more tries."
                 emb_field_name = "Your tries:"
@@ -218,7 +218,7 @@ class Beetdle(commands.Cog):
             if(game_won):
                 await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries!")
             else:
-                await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> didn't get the daily beetle correctly...")
+                await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> didn't get the daily beetdle correctly...")
 
 
 def setup(bot):
