@@ -55,7 +55,7 @@ class Beetdle(commands.Cog):
 
     
     # BEETDLE
-    @discord.command(name="beetdle", description="Start/continue a game of beetdle.")
+    @discord.command(name="beetdle", description="Start/continue a game of beetdle. The first daily is equal to everyone and gives full reward.")
     @discord.option("guess", description="Your beetdle guess (5-letter English word)", required=True)
     async def start(self, ctx: discord.ApplicationContext, guess: str):
         # Check validity of guess
