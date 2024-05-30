@@ -106,7 +106,10 @@ class Beetdle(commands.Cog):
             game_won = True
             game_over = True
             guesses = prev_guesses + "," + word
-            guesses_print = prev_guesses_print + "**" + word + "**"
+            guess_separated = ""
+            for letter in word:
+                guess_separated += letter + " "
+            guesses_print = prev_guesses_print + "**" + guess_separated + "**"
             myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
             newValues = {'$set': {"ended": True, "won": True, "guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
             beetdleCol.update_one(myQuery, newValues)
