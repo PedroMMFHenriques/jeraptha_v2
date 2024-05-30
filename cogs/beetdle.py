@@ -54,7 +54,7 @@ class Beetdle(commands.Cog):
         self.bot = bot
 
     
-    # ROULETTE START
+    # BEETDLE
     @discord.command(name="beetdle", description="Start/continue a game of beetdle.")
     @discord.option("guess", description="Your beetdle guess (5-letter English word)", required=True)
     async def start(self, ctx: discord.ApplicationContext, guess: str):
@@ -65,24 +65,26 @@ class Beetdle(commands.Cog):
         elif(not guess in full_dict):
             await ctx.respond("That word isn't in the English dictionary!", ephemeral=True)
             return
+        
+        datetime_today = datetime.combine(datetime_today, datetime.min.time())
 
         # Check if it is the first guess of the daily
-        checkNewDailyGame = beetdleCol.find_one({"member_id": ctx.author.id, "date": date.today()},{})
+        checkNewDailyGame = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today},{})
         if(checkNewDailyGame is None): # If it is the first guess of the daily
-            seed = date.today() - date(1970, 1, 1) # Current day's seed
+            seed = datetime_today - datetime.combine(date(1970, 1, 1), datetime.min.time()) # Current day's seed
             random.seed(seed)
             wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
-            beetdleCol.insert_one({"member_id": ctx.author.id, "date": date.today(), "daily": True, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": guess})
+            beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": guess})
         
         else:
             # Check if it is the first guess of a non-daily
-            checkNewNonDailyGame = beetdleCol.find_one({"member_id": ctx.author.id, "date": date.today(), "ended": False},{})
+            checkNewNonDailyGame = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today, "ended": False},{})
             if(checkNewNonDailyGame is None): # If it is the first guess of a non-daily
                 random.seed()
                 wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
-                beetdleCol.insert_one({"member_id": ctx.author.id, "date": date.today(), "daily": False, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": guess})
+                beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": False, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": guess})
 
-        checkBeetdle = beetdleCol.find_one({"member_id": ctx.author.id, "date": date.today(), "ended": False},{"_id": 0, "daily": 1, "word": 1, "tries": 1, "guesses": 1})
+        checkBeetdle = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "word": 1, "tries": 1, "guesses": 1})
 
         daily = checkBeetdle["daily"]
         n_tries = checkBeetdle["tries"] + 1
@@ -93,7 +95,7 @@ class Beetdle(commands.Cog):
         if(guess == word): # Correct word, end game
             won = True
             guesses = prev_guesses + str(n_tries) + ") **" + word + "**"
-            myQuery= {"member_id": ctx.author.id, "date": date.today(), "ended": False}
+            myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
             newValues = {'$set': {"ended": True, "won": True, "guesses": guesses}, '$inc': {"tries": 1}}
             beetdleCol.update_one(myQuery, newValues)
 
@@ -144,7 +146,7 @@ class Beetdle(commands.Cog):
             guesses = prev_guesses + str(n_tries) + ") " + guess_correction
             if(n_tries >= 6): # Lost, end game
                 won = False
-                myQuery= {"member_id": ctx.author.id, "date": date.today(), "ended": False}
+                myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
                 newValues = {'$set': {"ended": True, "won": False, "guesses": guesses}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
 
@@ -160,7 +162,7 @@ class Beetdle(commands.Cog):
                     emb_ephemeral = False
             
             else: # Incorrect, but still has tries
-                myQuery= {"member_id": ctx.author.id, "date": date.today(), "ended": False}
+                myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
                 newValues = {'$set': {"guesses": guesses}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
 
