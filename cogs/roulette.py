@@ -43,7 +43,7 @@ class Roulette(commands.Cog):
     
     # ROULETTE START
     @roulette.command(name="start", description="Start a game of roulette.")
-    @discord.option("betting_time", description="Duration of the betting time in seconds (max 120).", required=False, default=30)
+    @discord.option("betting_time", description="Duration of the betting time in seconds (10-120).", required=False, default=30)
     async def start(self, ctx: discord.ApplicationContext, betting_time: int):
         rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1})
         if(rouletteGameCheck is None):
@@ -60,6 +60,9 @@ class Roulette(commands.Cog):
         if(betting_time > 120):
             await ctx.respond("Max betting time is 120 seconds!", ephemeral=True)
             return
+        elif(betting_time < 10):
+            await ctx.respond("Min betting time is 10 seconds!", ephemeral=True)
+            return
 
         end_betting_time = betting_time + math.floor(time.time())
 
@@ -69,7 +72,7 @@ class Roulette(commands.Cog):
         rouletteGameCol.update_one(myQuery, newValues)
 
         embed = discord.Embed(title="Roulette Started!",
-                      description="<@" + str(ctx.author.id) + "> just started a roulette!\nBetting will end <t:" + str(end_betting_time) + ":R>!\nDo '/roulette bet' to join.",
+                      description="<@" + str(ctx.author.id) + "> just started a roulette!\nBetting will end <t:" + str(end_betting_time) + ":R>!\nDo `/roulette bet` to join.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -159,7 +162,9 @@ class Roulette(commands.Cog):
         newValues = {'$set': {"running": False, "rolling": False}}
         rouletteGameCol.update_one(myQuery, newValues)
 
-        rouletteUserCol.drop()
+        # Delete all bets from guild
+        myQuery= {"guild_id": ctx.guild.id}
+        rouletteUserCol.delete_many(myQuery)
 
 
 
@@ -254,11 +259,11 @@ class Roulette(commands.Cog):
     async def bet(self, ctx: discord.ApplicationContext, amount: int, option: str, sub_option: str):
         rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1, "rolling": 1})
         if(rouletteGameCheck is None):
-            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
+            await ctx.respond("Start a roulette game first with `/roulette start`.", ephemeral=True)
             return
 
         if(rouletteGameCheck["running"] == False):
-            await ctx.respond("Start a roulette game first with '/roulette start'.", ephemeral=True)
+            await ctx.respond("Start a roulette game first with `/roulette start`.", ephemeral=True)
             return
         
         if(rouletteGameCheck["rolling"] == True):
@@ -304,7 +309,7 @@ class Roulette(commands.Cog):
         # Remove from wallet
         remove_coins = 0 - amount
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-        newValues = {'$inc': {'coins': int(remove_coins)}}
+        newValues = {'$inc': {'coins': int(remove_coins), 'coins_bet': int(amount)}}
         usersCol.update_one(myQuery, newValues)
         
         rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})

@@ -56,7 +56,7 @@ class Economy(commands.Cog):
             daily_coins = daily_coins * daily_boost_tier["MULT"]
             extra_msg = ""
             if(random.SystemRandom().randint(1, 101) >= 101 - daily_crit_tier["CHANCE"]): 
-                daily_coins = daily_coins*3
+                daily_coins = daily_coins*3*daily_crit_tier["MULT"]
                 extra_msg = "a **CRIT**, winning "
             elif(random.SystemRandom().randint(1, 101) <= 5 and checkUser["coins"] > 1000):
                 daily_coins = daily_coins/3
@@ -69,7 +69,7 @@ class Economy(commands.Cog):
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
             if(myWallet is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-            await ctx.respond(f"[Daily] <@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)} <:beets:1245409413284499587>, totalling {myWallet}.")
+            await ctx.respond(f"[Daily] <@{ctx.author.id}> used daily and got {extra_msg}{int(daily_coins)}<:beets:1245409413284499587>, totalling {myWallet}.")
         
         else:
             timeLeft = (datetime.combine(date.today() + timedelta(days=1), datetime.min.time()) - datetime.now())
@@ -80,27 +80,37 @@ class Economy(commands.Cog):
     
 
     # LEADERBOARD
-    @discord.slash_command(name="leaderboard", description="Check beets leaderboard.")
-    async def leaderboard(self, ctx: discord.ApplicationContext):
-        myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "coins": 1}).sort("coins", -1)
+    @discord.slash_command(name="leaderboard", description="Check leaderboards.")
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet'])
+    async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
+        if(option == "Wallet"):
+            check_value = "coins"
+            embed_title = "Check out the richest dudes!"
+            embed_subtitle = "Most beets <:beets:1245409413284499587>:"
+        elif(option == "Total Bet"):
+            check_value = "coins_bet"
+            embed_title = "Check out the problem gamblers!"
+            embed_subtitle = "Most beets <:beets:1245409413284499587> bet:"
+
+        myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value : 1}).sort(check_value, -1)
         if(myLeaderboard is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
-        
+
         # Get leaderboard
         embedString = ""
         for user in myLeaderboard:
             user_name = str(user["member_id"])
-            user_coins = str(user["coins"])
-            embedString += "<@" + user_name + ">: " + user_coins + "\n"
+            user_value = str(user[check_value])
+            embedString += "<@" + user_name + ">: " + user_value + "\n"
 
         # Generate embed
-        embed = discord.Embed(description="Check out the richest dudes!",
+        embed = discord.Embed(description=embed_title,
                       colour=0x009900)
         
-        embed.set_author(name="Wallet Leaderboard",
+        embed.set_author(name="Leaderboard",
                         icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
         
-        embed.add_field(name="Most beets <:beets:1245409413284499587>:",
+        embed.add_field(name=embed_subtitle,
                         value=embedString,
                         inline=False)
 
