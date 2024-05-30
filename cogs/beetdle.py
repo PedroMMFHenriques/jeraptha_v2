@@ -90,12 +90,14 @@ class Beetdle(commands.Cog):
         n_tries = checkBeetdle["tries"] + 1
         prev_guesses = checkBeetdle["guesses"]
 
-        won = False
+        game_won = False
+        game_over = False
 
         # Process guess
         word = checkBeetdle["word"]
         if(guess == word): # Correct word, end game
-            won = True
+            game_won = True
+            game_over = True
             guesses = prev_guesses + str(n_tries) + ") **" + word + "**"
             myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
             newValues = {'$set': {"ended": True, "won": True, "guesses": guesses}, '$inc': {"tries": 1}}
@@ -145,7 +147,7 @@ class Beetdle(commands.Cog):
                 if(letter_c == "C"): cor = "**"
                 elif(letter_c == "S"): cor = "__"
                 else: cor = "~~"
-                guess_correction += cor + letter_g + cor
+                guess_correction += cor + letter_g.upper() + cor + " "
 
             guesses = prev_guesses + str(n_tries) + ") " + guess_correction
             if(n_tries >= 6): # Lost, end game
@@ -189,8 +191,8 @@ class Beetdle(commands.Cog):
 
         await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=emb_ephemeral)
 
-        if(daily):
-            if(won):
+        if(daily and game_over):
+            if(game_won):
                 await ctx.send("[Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries!")
             else:
                 await ctx.send("[Beetdle] <@" + str(ctx.author.id) + "> didn't get the daily beetle correctly...")
