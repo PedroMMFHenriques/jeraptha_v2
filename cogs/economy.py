@@ -47,11 +47,6 @@ class Economy(commands.Cog):
         if(checkUser is None or checkRewards is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
         # Check if already did /daily today
-        print(checkUser["last_daily"])
-        print(checkUser["last_daily"].date())
-        print(timedelta(days=1))
-        print(checkUser["last_daily"].date() + timedelta(days=1))
-        print(date.today())
         if(date.today() >= checkUser["last_daily"].date() + timedelta(days=1)):
             daily_coins = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
 

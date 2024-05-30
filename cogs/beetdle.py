@@ -126,7 +126,7 @@ class Beetdle(commands.Cog):
                 emb_ephemeral = False
 
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-            newValues = {"$set": {"last_daily": datetime.now()},'$inc': {'coins': int(reward)}}
+            newValues = {'$inc': {'coins': int(reward)}}
             usersCol.update_one(myQuery, newValues)
         
 
