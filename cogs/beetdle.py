@@ -110,7 +110,7 @@ class Beetdle(commands.Cog):
                 emb_ephemeral = True
             else:
                 reward = reward / 10
-                emb_title = "<@" + ctx.author.id + "> got the beetdle **" + word + "**!"
+                emb_title = "<@" + str(ctx.author.id) + "> got the beetdle **" + word + "**!"
                 emb_description = "It took them " + str(n_tries) + " tries."
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
@@ -159,7 +159,7 @@ class Beetdle(commands.Cog):
                     emb_field_name = "Your tries:"
                     emb_ephemeral = True
                 else:
-                    emb_title = "<@" + ctx.author.id + "> lost... The beetdle was **" + word + "**."
+                    emb_title = "<@" + str(ctx.author.id) + "> lost... The beetdle was **" + word + "**."
                     emb_description = ""
                     emb_field_name = "Their tries:"
                     emb_ephemeral = False
@@ -191,9 +191,9 @@ class Beetdle(commands.Cog):
 
         if(daily):
             if(won):
-                await ctx.send("[Beetdle] <@" + ctx.author.id + "> got the daily beetdle correctly in " + str(n_tries) + " tries!")
+                await ctx.send("[Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries!")
             else:
-                await ctx.send("[Beetdle] <@" + ctx.author.id + "> didn't get the daily beetle correctly...")
+                await ctx.send("[Beetdle] <@" + str(ctx.author.id) + "> didn't get the daily beetle correctly...")
 
         print(word)
 
