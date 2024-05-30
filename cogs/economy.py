@@ -125,7 +125,7 @@ class Economy(commands.Cog):
                     if(not game["member_id"] in win_count):
                         win_count[game["member_id"]] = 1
                     else: win_count[game["member_id"]] += 1
-            win_count = dict(sorted(win_count.items(), key=lambda item: item[1]))
+            win_count = dict(sorted(win_count.items(), key=lambda item: item[1]), reverse=True)
 
             # Get leaderboard
             embedString = ""
