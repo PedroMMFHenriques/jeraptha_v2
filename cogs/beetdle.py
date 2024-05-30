@@ -115,13 +115,13 @@ class Beetdle(commands.Cog):
 
             if(daily):
                 emb_title = "[Daily Beetle] You got it! The daily beetdle is '" + word + "'!"
-                emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(reward) + "<:beets:1245409413284499587>!"
+                emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
             else:
                 reward = reward / 10
                 emb_title = "[Non-Daily Beetle] You got the beetdle '" + word + "'!"
-                emb_description = "It took <@" + str(ctx.author.id) + "> " + str(n_tries) + " tries.\nThey won " + str(reward) + "<:beets:1245409413284499587>!"
+                emb_description = "It took <@" + str(ctx.author.id) + "> " + str(n_tries) + " tries.\nThey won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
 
