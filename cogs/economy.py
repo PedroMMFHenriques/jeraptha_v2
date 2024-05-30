@@ -22,6 +22,7 @@ myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
 rewardsCol = myDB[db["REWARDS_COL"]]
+beetdleCol = myDB[db["BEETDLE_COL"]]
 
 class Economy(commands.Cog):
     """
@@ -81,34 +82,67 @@ class Economy(commands.Cog):
 
     # LEADERBOARD
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
-    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet'])
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet', 'Beetle Daily', 'Beetle Total'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
-        if(option == "Wallet"):
-            check_value = "coins"
-            embed_title = "Check out the richest dudes!"
-            embed_subtitle = "Most beets <:beets:1245409413284499587>:"
-        elif(option == "Total Bet"):
-            check_value = "coins_bet"
-            embed_title = "Check out the problem gamblers!"
-            embed_subtitle = "Most beets <:beets:1245409413284499587> bet:"
+        if(option == "Wallet" or option == "Total Bet"): 
+            if(option == "Wallet"):
+                check_value = "coins"
+                embed_title = "Check out the richest dudes!"
+                embed_subtitle = "Most beets <:beets:1245409413284499587>:"
+                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value : 1}).sort(check_value, -1)
+                
+            elif(option == "Total Bet"):
+                check_value = "coins_bet"
+                embed_title = "Check out the problem gamblers!"
+                embed_subtitle = "Most beets <:beets:1245409413284499587> bet:"
+                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value : 1}).sort(check_value, -1)
 
-        myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value : 1}).sort(check_value, -1)
-        if(myLeaderboard is None):
-            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            if(myLeaderboard is None):
+                await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            
+            # Get leaderboard
+            embedString = ""
+            for user in myLeaderboard:
+                user_name = str(user["member_id"])
+                user_value = str(user[check_value])
+                embedString += "<@" + user_name + ">: " + user_value + "\n"
 
-        # Get leaderboard
-        embedString = ""
-        for user in myLeaderboard:
-            user_name = str(user["member_id"])
-            user_value = str(user[check_value])
-            embedString += "<@" + user_name + ">: " + user_value + "\n"
 
+        elif(option == "Beetle Daily" or option == "Beetle Total"):
+            if(option == "Beetle Daily"):
+                gamesList = beetdleCol.find({"daily": True, "ended": True, "won": True},{"_id": 0, "member_id": 1})
+                embed_title = "Check out the most dedicated beetdlers!"
+                embed_subtitle = "Most daily beetdle wins:"
+            
+            elif(option == "Beetle Total"):
+                gamesList = beetdleCol.find({"ended": True, "won": True},{"_id": 0, "member_id": 1})
+                embed_title = "Check out the problem beetdlers!"
+                embed_subtitle = "Most total beetdle wins:"
+                    
+            win_count = {}
+            for game in gamesList:
+                if(ctx.guild.get_member(game["member_id"]) is not None): #if the member that played the game is on the server
+                    if(not game["member_id"] in win_count):
+                        win_count[game["member_id"]] = 1
+                    else: win_count[game["member_id"]] += 1
+            win_count = dict(sorted(win_count.items(), key=lambda item: item[1]))
+
+            # Get leaderboard
+            embedString = ""
+            for user in win_count:
+                user_name = str(user)
+                user_value = str(win_count[user])
+                embedString += "<@" + user_name + ">: " + user_value + "\n"
+
+                
         # Generate embed
         embed = discord.Embed(description=embed_title,
                       colour=0x009900)
         
-        embed.set_author(name="Leaderboard",
-                        icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")
+        """embed.set_author(name="Leaderboard",
+                        icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")"""
+        
+        embed.set_author(name="Leaderboard")
         
         embed.add_field(name=embed_subtitle,
                         value=embedString,

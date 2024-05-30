@@ -1,13 +1,10 @@
-import os
 import discord
 from discord.ext import commands
 
-import time, math
-from datetime import datetime, timedelta, date
+from datetime import datetime, date
 
 import pymongo
 
-import asyncio
 import random
 
 import numpy as np
@@ -23,7 +20,6 @@ myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
 beetdleCol = myDB[db["BEETDLE_COL"]]
-
 
 
 wotd_list = [] # Get word of the day list: faster to get a random word
