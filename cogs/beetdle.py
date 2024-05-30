@@ -76,7 +76,7 @@ class Beetdle(commands.Cog):
             seed = datetime_today - datetime.combine(date(1970, 1, 1), datetime.min.time()) # Current day's seed
             random.seed(seed)
             wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
-            beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
+            beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
         
         else:
             # Check if it is the first guess of a non-daily
@@ -84,7 +84,7 @@ class Beetdle(commands.Cog):
             if(checkNewNonDailyGame is None): # If it is the first guess of a non-daily
                 random.seed()
                 wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
-                beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": False, "word": wotd, "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
+                beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": False, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
 
         checkBeetdle = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "word": 1, "tries": 1, "guesses": 1, "guesses_print": 1})
 
@@ -105,8 +105,8 @@ class Beetdle(commands.Cog):
         if(guess == word): # Correct word, end game
             game_won = True
             game_over = True
-            guesses = prev_guesses + "," + word.upper()
-            guesses_print = prev_guesses_print + "**" + word.upper() + "**"
+            guesses = prev_guesses + "," + word
+            guesses_print = prev_guesses_print + "**" + word + "**"
             myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
             newValues = {'$set': {"ended": True, "won": True, "guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
             beetdleCol.update_one(myQuery, newValues)
@@ -114,13 +114,13 @@ class Beetdle(commands.Cog):
             reward = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
 
             if(daily):
-                emb_title = "[Daily Beetle] You got it! The daily beetdle is **" + word.upper() + "**!"
+                emb_title = "[Daily Beetle] You got it! The daily beetdle is '" + word + "'!"
                 emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(reward) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
             else:
                 reward = reward / 10
-                emb_title = "[Non-Daily Beetle] You got the beetdle **" + word.upper() + "**!"
+                emb_title = "[Non-Daily Beetle] You got the beetdle '" + word + "'!"
                 emb_description = "It took <@" + str(ctx.author.id) + "> " + str(n_tries) + " tries.\nThey won " + str(reward) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
@@ -166,7 +166,7 @@ class Beetdle(commands.Cog):
                 if(letter_c == "C"): cor = "**"
                 elif(letter_c == "S"): cor = "__"
                 else: cor = "~~"
-                guess_correction += cor + letter_g.upper() + cor + " "
+                guess_correction += cor + letter_g + cor + " "
 
             guesses = prev_guesses + "," + guess
             guesses_print = prev_guesses_print + guess_correction + "\n"
@@ -176,12 +176,12 @@ class Beetdle(commands.Cog):
                 beetdleCol.update_one(myQuery, newValues)
 
                 if(daily):
-                    emb_title = "[Daily Beetle] You lost... The daily beetdle was **" + word.upper() + "**."
+                    emb_title = "[Daily Beetle] You lost... The daily beetdle was '" + word + "'."
                     emb_description = "You didn't win any <:beets:1245409413284499587>..."
                     emb_field_name = "Your tries:"
                     emb_ephemeral = True
                 else:
-                    emb_title = "[Non-Daily Beetle] You lost... The beetdle was **" + word.upper() + "**."
+                    emb_title = "[Non-Daily Beetle] You lost... The beetdle was '" + word + "'."
                     emb_description = "<@" + str(ctx.author.id) + "> didn't win any <:beets:1245409413284499587>..."
                     emb_field_name = "Their tries:"
                     emb_ephemeral = False
@@ -192,9 +192,9 @@ class Beetdle(commands.Cog):
                 beetdleCol.update_one(myQuery, newValues)
 
                 if(daily):
-                    emb_title = "[Daily Beetle] Try " + str(n_tries) + "] '" + guess + "' wasn't correct."
+                    emb_title = "[Daily Beetle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
                 else:
-                    "[Non-Daily Beetle] Try " + str(n_tries) + "] '" + guess + "' wasn't correct."
+                    emb_title = "[Non-Daily Beetle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
                 emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n\n"
                 emb_description += "You have **" + str(6 - n_tries) + "** more tries."
                 emb_field_name = "Your tries:"
