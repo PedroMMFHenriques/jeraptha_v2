@@ -127,13 +127,15 @@ class Beetdle(commands.Cog):
 
             correction = "" #C correct, S correct wrong space, X incorrect
             for letter_g, letter_word in zip(guess, word):
-                if(letter_g == letter_word): # Correct letter in correct space
+                if(not letter_g in word_count): # Wrong letter
+                    correction += "X"
+                elif(letter_g == letter_word): # Correct letter in correct space
                     correction += "C" 
                     word_count[letter_g] -= 1
                 elif(word_count[letter_g] >= 1): # Correct letter in wrong space
                     correction += "S"
                     word_count[letter_g] -= 1
-                else: # Wrong letter
+                else: # The letter is there, but there are too many already
                     correction += "X"
 
             guess_correction = ""

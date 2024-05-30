@@ -27,6 +27,9 @@ usersCol = myDB[db["USERS_COL"]]
 wagersCol = myDB["Wagers"]
 wagersSubCol = myDB["WagersSub"]
 
+"""beetdleCol = myDB[db["BEETDLE_COL"]]
+beetdleCol.drop()"""
+
 """usersCol.update_many({},
                 {"$set" : {"coins_bet": 0}},
                 upsert = False
