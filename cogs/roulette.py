@@ -43,7 +43,7 @@ class Roulette(commands.Cog):
     
     # ROULETTE START
     @roulette.command(name="start", description="Start a game of roulette.")
-    @discord.option("betting_time", description="Duration of the betting time in seconds (max 120).", required=False, default=30)
+    @discord.option("betting_time", description="Duration of the betting time in seconds (10-120).", required=False, default=30)
     async def start(self, ctx: discord.ApplicationContext, betting_time: int):
         rouletteGameCheck = rouletteGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1})
         if(rouletteGameCheck is None):
@@ -59,6 +59,9 @@ class Roulette(commands.Cog):
 
         if(betting_time > 120):
             await ctx.respond("Max betting time is 120 seconds!", ephemeral=True)
+            return
+        elif(betting_time > 10):
+            await ctx.respond("Min betting time is 10 seconds!", ephemeral=True)
             return
 
         end_betting_time = betting_time + math.floor(time.time())
