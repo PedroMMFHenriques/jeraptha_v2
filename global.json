@@ -4,7 +4,8 @@
         "CLIENT": "mongodb://localhost:27017/",
         "DB": "JerapthaV2",
         "USERS_COL": "Users",
-        "REWARDS_COL": "Rewards"
+        "REWARDS_COL": "Rewards",
+        "BEETDLE_COL": "Beetdle"
     },
 
     "ROLES":
