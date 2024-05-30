@@ -168,7 +168,7 @@ class Beetdle(commands.Cog):
                 newValues = {'$set': {"guesses": guesses}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
 
-                emb_title = "[Try " + n_tries + "] " + guess + " wasn't correct."
+                emb_title = "[Try " + str(n_tries) + "] " + guess + " wasn't correct."
                 emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n\n"
                 emb_description += "You have **" + str(6 - n_tries) + "** more tries."
                 emb_field_name = "Your tries:"
