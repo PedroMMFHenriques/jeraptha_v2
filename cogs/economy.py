@@ -56,7 +56,7 @@ class Economy(commands.Cog):
             daily_coins = daily_coins * daily_boost_tier["MULT"]
             extra_msg = ""
             if(random.SystemRandom().randint(1, 101) >= 101 - daily_crit_tier["CHANCE"]): 
-                daily_coins = daily_coins*3
+                daily_coins = daily_coins*3*daily_crit_tier["MULT"]
                 extra_msg = "a **CRIT**, winning "
             elif(random.SystemRandom().randint(1, 101) <= 5 and checkUser["coins"] > 1000):
                 daily_coins = daily_coins/3

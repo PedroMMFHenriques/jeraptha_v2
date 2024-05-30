@@ -49,11 +49,13 @@ class Rewards(commands.Cog):
             if(reward_name == "DAILY_BOOST"):
                 user_tier = userCheck["daily_boost_tier"]
                 reward_description = "Multiplier of the /daily reward.\n"
+                n_rewards = 1
                 
 
             elif(reward_name == "DAILY_CRIT"):
                 user_tier = userCheck["daily_crit_tier"]
-                reward_description = "Increase the % chance of a CRIT /daily, gaining 3x<:beets:1245409413284499587>.\n"
+                reward_description = "Increase the % chance and multiplier of a CRIT /daily, gaining increased <:beets:1245409413284499587>.\n"
+                n_rewards = 2
                 
             else:
                 await ctx.respond("Invalid reward name!", ephemeral=True)
@@ -67,13 +69,19 @@ class Rewards(commands.Cog):
     
                 if(tier_num < user_tier_num): continue #Skip previous tiers to the user's tier
                 elif(tier_num == user_tier_num):
-                    reward_value = list(tier_info.values())[1]
-                    reward_title = "`" + reward_name + "` (" + user_tier + ":  " + list(tier_info.keys())[1] + " = " + str(reward_value) + ")"
+                    if(n_rewards == 1):
+                        reward_title = "`" + reward_name + "` (" + user_tier + ":  " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ")"
+                    elif(n_rewards == 2):
+                        reward_title = "`" + reward_name + "` (" + user_tier + ":  " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ", " + list(tier_info.keys())[2] + " = " + str(list(tier_info.values())[2]) + ")"
+
                     if(user_tier_num + 1 >= n_tiers):
                         reward_description += "**MAX TIER**"
                 else:
                     if(tier_num == user_tier_num + 1): reward_description += "**NEXT** "
-                    reward_description += tier + ": " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ", costs " + str(list(tier_info.values())[0]) + " <:beets:1245409413284499587>.\n"
+                    if(n_rewards == 1):
+                        reward_description += tier + ": " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ", costs " + str(list(tier_info.values())[0]) + " <:beets:1245409413284499587>.\n"
+                    elif(n_rewards == 2):
+                        reward_description += tier + ": " + list(tier_info.keys())[1] + " = " + str(list(tier_info.values())[1]) + ", " + list(tier_info.keys())[2] + " = " + str(list(tier_info.values())[2]) + ", costs " + str(list(tier_info.values())[0]) + " <:beets:1245409413284499587>.\n"
 
 
             embed.add_field(name=reward_title,
