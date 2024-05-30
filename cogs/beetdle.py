@@ -28,14 +28,14 @@ beetdleCol = myDB[db["BEETDLE_COL"]]
 
 wotd_list = [] # Get word of the day list: faster to get a random word
 full_dict = {} # All guesses dictionary: faster to verify if word is valid
-with open("/data/beetdle_dict/wordle-La.txt", 'r') as file:
+with open("data/beetdle_dict/wordle-La.txt", 'r') as file:
     for line in file:
         word = line.strip()
         if word:  # Ensure the line is not empty
             wotd_list.append(word)
             full_dict[word] = ''
 
-with open("/data/beetdle_dict/wordle-Ta.txt", 'r') as file:
+with open("data/beetdle_dict/wordle-Ta.txt", 'r') as file:
     for line in file:
         word = line.strip()
         if word:  # Ensure the line is not empty
