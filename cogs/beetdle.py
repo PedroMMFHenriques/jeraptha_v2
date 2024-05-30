@@ -171,6 +171,7 @@ class Beetdle(commands.Cog):
             guesses = prev_guesses + "," + guess
             guesses_print = prev_guesses_print + guess_correction + "\n"
             if(n_tries >= 6): # Lost, end game
+                game_over = True
                 myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
                 newValues = {'$set': {"ended": True, "won": False, "guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
@@ -195,7 +196,7 @@ class Beetdle(commands.Cog):
                     emb_title = "[Daily Beetle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
                 else:
                     emb_title = "[Non-Daily Beetle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
-                emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n\n"
+                emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n"
                 emb_description += "You have **" + str(6 - n_tries) + "** more tries."
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
