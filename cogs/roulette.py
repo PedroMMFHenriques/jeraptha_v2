@@ -60,7 +60,7 @@ class Roulette(commands.Cog):
         if(betting_time > 120):
             await ctx.respond("Max betting time is 120 seconds!", ephemeral=True)
             return
-        elif(betting_time > 10):
+        elif(betting_time < 10):
             await ctx.respond("Min betting time is 10 seconds!", ephemeral=True)
             return
 
