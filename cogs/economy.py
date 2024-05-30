@@ -136,13 +136,13 @@ class Economy(commands.Cog):
 
                 
         # Generate embed
-        embed = discord.Embed(description=embed_title,
+        embed = discord.Embed(title= option + " Leaderboard",
+                              description=embed_title,
                       colour=0x009900)
         
         """embed.set_author(name="Leaderboard",
                         icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")"""
         
-        embed.set_author(name="Leaderboard")
         
         embed.add_field(name=embed_subtitle,
                         value=embedString,
