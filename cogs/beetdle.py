@@ -66,7 +66,7 @@ class Beetdle(commands.Cog):
             await ctx.respond("That word isn't in the English dictionary!", ephemeral=True)
             return
         
-        datetime_today = datetime.combine(datetime_today, datetime.min.time())
+        datetime_today = datetime.combine(datetime.today(), datetime.min.time())
 
         # Check if it is the first guess of the daily
         checkNewDailyGame = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today},{})
