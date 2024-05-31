@@ -181,24 +181,31 @@ class Rewards(commands.Cog):
 
         #Check perms and apply punishment
         if(punishment == "RENAME"):
+            if(new_nick is None):
+                await ctx.respond("You have to choose the option 'new_nick'!", ephemeral=True)
+                return
+
             try:
                 await user_change.edit(nick=new_nick, reason=reason)
                 response_msg = "<@" + ctx.author.id + "> changed " + target_user + "'s nickname!"
-            except:
+            except Exception as e: 
+                print(e)
                 await ctx.respond("You can't change " + target_user + "'s nickame!", ephemeral=True)
                 return
         elif(punishment == "MUTE"):
             try:
                 await user_change.edit(mute=True, reason=reason)
                 response_msg = "<@" + ctx.author.id + "> muted " + target_user + "!"
-            except:
+            except Exception as e: 
+                print(e)
                 await ctx.respond("You can't mute " + target_user + "!", ephemeral=True)
                 return
         elif(punishment == "DISCONNECT"):
             try:
                 await user_change.edit(voice_channel=None, reason=reason)
                 response_msg = "<@" + ctx.author.id + "> disconnected " + target_user + "!"
-            except:
+            except Exception as e:
+                print(e)
                 await ctx.respond("You can't disconnect " + target_user + "!", ephemeral=True)
                 return
         
