@@ -111,16 +111,31 @@ class Beetdle(commands.Cog):
             beetdleCol.update_one(myQuery, newValues)
 
             reward = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
+            reward = reward*(1 + (6-n_tries)/10) # increase by 10% per try left
 
             if(daily):
-                emb_title = "[Daily Beetdle] You got it! The daily beetdle is '" + word + "'!"
-                emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(int(reward)) + "<:beets:1245409413284499587>!"
+                if(n_tries == 1):
+                    emb_title = "[Daily Beetdle] WHAAAAT! You got the daily beetdle correctly in the first try! It is '" + word + "'."
+                    emb_description = "You won " + str(int(reward)) + "<:beets:1245409413284499587>!"
+                elif(n_tries == 6):
+                    emb_title = "[Daily Beetdle] PHEW! You got the daily beetdle correctly in the last try! It is '" + word + "'."  
+                    emb_description = "You won " + str(int(reward)) + "<:beets:1245409413284499587>!"              
+                else:
+                    emb_title = "[Daily Beetdle] You got it! The daily beetdle is '" + word + "'!"
+                    emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
             else:
                 reward = reward / 10
-                emb_title = "[Non-Daily Beetdle] You got the beetdle '" + word + "'!"
-                emb_description = "It took <@" + str(ctx.author.id) + "> " + str(n_tries) + " tries.\nThey won " + str(int(reward)) + "<:beets:1245409413284499587>!"
+                if(n_tries == 1):
+                    emb_title = "[Non-Daily Beetdle] WHAAAAT! You got the daily beetdle correctly in the first try! It is '" + word + "'."
+                    emb_description = "You won " + str(int(reward)) + "<:beets:1245409413284499587>!"
+                elif(n_tries == 6):
+                    emb_title = "[Non-Daily Beetdle] PHEW! You got the daily beetdle correctly in the last try! It is '" + word + "'."  
+                    emb_description = "You won " + str(int(reward)) + "<:beets:1245409413284499587>!"              
+                else:
+                    emb_title = "[Non-Daily Beetdle] You got it! The daily beetdle is '" + word + "'!"
+                    emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
 
@@ -176,12 +191,12 @@ class Beetdle(commands.Cog):
                 beetdleCol.update_one(myQuery, newValues)
 
                 if(daily):
-                    emb_title = "[Daily Beetdle] You lost... The daily beetdle was '" + word + "'."
+                    emb_title = "[Daily Beetdle] Oh, you lost... The daily beetdle was '" + word + "'."
                     emb_description = "You didn't win any <:beets:1245409413284499587>..."
                     emb_field_name = "Your tries:"
                     emb_ephemeral = True
                 else:
-                    emb_title = "[Non-Daily Beetdle] You lost... The beetdle was '" + word + "'."
+                    emb_title = "[Non-Daily Beetdle] Oh, you lost... The beetdle was '" + word + "'."
                     emb_description = "<@" + str(ctx.author.id) + "> didn't win any <:beets:1245409413284499587>..."
                     emb_field_name = "Their tries:"
                     emb_ephemeral = False
@@ -196,7 +211,10 @@ class Beetdle(commands.Cog):
                 else:
                     emb_title = "[Non-Daily Beetdle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
                 emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n"
-                emb_description += "You have **" + str(6 - n_tries) + "** more tries."
+                if(n_tries == 5):
+                    emb_description += "You only have **one last try**!"
+                else:
+                    emb_description += "You have **" + str(6 - n_tries) + "** more tries."
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
 
@@ -216,7 +234,12 @@ class Beetdle(commands.Cog):
 
         if(daily and game_over):
             if(game_won):
-                await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries and won " + str(int(reward)) + "<:beets:1245409413284499587>!")
+                if(n_tries == 1):
+                    await ctx.send("[Daily Beetdle] WHAAAAT! <@" + str(ctx.author.id) + "> got the daily beetdle correctly in the first try and won " + str(int(reward)) + "<:beets:1245409413284499587>!")
+                elif(n_tries == 6):
+                    await ctx.send("[Daily Beetdle] PHEW! <@" + str(ctx.author.id) + "> got the daily beetdle correctly in the last try and won " + str(int(reward)) + "<:beets:1245409413284499587>!")
+                else:
+                    await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries and won " + str(int(reward)) + "<:beets:1245409413284499587>!")
             else:
                 await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> didn't get the daily beetdle correctly...")
 
