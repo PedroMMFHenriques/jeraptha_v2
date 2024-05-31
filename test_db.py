@@ -29,13 +29,18 @@ usersCol = myDB[db["USERS_COL"]]
 wagersCol = myDB["Wagers"]
 wagersSubCol = myDB["WagersSub"]
 
+
+for x in usersCol.find({},{ "_id": 0, "last_punished": 1}):
+  print(x)
+
 """beetdleCol = myDB[db["BEETDLE_COL"]]
 beetdleCol.drop()"""
 
-usersCol.update_many({},
+"""usersCol.update_many({},
                 {"$set" : {"last_punish": datetime(2000, 1, 1)}},
                 upsert = True
-              )
+              )"""
+
 
 """for x in wagersCol.find({},{}):
   print(x)"""

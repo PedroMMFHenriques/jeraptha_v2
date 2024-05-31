@@ -234,7 +234,6 @@ class Rewards(commands.Cog):
         newValues = {'$set': {'last_punish': datetime.now()}}
         usersCol.update_one(myQuery, newValues)
 
-
         # Remove coins from punisher
         remove_coins = 0 - target_punishment["COST"]
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
