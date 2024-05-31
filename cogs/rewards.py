@@ -17,13 +17,16 @@ usersCol = myDB[db["USERS_COL"]]
 rewardsCol = myDB[db["REWARDS_COL"]]
 
 reason = "Jeraptha punishment"
-punishments = global_json["PUNISHMENTS"]
 
-perk_list = ["DAILY_BOOST", "DAILY_CRIT"]
+global_json = json.load(open('global.json'))
+perk_list = list(global_json["TIERED_REWARDS"].keys())
+punishment_list = list(global_json["PUNISHMENTS"].keys())
+for i in range(len(punishment_list)):
+    punishment_list[i] += " (costs " +  global_json["PUNISHMENTS"][punishment_list[i]]["COST"] + ")"
 
 class Rewards(commands.Cog): 
     """
-    Check and upgrade perks.
+    Check and upgrade perks. Buy punishments for other users.
     """
         
     def __init__(self, bot): 
@@ -147,46 +150,64 @@ class Rewards(commands.Cog):
         await ctx.respond("[Perk] <@" + str(ctx.author.id) + "> upgraded **" + perk + "** to **" + next_tier + "**!")
 
 
-
-    # RENAME
-    @discord.command(name="rename", description="Rename an user. Costs " + str(punishments["RENAME_COST"]) + " beets.")
-    @discord.option("user", description="@ the target user.", required=True)
-    @discord.option("new_nick", description="Choose the new nick for the user.", required=True)
-    async def rename(self, ctx: discord.ApplicationContext, user: str, new_nick: str):
+    # PUNISH
+    @discord.command(name="punish", description="Punish an user.")
+    @discord.option("punishment", description="What punishment to apply.", required=True, choices = punishment_list)
+    @discord.option("target_user", description="@ the target user.", required=True)
+    @discord.option("new_nick", description="[RENAME] Choose the new nick for the user.", required=False)
+    async def rename(self, ctx: discord.ApplicationContext, punishment: str, target_user: str, new_nick: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
         if(userCheck is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
-
-        if(userCheck["coins"] < punishments["RENAME_COST"]): 
+        
+        target_punishment = global_json["PUNISHMENTS"][punishment]
+        if(userCheck["coins"] < target_punishment["COST"]): 
             await ctx.respond("You don't have enough <:beets:1245409413284499587>, scrub!", ephemeral=True)
             return
         
         #Check user argument
         try:
-            user_change = user.split("@")[1][:-1]
+            user_change = target_user.split("@")[1][:-1]
             user_change = ctx.guild.get_member(int(user_change))
         except:
             await ctx.respond("Wrong user argument! Make sure you @ an user.", ephemeral=True)
             return
 
         if user_change.bot:
-            await ctx.respond("You can't change a bot's nickname!", ephemeral=True)
+            await ctx.respond("You can't target a bot!", ephemeral=True)
             return
 
-        #Check perms
-        try:
-            await user_change.edit(nick=new_nick, reason=reason)
-        except:
-            await ctx.respond("You can't change " + user + "'s nickame!", ephemeral=True)
-            return
+        #Check perms and apply punishment
+        if(punishment == "RENAME"):
+            try:
+                await user_change.edit(nick=new_nick, reason=reason)
+                response_msg = "<@" + ctx.author.id + "> changed " + target_user + "'s nickname!"
+            except:
+                await ctx.respond("You can't change " + target_user + "'s nickame!", ephemeral=True)
+                return
+        elif(punishment == "MUTE"):
+            try:
+                await user_change.edit(mute=True, reason=reason)
+                response_msg = "<@" + ctx.author.id + "> muted " + target_user + "!"
+            except:
+                await ctx.respond("You can't mute " + target_user + "!", ephemeral=True)
+                return
+        elif(punishment == "DISCONNECT"):
+            try:
+                await user_change.edit(voice_channel=None, reason=reason)
+                response_msg = "<@" + ctx.author.id + "> disconnected " + target_user + "!"
+            except:
+                await ctx.respond("You can't disconnect " + target_user + "!", ephemeral=True)
+                return
         
-        remove_coins = 0 - punishments["RENAME_COST"]
+
+        remove_coins = 0 - target_punishment["COST"]
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)
 
-        await ctx.respond("You changed " + user + "'s nickname!", ephemeral=True)
+        await ctx.respond(response_msg)
 
 
 

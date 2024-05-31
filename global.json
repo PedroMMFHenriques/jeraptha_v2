@@ -23,7 +23,18 @@
 
     "PUNISHMENTS":
     {
-        "RENAME_COST": 1000
+        "RENAME":
+        {
+            "COST": 5000
+        },
+        "MUTE":
+        {
+            "COST": 2500
+        },
+        "DISCONNECT":
+        {
+            "COST": 2500
+        }         
     },
 
     "TIERED_REWARDS":
