@@ -183,7 +183,7 @@ class Rewards(commands.Cog):
         
 
         # Don't punish if user was punished less than 1 hour ago
-        if(userCheck["last_punish"] + timedelta(hours=1) <  datetime.now()):
+        if(userCheck["last_punish"] + timedelta(hours=1) >  datetime.now()):
             timeLeft = userCheck["last_punish"] + timedelta(hours=1) - datetime.now()
             minutesLeft = math.floor(timeLeft.seconds/60)
             secondsLeft = timeLeft.seconds - minutesLeft*60

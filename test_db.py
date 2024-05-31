@@ -34,7 +34,7 @@ beetdleCol.drop()"""
 
 usersCol.update_many({},
                 {"$set" : {"last_punish": datetime(2000, 1, 1)}},
-                upsert = False
+                upsert = True
               )
 
 """for x in wagersCol.find({},{}):
