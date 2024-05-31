@@ -40,7 +40,7 @@ usersCol.update_many({},
                 upsert = False
               )
 
-for x in usersCol.find({},{ "_id": 0, "last_punished": 1}):
+for x in usersCol.find({},{ "_id": 0, "last_punish": 1}):
   print(x)
 
 """for x in wagersCol.find({},{}):
