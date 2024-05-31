@@ -25,7 +25,7 @@
     {
         "RENAME":
         {
-            "COST": 5000
+            "COST": 7000
         },
         "MUTE":
         {
@@ -33,7 +33,7 @@
         },
         "DISCONNECT":
         {
-            "COST": 2500
+            "COST": 3500
         }         
     },
 

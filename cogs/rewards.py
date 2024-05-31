@@ -4,7 +4,7 @@ from discord.ext import commands
 
 import pymongo
 
-from datetime import datetime, timedelta, date
+import asyncio
 
 import json
 global_json = json.load(open('global.json'))
@@ -184,26 +184,29 @@ class Rewards(commands.Cog):
             if(new_nick is None):
                 await ctx.respond("You have to choose the option 'new_nick'!", ephemeral=True)
                 return
-
             try:
                 await user_change.edit(nick=new_nick, reason=reason)
                 response_msg = "<@" + str(ctx.author.id) + "> changed " + target_user + "'s nickname!"
             except:
                 await ctx.respond("You can't change " + target_user + "'s nickame! They're an admin.", ephemeral=True)
                 return
+            
         elif(punishment == "MUTE"):
-            if(user_change.voice == None):
+            if(user_change.voice is None):
                 await ctx.respond("You can't mute " + target_user + " while they're not on a voice channel!", ephemeral=True)
                 return
-
+            elif(user_change.voice.mute == True):
+                await ctx.respond(target_user + " is already muted!", ephemeral=True)
+                return
             try:
                 await user_change.edit(mute=True, reason=reason)
                 response_msg = "<@" + str(ctx.author.id) + "> muted " + target_user + "!"
             except:
                 await ctx.respond("You can't mute " + target_user + "! They're an admin.", ephemeral=True)
                 return
+            
         elif(punishment == "DISCONNECT"):
-            if(user_change.voice == None):
+            if(user_change.voice is None):
                 await ctx.respond("You can't disconnect " + target_user + " while they're not on a voice channel!", ephemeral=True)
                 return
             
@@ -221,6 +224,17 @@ class Rewards(commands.Cog):
         usersCol.update_one(myQuery, newValues)
 
         await ctx.respond(response_msg)
+
+
+        if(punishment == "MUTE"):
+            # Mute duration
+            await asyncio.sleep(10)
+
+            if(user_change.voice is not None):
+                if(user_change.voice.mute == True):
+                    user_change.edit(mute=False, reason=reason)
+                    await ctx.send(target_user + " has been unmuted.")
+
 
 
 

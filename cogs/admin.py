@@ -98,6 +98,13 @@ class Admin(commands.Cog):
         await ctx.respond(content="<@" + str(ctx.author.id) + "> asked daddy J. Pow for a small loan of a million <:beets:1245409413284499587>!", file=file)
     
 
+    @commands.Cog.listener() 
+    async def on_voice_state_update(self, member, before, after): # this is called when a member changes voice state
+        if(before is None): # if member enters a voice channel
+            if(after.mute == True): # if a muted member enters a voice channel
+                member.edit(mute=False)
+
+
 def setup(bot):
     bot.add_cog(Admin(bot))
 
