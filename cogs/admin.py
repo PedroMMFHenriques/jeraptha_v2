@@ -102,11 +102,9 @@ class Admin(commands.Cog):
     async def on_voice_state_update(self, member, before, after): # this is called when a member changes voice state
         print(before)
         print(after)
-        if(before is None): # if member enters a voice channel
-            print("oi")
-            if(after.mute == True): # if a muted member enters a voice channel
-                print("oi mute")
-                member.edit(mute=False)
+        if(before.channel is None and after.mute == True): # if member enters a voice channel
+            print("oi mute")
+            member.edit(mute=False)
 
 
 def setup(bot):
