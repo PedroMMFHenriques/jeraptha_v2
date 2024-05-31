@@ -161,6 +161,7 @@ class Rewards(commands.Cog):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
         
+        punishment = punishment.split(" ")[0]
         target_punishment = global_json["PUNISHMENTS"][punishment]
         if(userCheck["coins"] < target_punishment["COST"]): 
             await ctx.respond("You don't have enough <:beets:1245409413284499587>, scrub!", ephemeral=True)
