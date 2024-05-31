@@ -187,7 +187,7 @@ class Rewards(commands.Cog):
             timeLeft = userCheck["last_punish"] + timedelta(hours=1) - datetime.now()
             minutesLeft = math.floor(timeLeft.seconds/60)
             secondsLeft = timeLeft.seconds - minutesLeft*60
-            await ctx.respond(target_user + " was punished less than an hour ago! Time left: " + minutesLeft + "m:" + secondsLeft + "s.", ephemeral=True)
+            await ctx.respond(target_user + " was punished less than an hour ago! Time left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
             return
         
         #Check perms and apply punishment
