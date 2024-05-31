@@ -192,18 +192,26 @@ class Rewards(commands.Cog):
                 await ctx.respond("You can't change " + target_user + "'s nickame! They're an admin.", ephemeral=True)
                 return
         elif(punishment == "MUTE"):
+            if(user_change.voice == None):
+                await ctx.respond("You can't mute " + target_user + " while they're not on a voice channel!", ephemeral=True)
+                return
+
             try:
                 await user_change.edit(mute=True, reason=reason)
                 response_msg = "<@" + str(ctx.author.id) + "> muted " + target_user + "!"
             except:
-                await ctx.respond("You can't mute " + target_user + "! They're not on voice or are an admin.", ephemeral=True)
+                await ctx.respond("You can't mute " + target_user + "! They're an admin.", ephemeral=True)
                 return
         elif(punishment == "DISCONNECT"):
+            if(user_change.voice == None):
+                await ctx.respond("You can't disconnect " + target_user + " while they're not on a voice channel!", ephemeral=True)
+                return
+            
             try:
                 await user_change.edit(voice_channel=None, reason=reason)
                 response_msg = "<@" + str(ctx.author.id) + "> disconnected " + target_user + "!"
             except:
-                await ctx.respond("You can't disconnect " + target_user + "! They're not on voice or are an admin.", ephemeral=True)
+                await ctx.respond("You can't disconnect " + target_user + "! They're an admin.", ephemeral=True)
                 return
         
 
