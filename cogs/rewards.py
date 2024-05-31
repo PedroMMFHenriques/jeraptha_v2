@@ -158,7 +158,7 @@ class Rewards(commands.Cog):
     @discord.option("target_user", description="@ the target user.", required=True)
     @discord.option("new_nick", description="[RENAME] Choose the new nick for the user.", required=False)
     async def rename(self, ctx: discord.ApplicationContext, punishment: str, target_user: str, new_nick: str):
-        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_punish": 1})
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
         if(userCheck is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
@@ -183,8 +183,9 @@ class Rewards(commands.Cog):
         
 
         # Don't punish if user was punished less than 1 hour ago
-        if(userCheck["last_punish"] + timedelta(hours=1) >  datetime.now()):
-            timeLeft = userCheck["last_punish"] + timedelta(hours=1) - datetime.now()
+        targetCheck = usersCol.find_one({"member_id": user_change.id, "guild_id": ctx.guild.id},{"_id": 0, "last_punish": 1})
+        if(targetCheck["last_punish"] + timedelta(hours=1) >  datetime.now()):
+            timeLeft = targetCheck["last_punish"] + timedelta(hours=1) - datetime.now()
             minutesLeft = math.floor(timeLeft.seconds/60)
             secondsLeft = timeLeft.seconds - minutesLeft*60
             await ctx.respond(target_user + " was punished less than an hour ago! Time left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
