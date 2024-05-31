@@ -22,7 +22,7 @@ global_json = json.load(open('global.json'))
 perk_list = list(global_json["TIERED_REWARDS"].keys())
 punishment_list = list(global_json["PUNISHMENTS"].keys())
 for i in range(len(punishment_list)):
-    punishment_list[i] += " (costs " +  global_json["PUNISHMENTS"][punishment_list[i]]["COST"] + ")"
+    punishment_list[i] += " (costs " +  str(global_json["PUNISHMENTS"][punishment_list[i]]["COST"]) + ")"
 
 class Rewards(commands.Cog): 
     """
