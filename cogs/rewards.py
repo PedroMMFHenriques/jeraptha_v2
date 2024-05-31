@@ -193,6 +193,7 @@ class Rewards(commands.Cog):
             
         elif(punishment == "MUTE"):
             if(user_change.voice is None):
+                print(user_change.voice)
                 await ctx.respond("You can't mute " + target_user + " while they're not on a voice channel!", ephemeral=True)
                 return
             elif(user_change.voice.mute == True):
