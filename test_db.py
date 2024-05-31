@@ -35,10 +35,10 @@ wagersSubCol = myDB["WagersSub"]
 """beetdleCol = myDB[db["BEETDLE_COL"]]
 beetdleCol.drop()"""
 
-usersCol.update_many({},
+"""usersCol.update_many({},
                 {"$set" : {"earned_bet": 0, "total_earned": 0}},
                 upsert = False
-              )
+              )"""
 
 
 """for x in wagersCol.find({},{}):

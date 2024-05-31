@@ -84,7 +84,7 @@ class Economy(commands.Cog):
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
     @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Net Result', 'Beetdle Daily', 'Beetdle Total'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
-        if(option == "Wallet" or option == "Total Earned" or option == "Total Bet"): 
+        if(option == "Wallet" or option == "Total Earned" or option == "Total Bet" or option == "Bet Net Result"): 
             if(option == "Wallet"):
                 check_value = "coins"
                 embed_title = "Check out the richest dudes!"
