@@ -118,10 +118,11 @@ class Economy(commands.Cog):
 
             if(myLeaderboard is None):
                 await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
-            
+            print(myLeaderboard)
             # Get leaderboard
             embedString = ""
             for user in myLeaderboard:
+                print(user)
                 user_name = str(user["member_id"])
                 user_value = str(user[check_value])
                 embedString += "<@" + user_name + ">: " + user_value + "\n"
