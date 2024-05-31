@@ -117,7 +117,7 @@ class Economy(commands.Cog):
             elif(option == "Beetdle Total"):
                 gamesList = beetdleCol.find({"ended": True, "won": True},{"_id": 0, "member_id": 1})
                 embed_title = "Check out the problem beetdlers!"
-                embed_subtitle = "Most total beetdle wins:"
+                embed_subtitle = "Most beetdle wins (daily and not):"
                     
             win_count = {}
             for game in gamesList:
