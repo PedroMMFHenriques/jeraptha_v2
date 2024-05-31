@@ -232,7 +232,7 @@ class Rewards(commands.Cog):
 
             if(user_change.voice is not None):
                 if(user_change.voice.mute == True):
-                    user_change.edit(mute=False, reason=reason)
+                    await user_change.edit(mute=False, reason=reason)
                     await ctx.send(target_user + " has been unmuted.")
 
 

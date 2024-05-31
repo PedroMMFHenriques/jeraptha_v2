@@ -103,8 +103,7 @@ class Admin(commands.Cog):
         print(before)
         print(after)
         if(before.channel is None and after.mute == True): # if member enters a voice channel
-            print("oi mute")
-            member.edit(mute=False)
+            await member.edit(mute=False)
 
 
 def setup(bot):
