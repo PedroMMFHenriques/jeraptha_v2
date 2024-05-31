@@ -64,7 +64,7 @@ class Economy(commands.Cog):
                 extra_msg = "a **CRIT FAILURE**, winning only "
             
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-            newValues = {"$set": {"last_daily": datetime.now()},'$inc': {'coins': int(daily_coins)}}
+            newValues = {"$set": {"last_daily": datetime.now()},'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins)}}
             usersCol.update_one(myQuery, newValues)
 
             myWallet = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})["coins"]
@@ -82,20 +82,38 @@ class Economy(commands.Cog):
 
     # LEADERBOARD
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
-    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Bet', 'Beetdle Daily', 'Beetdle Total'])
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Net Result', 'Beetdle Daily', 'Beetdle Total'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
-        if(option == "Wallet" or option == "Total Bet"): 
+        if(option == "Wallet" or option == "Total Earned" or option == "Total Bet"): 
             if(option == "Wallet"):
                 check_value = "coins"
                 embed_title = "Check out the richest dudes!"
                 embed_subtitle = "Most beets <:beets:1245409413284499587>:"
-                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value : 1}).sort(check_value, -1)
-                
+                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value: 1}).sort(check_value, -1)
+            
+            elif(option == "Total Earned"):
+                check_value = "total_earned"
+                embed_title = "Check out the biggest winners!"
+                embed_subtitle = "Most beets <:beets:1245409413284499587> earned:"
+                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value: 1}).sort(check_value, -1)
+    
             elif(option == "Total Bet"):
                 check_value = "coins_bet"
                 embed_title = "Check out the problem gamblers!"
                 embed_subtitle = "Most beets <:beets:1245409413284499587> bet:"
-                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value : 1}).sort(check_value, -1)
+                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value: 1}).sort(check_value, -1)
+            
+            elif(option == "Bet Net Result"):
+                check_value = "bet_net"
+                embed_title = "Check out the least losers!"
+                embed_subtitle = "Best net bet result:"
+                userList = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "earned_bet": 1, "coins_bet": 1})
+                
+                myLeaderboard = []
+                for user in userList:
+                    myLeaderboard.append({"member_id": user["member_id"], check_value: int(user["earned_bet"] - user["coins_bet"])})
+                myLeaderboard = sorted(myLeaderboard, reverse=True)
+
 
             if(myLeaderboard is None):
                 await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)

@@ -127,8 +127,9 @@ class Roulette(commands.Cog):
         winnings_embed = ""
         for winner in winners_list:
             if(winner["winnings"] > 0):
+                winnings = math.floor(winner["winnings"])
                 myQuery= {"member_id": int(winner["id"]), "guild_id": ctx.guild.id}
-                newValues = {'$inc': {'coins': math.floor(winner["winnings"])}}
+                newValues = {'$inc': {'coins': winnings, 'earned_bet': winnings, 'total_earned': winnings}}
                 usersCol.update_one(myQuery, newValues)
 
                 winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winner["winnings"])) + "**<:beets:1245409413284499587>!\n"
@@ -315,57 +316,6 @@ class Roulette(commands.Cog):
         rouletteUserCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "bet": int(amount), "bet_numbers": numbers_str})
 
         await ctx.respond("[Roulette] <@" + str(ctx.author.id) + "> bet on **" + print_msg + "** with **" + str(amount) + "**<:beets:1245409413284499587>!")
-
-
-    #roulette cancel ?????????????????????????????????????????????????????
-    """@wager.command(name="cancel", description="Cancel a wager.")
-    @discord.option("wager_id", description="ID of the wager.", required=True)
-    async def cancel(self, ctx: discord.ApplicationContext, wager_id: int):
-
-        # Checks
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
-        
-        if(wagerCheck is None): 
-            await ctx.respond("That wager doesn't exist!", ephemeral=True)
-            return
-        
-        elif(wagerCheck["canceled"] == True): 
-            await ctx.respond("That wager has been canceled!", ephemeral=True)
-            return
-        
-        elif(wagerCheck["settled"] == True): 
-            await ctx.respond("That wager was already settled!", ephemeral=True)
-            return
-
-        role = discord.utils.get(ctx.author.roles, name=AdminRole)
-        if(role is None and wagerCheck["author_id"] != ctx.author.id):
-            await ctx.respond("You didn't start this bet, so you can't cancel!", ephemeral=True)
-            return
-
-
-        # Cancel and return bets
-        myQuery= {"_id": wager_id}
-        newValues = {'$set': {"canceled": True,}}
-        wagersCol.update_one(myQuery, newValues)
-        
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
-
-        for bettor in wagersSub_bettors:
-            myQuery= {"member_id": int(bettor["member_id"]), "guild_id": ctx.guild.id}
-            newValues = {'$inc': {'coins': bettor["total_bet"]}}
-            usersCol.update_one(myQuery, newValues)
-
-        # Embed
-        wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
-        embed = discord.Embed(title="Bet Canceled: " + wagerCheck["title"],
-                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> canceled the bet!\nThe <:beets:1245409413284499587> have been returned.",
-                      colour=0x009900,
-                      timestamp=datetime.now())
-
-        embed.set_footer(text="Wager ID: " + str(wager_id),
-                        icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
-
-        await ctx.respond(content="<@&" + str(wagerRoleId) + ">\n", embed=embed, allowed_mentions=discord.AllowedMentions())"""
 
 
 def setup(bot):

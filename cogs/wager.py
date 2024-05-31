@@ -213,7 +213,7 @@ class Wager(commands.Cog):
             winnings = 0.99 * winner["bet"] * total_bet / winning_bet
 
             myQuery= {"member_id": int(winner["id"]), "guild_id": ctx.guild.id}
-            newValues = {'$inc': {'coins': math.floor(winnings)}}
+            newValues = {'$inc': {'coins': math.floor(winnings), 'earned_bet': math.floor(winnings), 'total_earned': math.floor(winnings)}}
             usersCol.update_one(myQuery, newValues)
 
             winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winnings)) + "**<:beets:1245409413284499587>!\n"
