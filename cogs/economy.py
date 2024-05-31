@@ -112,7 +112,8 @@ class Economy(commands.Cog):
                 myLeaderboard = []
                 for user in userList:
                     myLeaderboard.append({"member_id": user["member_id"], check_value: int(user["earned_bet"] - user["coins_bet"])})
-                myLeaderboard = sorted(myLeaderboard, reverse=True)
+                
+                myLeaderboard = dict(sorted(myLeaderboard.items(), key=lambda d: d[check_value], reverse=True))
 
 
             if(myLeaderboard is None):
