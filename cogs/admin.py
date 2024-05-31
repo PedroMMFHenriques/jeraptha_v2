@@ -101,7 +101,9 @@ class Admin(commands.Cog):
     @commands.Cog.listener() 
     async def on_voice_state_update(self, member, before, after): # this is called when a member changes voice state
         if(before is None): # if member enters a voice channel
+            print("oi")
             if(after.mute == True): # if a muted member enters a voice channel
+                print("oi mute")
                 member.edit(mute=False)
 
 
