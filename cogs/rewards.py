@@ -187,26 +187,23 @@ class Rewards(commands.Cog):
 
             try:
                 await user_change.edit(nick=new_nick, reason=reason)
-                response_msg = "<@" + ctx.author.id + "> changed " + target_user + "'s nickname!"
-            except Exception as e: 
-                print(e)
-                await ctx.respond("You can't change " + target_user + "'s nickame!", ephemeral=True)
+                response_msg = "<@" + str(ctx.author.id) + "> changed " + target_user + "'s nickname!"
+            except:
+                await ctx.respond("You can't change " + target_user + "'s nickame! They're an admin.", ephemeral=True)
                 return
         elif(punishment == "MUTE"):
             try:
                 await user_change.edit(mute=True, reason=reason)
-                response_msg = "<@" + ctx.author.id + "> muted " + target_user + "!"
-            except Exception as e: 
-                print(e)
-                await ctx.respond("You can't mute " + target_user + "!", ephemeral=True)
+                response_msg = "<@" + str(ctx.author.id) + "> muted " + target_user + "!"
+            except:
+                await ctx.respond("You can't mute " + target_user + "! They're not on voice or are an admin.", ephemeral=True)
                 return
         elif(punishment == "DISCONNECT"):
             try:
                 await user_change.edit(voice_channel=None, reason=reason)
-                response_msg = "<@" + ctx.author.id + "> disconnected " + target_user + "!"
-            except Exception as e:
-                print(e)
-                await ctx.respond("You can't disconnect " + target_user + "!", ephemeral=True)
+                response_msg = "<@" + str(ctx.author.id) + "> disconnected " + target_user + "!"
+            except:
+                await ctx.respond("You can't disconnect " + target_user + "! They're not on voice or are an admin.", ephemeral=True)
                 return
         
 
