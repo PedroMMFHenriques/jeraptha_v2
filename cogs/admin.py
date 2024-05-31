@@ -4,6 +4,8 @@ from discord.ext import commands
 
 import pymongo
 
+from datetime import datetime
+
 import json
 global_json = json.load(open('global.json'))
 
@@ -12,8 +14,11 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
+rewardsCol = myDB[db["REWARDS_COL"]]
 
 AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
+
+global_vars = global_json["VARS"]
 
 
 class Admin(commands.Cog):
@@ -39,22 +44,6 @@ class Admin(commands.Cog):
                     self.bot.load_extension(f"cogs.{filename[:-3]}")
                     print(f'{filename} successfully re-loaded')
             await ctx.respond('Extensions reloaded!', ephemeral=True)
-
-    
-
-    """# SEND_FILE
-    @discord.slash_command(name="send_file", description="[ADMIN] Sends file.", hidden=True)
-    async def send_file(self, ctx: discord.ApplicationContext):
-        role = discord.utils.get(ctx.author.roles, name=AdminRole) #Check if user has the correct role
-        if role is None:
-            await ctx.respond("You don't have the necessary role!", ephemeral=True)
-            return
-        
-        else:
-            with open('images/roulette/roulette_0.gif', 'rb') as f:
-                picture = discord.File(f)
-                await ctx.respond(file=picture)"""
-    
 
     
     # SET WALLET
@@ -98,10 +87,34 @@ class Admin(commands.Cog):
         await ctx.respond(content="<@" + str(ctx.author.id) + "> asked daddy J. Pow for a small loan of a million <:beets:1245409413284499587>!", file=file)
     
 
+    # UNMUTE USERS WHEN JOINING A VOICE CHANNEL
     @commands.Cog.listener() 
     async def on_voice_state_update(self, member, before, after): # this is called when a member changes voice state
-        if(before.channel is None and after.mute == True): # if member enters a voice channel
+        if(before.channel is None and after.mute == True): # if member enters a voice channel and is muted
             await member.edit(mute=False)
+
+
+    # INIT NEW USER
+    @commands.Cog.listener() 
+    async def on_member_join(self, member): # this is called when a member joins the server
+        usersCol.update_one(
+            {
+                "member_id": member.id, "guild_id": member.guild.id
+            }, 
+            {
+                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_vars["INIT_COINS"], "last_daily": datetime(2000, 1, 1), "last_punish": datetime(2000, 1, 1), "coins_bet": 0}
+            },
+            upsert = True
+        )
+        rewardsCol.update_one(
+                    {
+                        "member_id": member.id, "guild_id": member.guild.id
+                    }, 
+                    {
+                        "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "daily_boost_tier": "TIER_0", "daily_crit_tier": "TIER_0"}
+                    },
+                    upsert = True
+                )
 
 
 def setup(bot):

@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 
 import pymongo
 
+from datetime import datetime
+
 load_dotenv() # Load vars
 
 import json
@@ -30,10 +32,10 @@ wagersSubCol = myDB["WagersSub"]
 """beetdleCol = myDB[db["BEETDLE_COL"]]
 beetdleCol.drop()"""
 
-"""usersCol.update_many({},
-                {"$set" : {"coins_bet": 0}},
+usersCol.update_many({},
+                {"$set" : {"last_punish": datetime(2000, 1, 1)}},
                 upsert = False
-              )"""
+              )
 
 """for x in wagersCol.find({},{}):
   print(x)"""

@@ -47,7 +47,7 @@ class Economy(commands.Cog):
         checkRewards = rewardsCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "daily_boost_tier": 1, "daily_crit_tier": 1})
         if(checkUser is None or checkRewards is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
-        # Check if already did /daily today
+        # Check didn't do /daily today
         if(date.today() >= checkUser["last_daily"].date() + timedelta(days=1)):
             daily_coins = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
 
@@ -150,28 +150,6 @@ class Economy(commands.Cog):
 
         await ctx.respond(embed=embed)
 
-
-    # INIT NEW USER
-    @commands.Cog.listener() 
-    async def on_member_join(self, member): # this is called when a member joins the server
-        usersCol.update_one(
-            {
-                "member_id": member.id, "guild_id": member.guild.id
-            }, 
-            {
-                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_vars["INIT_COINS"], "last_daily": datetime(2000, 1, 1)}
-            },
-            upsert = True
-        )
-        rewardsCol.update_one(
-                    {
-                        "member_id": member.id, "guild_id": member.guild.id
-                    }, 
-                    {
-                        "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "daily_boost_tier": "TIER_0", "daily_crit_tier": "TIER_0"}
-                    },
-                    upsert = True
-                )
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Economy(bot)) # add the cog to the bot
