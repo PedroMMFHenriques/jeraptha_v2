@@ -72,19 +72,6 @@ class Admin(commands.Cog):
         usersCol.update_one(myQuery, newValues)
 
         await ctx.respond("You set " + user + "'s balance to " + str(new_balance) + " <:beets:1245409413284499587>!", ephemeral=True)
-
-
-    # BETA COMMAND REMOVE LATER
-    @discord.command(name="beg", description="Ask daddy J. Pow for a small loan of a million beets.")
-    async def beg(self, ctx: discord.ApplicationContext):
-
-        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-        newValues = {'$set': {'coins': 1000000}}
-        usersCol.update_one(myQuery, newValues)
-
-        with open("images/money-printer.gif", "rb") as fh:
-            file = discord.File(fh, filename="money-printer.gif")
-        await ctx.respond(content="<@" + str(ctx.author.id) + "> asked daddy J. Pow for a small loan of a million <:beets:1245409413284499587>!", file=file)
     
 
     # UNMUTE USERS WHEN JOINING A VOICE CHANNEL

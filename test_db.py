@@ -28,12 +28,15 @@ myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
 wagersCol = myDB["Wagers"]
 wagersSubCol = myDB["WagersSub"]
+rewardsCol = myDB["Rewards"]
+beetdleCol = myDB["Beetdle"]
 
-
-
-
-"""beetdleCol = myDB[db["BEETDLE_COL"]]
-beetdleCol.drop()"""
+usersCol.drop()
+beetdleCol.drop()
+wagersCol.drop()
+wagersSubCol.drop()
+rewardsCol.drop()
+beetdleCol.drop()
 
 """usersCol.update_many({},
                 {"$set" : {"earned_bet": 0, "total_earned": 0}},
