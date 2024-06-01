@@ -41,12 +41,12 @@ rewardsCol = myDB["Rewards"]
 beetdleCol = myDB["Beetdle"]
 
 
-usersCol.drop()
+"""usersCol.drop()
 beetdleCol.drop()
 wagersCol.drop()
 wagersSubCol.drop()
 rewardsCol.drop()
-beetdleCol.drop()
+beetdleCol.drop()"""
 
 
 """usersCol.update_many({},

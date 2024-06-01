@@ -3,7 +3,9 @@
     {
         "CLIENT": "mongodb://localhost:27017/",
         "DB": "JerapthaV2",
-        "USERS_COL": "Users"
+        "USERS_COL": "Users",
+        "REWARDS_COL": "Rewards",
+        "BEETDLE_COL": "Beetdle"
     },
 
     "ROLES":
@@ -17,5 +19,82 @@
         "INIT_COINS": 500,
         "DAILY_MEAN": 500,
         "DAILY_STD": 80
+    },
+
+    "PUNISHMENTS":
+    {
+        "RENAME":
+        {
+            "COST": 7000
+        },
+        "MUTE":
+        {
+            "COST": 2500
+        },
+        "DISCONNECT":
+        {
+            "COST": 3500
+        }         
+    },
+
+    "TIERED_REWARDS":
+    {
+        "DAILY_BOOST":
+        {
+            "TIER_0":
+            {
+                "COST": 0,
+                "MULT": 1
+            },
+
+            "TIER_1":
+            {
+                "COST": 2000,
+                "MULT": 1.2
+            },
+
+            "TIER_2":
+            {
+                "COST": 5000,
+                "MULT": 1.4
+            },
+
+            "TIER_3":
+            {
+                "COST": 13000,
+                "MULT": 1.6
+            }
+        },
+
+        "DAILY_CRIT":
+        {
+            "TIER_0":
+            {
+                "COST": 0,
+                "CHANCE": 5,
+                "MULT": 1    
+            },
+
+            "TIER_1":
+            {
+                "COST": 2000,
+                "CHANCE": 15,
+                "MULT": 1
+            },
+
+            "TIER_2":
+            {
+                "COST": 5000,
+                "CHANCE": 15,
+                "MULT": 1.5
+            },
+
+            "TIER_3":
+            {
+                "COST": 13000,
+                "CHANCE": 25,
+                "MULT": 1.5
+            }
+        }
     }
 }
