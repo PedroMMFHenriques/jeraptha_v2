@@ -21,7 +21,6 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
-beetdleCol = myDB[db["BEETDLE_COL"]]
 
 class Economy(commands.Cog):
     """
