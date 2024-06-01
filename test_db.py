@@ -31,15 +31,15 @@ wagersSubCol = myDB["WagersSub"]
 rewardsCol = myDB["Rewards"]
 beetdleCol = myDB["Beetdle"]
 
-usersCol.drop()
+"""usersCol.drop()
 beetdleCol.drop()
 wagersCol.drop()
 wagersSubCol.drop()
 rewardsCol.drop()
-beetdleCol.drop()
+beetdleCol.drop()"""
 
 """usersCol.update_many({},
-                {"$set" : {"earned_bet": 0, "total_earned": 0}},
+                {"$set" : {"wagers_won": 0}},
                 upsert = False
               )"""
 

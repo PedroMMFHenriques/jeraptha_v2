@@ -76,9 +76,9 @@ class Economy(commands.Cog):
 
     # LEADERBOARD
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
-    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Net Result'])
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Profit/Loss', 'Wagers Won'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
-        if(option == "Wallet" or option == "Total Earned" or option == "Total Bet" or option == "Bet Net Result"): 
+        if(option == "Wallet" or option == "Total Earned" or option == "Total Bet" or option == "Bet Net Result" or option == "Wagers Won"): 
             if(option == "Wallet"):
                 check_value = "coins"
                 embed_title = "Check out the richest dudes!"
@@ -97,10 +97,10 @@ class Economy(commands.Cog):
                 embed_subtitle = "Most beets <:beets:1245409413284499587> bet:"
                 myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value: 1}).sort(check_value, -1)
             
-            elif(option == "Bet Net Result"):
+            elif(option == "Bet Profit/Loss"):
                 check_value = "bet_net"
                 embed_title = "Check out the least losers!"
-                embed_subtitle = "Best net bet result:"
+                embed_subtitle = "Best profits from betting:"
                 userList = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, "earned_bet": 1, "coins_bet": 1})
                 
                 myLeaderboard = []
@@ -108,6 +108,12 @@ class Economy(commands.Cog):
                     myLeaderboard.append({"member_id": user["member_id"], check_value: int(user["earned_bet"] - user["coins_bet"])})
                 
                 myLeaderboard = sorted(myLeaderboard, key=lambda d: d[check_value], reverse=True)
+            
+            elif(option == "Wagers Won"):
+                check_value = "wagers_won"
+                embed_title = "Check out the smartest gamblers!"
+                embed_subtitle = "Most wagers won:"
+                myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value: 1}).sort(check_value, -1)
 
 
             if(myLeaderboard is None):
