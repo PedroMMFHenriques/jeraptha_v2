@@ -38,10 +38,10 @@ wagersSubCol.drop()
 rewardsCol.drop()
 beetdleCol.drop()"""
 
-"""usersCol.update_many({},
+usersCol.update_many({},
                 {"$set" : {"wagers_won": 0}},
                 upsert = False
-              )"""
+              )
 
 
 """for x in wagersCol.find({},{}):
