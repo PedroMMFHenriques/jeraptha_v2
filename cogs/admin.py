@@ -14,6 +14,7 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
+rewardsCol = myDB[db["REWARDS_COL"]]
 
 AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
 
@@ -71,7 +72,7 @@ class Admin(commands.Cog):
         usersCol.update_one(myQuery, newValues)
 
         await ctx.respond("You set " + user + "'s balance to " + str(new_balance) + " <:beets:1245409413284499587>!", ephemeral=True)
-    
+
 
     # UNMUTE USERS WHEN JOINING A VOICE CHANNEL
     @commands.Cog.listener() 
@@ -93,10 +94,18 @@ class Admin(commands.Cog):
             },
             upsert = True
         )
+        rewardsCol.update_one(
+                    {
+                        "member_id": member.id, "guild_id": member.guild.id
+                    }, 
+                    {
+                        "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "daily_boost_tier": "TIER_0", "daily_crit_tier": "TIER_0"}
+                    },
+                    upsert = True
+                )
 
 
 def setup(bot):
     bot.add_cog(Admin(bot))
-
 
 

@@ -21,6 +21,8 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
+rewardsCol = myDB[db["REWARDS_COL"]]
+beetdleCol = myDB[db["BEETDLE_COL"]]
 
 class Economy(commands.Cog):
     """
@@ -42,16 +44,20 @@ class Economy(commands.Cog):
     @discord.slash_command(name="daily", description="Get your free daily reward!")
     async def daily(self, ctx: discord.ApplicationContext):
         checkUser = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_daily": 1})
-        if(checkUser is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+        checkRewards = rewardsCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "daily_boost_tier": 1, "daily_crit_tier": 1})
+        if(checkUser is None or checkRewards is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
         # Check didn't do /daily today
         if(date.today() >= checkUser["last_daily"].date() + timedelta(days=1)):
             daily_coins = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
 
-            daily_coins = daily_coins
+            daily_boost_tier = global_json["TIERED_REWARDS"]["DAILY_BOOST"][checkRewards["daily_boost_tier"]]
+            daily_crit_tier = global_json["TIERED_REWARDS"]["DAILY_CRIT"][checkRewards["daily_crit_tier"]]
+
+            daily_coins = daily_coins * daily_boost_tier["MULT"]
             extra_msg = ""
-            if(random.SystemRandom().randint(1, 101) >= 96): 
-                daily_coins = daily_coins*3
+            if(random.SystemRandom().randint(1, 101) >= 101 - daily_crit_tier["CHANCE"]): 
+                daily_coins = daily_coins*3*daily_crit_tier["MULT"]
                 extra_msg = "a **CRIT**, winning "
             elif(random.SystemRandom().randint(1, 101) <= 5 and checkUser["coins"] > 1000):
                 daily_coins = daily_coins/3
@@ -76,7 +82,7 @@ class Economy(commands.Cog):
 
     # LEADERBOARD
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
-    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Profit/Loss', 'Wagers Won'])
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Profit/Loss', 'Wagers Won' 'Beetdle Daily', 'Beetdle Total'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
         if(option == "Wallet" or option == "Total Earned" or option == "Total Bet" or option == "Bet Profit/Loss" or option == "Wagers Won"): 
             if(option == "Wallet"):
@@ -126,6 +132,33 @@ class Economy(commands.Cog):
                 user_value = str(user[check_value])
                 embedString += "<@" + user_name + ">: " + user_value + "\n"
 
+
+        elif(option == "Beetdle Daily" or option == "Beetdle Total"):
+            if(option == "Beetdle Daily"):
+                gamesList = beetdleCol.find({"daily": True, "ended": True, "won": True},{"_id": 0, "member_id": 1})
+                embed_title = "Check out the most dedicated beetdlers!"
+                embed_subtitle = "Most daily beetdle wins:"
+            
+            elif(option == "Beetdle Total"):
+                gamesList = beetdleCol.find({"ended": True, "won": True},{"_id": 0, "member_id": 1})
+                embed_title = "Check out the problem beetdlers!"
+                embed_subtitle = "Most beetdle wins (daily and not):"
+                    
+            win_count = {}
+            for game in gamesList:
+                if(ctx.guild.get_member(game["member_id"]) is not None): #if the member that played the game is on the server
+                    if(not game["member_id"] in win_count):
+                        win_count[game["member_id"]] = 1
+                    else: win_count[game["member_id"]] += 1
+            win_count = dict(sorted(win_count.items(), key=lambda item: item[1], reverse=True))
+
+            # Get leaderboard
+            embedString = ""
+            for user in win_count:
+                user_name = str(user)
+                user_value = str(win_count[user])
+                embedString += "<@" + user_name + ">: " + user_value + "\n"
+
                 
         # Generate embed
         embed = discord.Embed(title= option + " Leaderboard",
@@ -145,6 +178,3 @@ class Economy(commands.Cog):
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Economy(bot)) # add the cog to the bot
-
-
-
