@@ -31,17 +31,10 @@ wagersSubCol = myDB["WagersSub"]
 rewardsCol = myDB["Rewards"]
 beetdleCol = myDB["Beetdle"]
 
-"""usersCol.drop()
-beetdleCol.drop()
-wagersCol.drop()
-wagersSubCol.drop()
-rewardsCol.drop()
-beetdleCol.drop()"""
-
-usersCol.update_many({},
+"""usersCol.update_many({},
                 {"$set" : {"wagers_won": 0}},
                 upsert = False
-              )
+              )"""
 
 
 """for x in wagersCol.find({},{}):
@@ -89,3 +82,11 @@ x = mycol.update_many(myquery, newvalues)"""
 
 """myclient.drop_database("mydatabase")
 print(myclient.list_database_names())"""
+
+
+"""usersCol.drop()
+beetdleCol.drop()
+wagersCol.drop()
+wagersSubCol.drop()
+rewardsCol.drop()
+beetdleCol.drop()"""
