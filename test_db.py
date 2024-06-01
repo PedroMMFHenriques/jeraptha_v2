@@ -7,6 +7,15 @@
 # sudo service mongod stop
 # sudo service mongod status
 
+# stored data: /var/lib/mongodb
+
+# Backup: mongodump --archive=/home/cawilho/jeraptha_v2_backup/JerapthaV2_01_06_2024
+# Restore: mongorestore --drop --archive=/home/cawilho/jeraptha_v2_backup/JerapthaV2_01_06_2024
+
+# Autobackup and deletion files older than 30 days: 
+# crontab -e
+# 0 6 * * * mongodump --archive=/home/cawilho/jeraptha_v2_backup/JerapthaV2_$(date +\%Y-\%m-\%d_\%H:\%M:\%S) && find /home/cawilho/jeraptha_v2_backup/ -type f -mtime +30 -exec rm {} \;
+
 import os
 from dotenv import load_dotenv
 
