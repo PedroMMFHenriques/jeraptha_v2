@@ -24,7 +24,6 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
-rewardsCol = myDB[db["REWARDS_COL"]]
 
 
 bot = discord.Bot(intents = discord.Intents.all())
@@ -50,18 +49,6 @@ def setup_db(bot):
                     upsert = True
                 )
 
-                rewardsCol.update_one(
-                    {
-                        "member_id": member.id, "guild_id": guild.id
-                    }, 
-                    {
-                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "daily_boost_tier": "TIER_0", "daily_crit_tier": "TIER_0"}
-                    },
-                    upsert = True
-                )
-
-    """for x in usersCol.find({},{ "_id": 1, "member_id": 1, "guild_id": 1, "coins": 1, "last_daily": 1 }):
-        print(x)"""
      
 # Load cogs
 for filename in os.listdir('./cogs'):
