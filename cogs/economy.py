@@ -82,7 +82,7 @@ class Economy(commands.Cog):
 
     # LEADERBOARD
     @discord.slash_command(name="leaderboard", description="Check leaderboards.")
-    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Profit/Loss', 'Wagers Won' 'Beetdle Daily', 'Beetdle Total'])
+    @discord.option("option", description="Choose what leaderboard to check.", required=True, choices=['Wallet', 'Total Earned', 'Total Bet', 'Bet Profit/Loss', 'Wagers Won', 'Beetdle Daily', 'Beetdle Total'])
     async def leaderboard(self, ctx: discord.ApplicationContext, option: str):
         if(option == "Wallet" or option == "Total Earned" or option == "Total Bet" or option == "Bet Profit/Loss" or option == "Wagers Won"): 
             if(option == "Wallet"):
