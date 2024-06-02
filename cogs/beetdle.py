@@ -49,20 +49,22 @@ class Beetdle(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
+    beetdle = discord.SlashCommandGroup("beetdle", "Play Beetdle: make a guess or remind your previous guesses.")
     
-    # BEETDLE
-    @discord.command(name="beetdle", description="Start/continue a game of beetdle. The first daily is equal to everyone and gives full reward.")
-    @discord.option("guess", description="Your beetdle guess (5-letter English word)", required=True)
-    async def start(self, ctx: discord.ApplicationContext, guess: str):
+    # BEETDLE GUESS
+    @beetdle.command(name="guess", description="Start/continue a game of beetdle. The first daily is equal to everyone and gives full reward.")
+    @discord.option("your_guess", description="Your beetdle guess (5-letter English word)", required=True)
+    async def guess(self, ctx: discord.ApplicationContext, your_guess: str):
         # Check validity of guess
-        if(len(guess) != 5):
+        if(len(your_guess) != 5):
             await ctx.respond("Invalid guess! Must be a 5-letter word.", ephemeral=True)
             return
-        elif(not guess.lower() in full_dict):
+        elif(not your_guess.lower() in full_dict):
             await ctx.respond("That word isn't in the English dictionary!", ephemeral=True)
             return
         
-        guess = guess.upper()
+        your_guess = your_guess.upper()
         
         datetime_today = datetime.combine(datetime.today(), datetime.min.time())
 
@@ -89,7 +91,7 @@ class Beetdle(commands.Cog):
         prev_guesses_print = checkBeetdle["guesses_print"]
 
         prev_guesses_list = prev_guesses.split(",")
-        if(guess in prev_guesses_list):
+        if(your_guess in prev_guesses_list):
             await ctx.respond("You already guessed that!", ephemeral=True)
             return
 
@@ -98,7 +100,7 @@ class Beetdle(commands.Cog):
         n_tries = checkBeetdle["tries"] + 1
         # Process guess
         word = checkBeetdle["word"]
-        if(guess == word): # Correct word, end game
+        if(your_guess == word): # Correct word, end game
             game_won = True
             game_over = True
             guesses = prev_guesses + "," + word
@@ -153,7 +155,7 @@ class Beetdle(commands.Cog):
 
             # First check exactly correct letters
             correction = "" #C correct, P possible correct wrong space, X incorrect
-            for letter_g, letter_word in zip(guess, word):
+            for letter_g, letter_word in zip(your_guess, word):
                 if(not letter_g in word_count): # Wrong letter
                     correction += "X"
                 elif(letter_g == letter_word): # Correct letter in correct space
@@ -166,7 +168,7 @@ class Beetdle(commands.Cog):
             # Now check correct letters in wrong places
             #C correct, S correct wrong space, X incorrect
             final_correction = ""
-            for letter_g, letter_c in zip(guess, correction):
+            for letter_g, letter_c in zip(your_guess, correction):
                 if(letter_c == "X" or letter_c == "C"): # Wrong letter or correct letter
                     final_correction += letter_c
                 elif(word_count[letter_g] >= 1): # Correct letter in wrong space
@@ -176,13 +178,13 @@ class Beetdle(commands.Cog):
                     final_correction += "X"
 
             guess_correction = ""
-            for letter_g, letter_c in zip(guess, final_correction):
+            for letter_g, letter_c in zip(your_guess, final_correction):
                 if(letter_c == "C"): cor = "**"
                 elif(letter_c == "S"): cor = "__"
                 else: cor = "~~"
                 guess_correction += cor + letter_g + cor + " "
 
-            guesses = prev_guesses + "," + guess
+            guesses = prev_guesses + "," + your_guess
             guesses_print = prev_guesses_print + guess_correction + "\n"
             if(n_tries >= 6): # Lost, end game
                 game_over = True
@@ -207,9 +209,9 @@ class Beetdle(commands.Cog):
                 beetdleCol.update_one(myQuery, newValues)
 
                 if(daily):
-                    emb_title = "[Daily Beetdle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
+                    emb_title = "[Daily Beetdle] Try " + str(n_tries) + " '" + your_guess + "' wasn't correct."
                 else:
-                    emb_title = "[Non-Daily Beetdle] Try " + str(n_tries) + " '" + guess + "' wasn't correct."
+                    emb_title = "[Non-Daily Beetdle] Try " + str(n_tries) + " '" + your_guess + "' wasn't correct."
                 emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n"
                 if(n_tries == 5):
                     emb_description += "You only have **one last try**!"
@@ -242,6 +244,36 @@ class Beetdle(commands.Cog):
                     await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> got the daily beetdle correctly in " + str(n_tries) + " tries and won " + str(int(reward)) + "<:beets:1245409413284499587>!")
             else:
                 await ctx.send("[Daily Beetdle] <@" + str(ctx.author.id) + "> didn't get the daily beetdle correctly...")
+
+
+
+    @beetdle.command(name="remind", description="Remind yourself of your previous guesses.")
+    async def remind(self, ctx: discord.ApplicationContext):
+        datetime_today = datetime.combine(datetime.today(), datetime.min.time())
+
+        checkBeetdle = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "guesses_print": 1})
+        if(checkBeetdle is None):
+            await ctx.respond("You don't have a game currently in progress.", ephemeral=True)
+            return
+        
+        if(checkBeetdle["daily"]):
+            emb_title = "[Daily Beetdle] Guesses Reminder"
+        else:
+            emb_title = "[Non-Daily Beetdle] Guesses Reminder"
+
+        embed = discord.Embed(title=emb_title,
+                      description="",
+                      colour=0x009900,
+                      timestamp=datetime.now())
+
+        embed.add_field(name="Here are your previous guesses:",
+                        value=checkBeetdle["guesses_print"],
+                        inline=False)
+
+        embed.set_footer(text="Beetdle",
+                         icon_url="https://png.pngtree.com/png-vector/20220603/ourmid/pngtree-a-letter-b-for-beetle-chitinous-alphabet-capitalized-vector-png-image_36940140.png")
+
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
 
 
 def setup(bot):
