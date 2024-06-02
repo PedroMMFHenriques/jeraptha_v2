@@ -262,7 +262,6 @@ class Rewards(commands.Cog):
 
 
 
-
     eightBall = discord.SlashCommandGroup("8ball", "Roll or add phrases to the 8-ball")
     
     # 8-BALL ROLL
@@ -275,11 +274,11 @@ class Rewards(commands.Cog):
             return
 
         # Don't roll if user already did less than 1 hour ago
-        if(userCheck["last_8ball"] + timedelta(hours=1) >  datetime.now()):
-            timeLeft = userCheck["last_8ball"] + timedelta(hours=1) - datetime.now()
+        if(userCheck["last_8ball"] + timedelta(minutes=30) >  datetime.now()):
+            timeLeft = userCheck["last_8ball"] + timedelta(minutes=30) - datetime.now()
             minutesLeft = math.floor(timeLeft.seconds/60)
             secondsLeft = timeLeft.seconds - minutesLeft*60
-            await ctx.respond("You rolled the 8-Ball less than an hour ago, please trust its prediction!\nTime left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
+            await ctx.respond("You rolled the 8-Ball less than an 30 minutes ago, please trust its prediction!\nTime left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
             return
         
         # Reset roll time
@@ -365,12 +364,12 @@ class Rewards(commands.Cog):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
 
-        # Don't ask for wisdom if user already did less than 1 hour ago
-        if(userCheck["last_fortune"] + timedelta(hours=1) >  datetime.now()):
-            timeLeft = userCheck["last_fortune"] + timedelta(hours=1) - datetime.now()
+        # Don't ask for wisdom if user already did less than 30 mins ago
+        if(userCheck["last_fortune"] + timedelta(minutes=30) >  datetime.now()):
+            timeLeft = userCheck["last_fortune"] + timedelta(minutes=30) - datetime.now()
             minutesLeft = math.floor(timeLeft.seconds/60)
             secondsLeft = timeLeft.seconds - minutesLeft*60
-            await ctx.respond("You used the fortune cookie less than an hour ago, please trust its wisdom!\nTime left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
+            await ctx.respond("You used the fortune cookie less than 30 minutes ago, please interiorize its wisdom!\nTime left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
             return
         
         # Reset roll time
