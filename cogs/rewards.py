@@ -330,12 +330,12 @@ class Rewards(commands.Cog):
                 if phrase:  
                     answer_list.append(phrase)
         
-        if phrase in answer_list:
+        if answer in answer_list:
             await ctx.respond("That answer already exists!", ephemeral=True)
             return
         
         with open(eight_ball_json["FILE"], 'a') as file:
-            file.write(phrase + '\n')
+            file.write(answer + '\n')
 
         # Remove coins from the adder
         remove_coins = 0 - eight_ball_json["ADD_COST"]
@@ -420,12 +420,12 @@ class Rewards(commands.Cog):
                 if phrase:  
                     answer_list.append(phrase)
         
-        if phrase in answer_list:
+        if wisdom in answer_list:
             await ctx.respond("That wisdom already exists!", ephemeral=True)
             return
         
         with open(fortune_cookie_json["FILE"], 'a') as file:
-            file.write(phrase + '\n')
+            file.write(wisdom + '\n')
 
         # Remove coins from the adder
         remove_coins = 0 - fortune_cookie_json["ADD_COST"]
