@@ -303,7 +303,7 @@ class Rewards(commands.Cog):
         answer = random.choice(answer_list)
 
         embed = discord.Embed(title="",
-                      description="<@" + ctx.author.id + "> asked the 8-Ball: \n**" + question + "**\n\nTo which it responded:\n```" + answer + "```",
+                      description="<@" + str(ctx.author.id) + "> asked the 8-Ball: \n**" + question + "**\n\nTo which it responded:\n```" + answer + "```",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -344,7 +344,7 @@ class Rewards(commands.Cog):
         usersCol.update_one(myQuery, newValues)
 
         embed = discord.Embed(title="",
-                      description="<@" + ctx.author.id + "> added a new answer to the 8-Ball.",
+                      description="<@" + str(ctx.author.id) + "> added a new answer to the 8-Ball.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -394,7 +394,7 @@ class Rewards(commands.Cog):
         answer = random.choice(answer_list)
 
         embed = discord.Embed(title="",
-                      description="<@" + ctx.author.id + "> asked the fortune cookie for wisdom.\n\nIt responded:\n```" + answer + "```",
+                      description="<@" + str(ctx.author.id) + "> asked the fortune cookie for wisdom.\n\nIt responded:\n```" + answer + "```",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -434,7 +434,7 @@ class Rewards(commands.Cog):
         usersCol.update_one(myQuery, newValues)
 
         embed = discord.Embed(title="",
-                      description="<@" + ctx.author.id + "> added a new wisdom to the fortune cookie.",
+                      description="<@" + str(ctx.author.id) + "> added a new wisdom to the fortune cookie.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
