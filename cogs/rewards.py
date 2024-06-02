@@ -47,7 +47,7 @@ class Rewards(commands.Cog):
             return
 
         embed = discord.Embed(title="Perks Info",
-                            description="Upgrade with `/upgrade <perk_name>`",
+                            description="Upgrade with `/perks upgrade`",
                             colour=0x009900)
         
         rewards_list = global_json["TIERED_REWARDS"]
