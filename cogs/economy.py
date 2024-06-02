@@ -135,21 +135,20 @@ class Economy(commands.Cog):
 
         elif(option == "Beetdle Daily" or option == "Beetdle Total"):
             if(option == "Beetdle Daily"):
-                gamesList = beetdleCol.find({"daily": True, "ended": True, "won": True},{"_id": 0, "member_id": 1})
+                gamesList = beetdleCol.find({"guild_id": ctx.guild.id, "daily": True, "ended": True, "won": True},{"_id": 0, "member_id": 1})
                 embed_title = "Check out the most dedicated beetdlers!"
                 embed_subtitle = "Most daily beetdle wins:"
             
             elif(option == "Beetdle Total"):
-                gamesList = beetdleCol.find({"ended": True, "won": True},{"_id": 0, "member_id": 1})
+                gamesList = beetdleCol.find({"guild_id": ctx.guild.id, "ended": True, "won": True},{"_id": 0, "member_id": 1})
                 embed_title = "Check out the problem beetdlers!"
                 embed_subtitle = "Most beetdle wins (daily and not):"
                     
             win_count = {}
             for game in gamesList:
-                if(ctx.guild.get_member(game["member_id"]) is not None): #if the member that played the game is on the server
-                    if(not game["member_id"] in win_count):
-                        win_count[game["member_id"]] = 1
-                    else: win_count[game["member_id"]] += 1
+                if(not game["member_id"] in win_count):
+                    win_count[game["member_id"]] = 1
+                else: win_count[game["member_id"]] += 1
             win_count = dict(sorted(win_count.items(), key=lambda item: item[1], reverse=True))
 
             # Get leaderboard
