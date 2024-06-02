@@ -69,22 +69,22 @@ class Beetdle(commands.Cog):
         datetime_today = datetime.combine(datetime.today(), datetime.min.time())
 
         # Check if it is the first guess of the daily
-        checkNewDailyGame = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today},{})
+        checkNewDailyGame = beetdleCol.find_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today},{})
         if(checkNewDailyGame is None): # If it is the first guess of the daily
-            seed = datetime_today - datetime.combine(date(1970, 1, 1), datetime.min.time()) # Current day's seed
+            seed = (datetime_today - datetime.combine(date(1970, 1, 1), datetime.min.time())) + int(ctx.guild.id) # Current day's seed
             random.seed(seed)
             wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
-            beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
+            beetdleCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
         
         else:
             # Check if it is the first guess of a non-daily
-            checkNewNonDailyGame = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today, "ended": False},{})
+            checkNewNonDailyGame = beetdleCol.find_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False},{})
             if(checkNewNonDailyGame is None): # If it is the first guess of a non-daily
                 random.seed()
                 wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
-                beetdleCol.insert_one({"member_id": ctx.author.id, "date": datetime_today, "daily": False, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
+                beetdleCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "daily": False, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
 
-        checkBeetdle = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "word": 1, "tries": 1, "guesses": 1, "guesses_print": 1})
+        checkBeetdle = beetdleCol.find_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "word": 1, "tries": 1, "guesses": 1, "guesses_print": 1})
 
         daily = checkBeetdle["daily"]
         prev_guesses = checkBeetdle["guesses"]
@@ -108,7 +108,7 @@ class Beetdle(commands.Cog):
             for letter in word:
                 guess_separated += letter + " "
             guesses_print = prev_guesses_print + "**" + guess_separated + "**"
-            myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
+            myQuery= {"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False}
             newValues = {'$set': {"ended": True, "won": True, "guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
             beetdleCol.update_one(myQuery, newValues)
 
@@ -142,12 +142,12 @@ class Beetdle(commands.Cog):
                 emb_ephemeral = False
                 
             # Check maximum games per day
-            myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
+            myQuery = {"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": True}
             if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
                 emb_description = "<@" + str(ctx.author.id) + "> already completed 10 Beetdles today, so they did't get more rewards."
                 reward = 0
             else:
-                myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+                myQuery= {"guild_id": ctx.guild.id, "member_id": ctx.author.id, "guild_id": ctx.guild.id}
                 newValues = {'$inc': {'coins': int(reward), 'total_earned': int(reward)}}
                 usersCol.update_one(myQuery, newValues)
             
@@ -194,7 +194,7 @@ class Beetdle(commands.Cog):
             guesses_print = prev_guesses_print + guess_correction + "\n"
             if(n_tries >= 6): # Lost, end game
                 game_over = True
-                myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
+                myQuery= {"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False}
                 newValues = {'$set': {"ended": True, "won": False, "guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
 
@@ -210,13 +210,13 @@ class Beetdle(commands.Cog):
                     emb_ephemeral = False
             
             else: # Incorrect, but still has tries
-                myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
+                myQuery= {"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False}
                 newValues = {'$set': {"guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
                 
                 emb_description = ""
                 # Check if already reach maximum number of rewarded games
-                myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
+                myQuery = {"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": True}
                 if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
                     emb_description += "*You already completed 10 Beetdles today, so you won't get more rewards.*\n\n"
 
@@ -263,7 +263,7 @@ class Beetdle(commands.Cog):
     async def remind(self, ctx: discord.ApplicationContext):
         datetime_today = datetime.combine(datetime.today(), datetime.min.time())
 
-        checkBeetdle = beetdleCol.find_one({"member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "guesses_print": 1})
+        checkBeetdle = beetdleCol.find_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "guesses_print": 1})
         if(checkBeetdle is None):
             await ctx.respond("You don't have a game currently in progress.", ephemeral=True)
             return
