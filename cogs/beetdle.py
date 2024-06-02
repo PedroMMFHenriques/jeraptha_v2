@@ -71,7 +71,7 @@ class Beetdle(commands.Cog):
         # Check if it is the first guess of the daily
         checkNewDailyGame = beetdleCol.find_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today},{})
         if(checkNewDailyGame is None): # If it is the first guess of the daily
-            seed = (datetime_today - datetime.combine(date(1970, 1, 1), datetime.min.time())) + int(ctx.guild.id) # Current day's seed
+            seed = int((datetime_today - datetime.combine(date(1970, 1, 1), datetime.min.time()))) + int(ctx.guild.id) # Current day's seed
             random.seed(seed)
             wotd = wotd_list[random.randint(0, len(wotd_list) - 1)]
             beetdleCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "daily": True, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
