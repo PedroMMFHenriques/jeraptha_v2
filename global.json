@@ -14,11 +14,28 @@
         "WAGER_ROLE": "Jerapthino"
     },
 
-    "VARS":
+    "CONSTS":
     {
         "INIT_COINS": 500,
         "DAILY_MEAN": 500,
         "DAILY_STD": 80
+    },
+
+    "FUN":
+    {
+        "8BALL":
+        {   
+            "ROLL_COST": 10,
+            "ADD_COST": 50,
+            "FILE": "data/8_ball.txt"
+        },
+
+        "FORTUNE_COOKIE": 
+        {
+            "FORTUNE_COST": 10,
+            "ADD_COST": 50,
+            "FILE": "data/fortune_cookie.txt"
+        }
     },
 
     "PUNISHMENTS":

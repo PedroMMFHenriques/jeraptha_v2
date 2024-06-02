@@ -49,10 +49,10 @@ rewardsCol.drop()
 beetdleCol.drop()"""
 
 
-"""usersCol.update_many({},
-                {"$set" : {"wagers_won": 0}},
+usersCol.update_many({},
+                {"$set" : {"last_8ball": datetime(2000, 1, 1), "last_fortune": datetime(2000, 1, 1)}},
                 upsert = False
-              )"""
+              )
 
 
 """for x in wagersCol.find({},{}):

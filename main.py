@@ -17,7 +17,7 @@ global_json = json.load(open('global.json'))
 load_dotenv() 
 
 # Init vars
-init_coins = global_json["VARS"]["INIT_COINS"]
+init_coins = global_json["CONSTS"]["INIT_COINS"]
 
 # Setup database
 db = global_json["DB"]
@@ -45,7 +45,8 @@ def setup_db(bot):
                     }, 
                     {
                         "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime(2000, 1, 1), 
-                                         "last_punish": datetime(2000, 1, 1), "coins_bet": 0, "earned_bet": 0, "total_earned": 0, "wagers_won": 0}
+                                         "last_punish": datetime(2000, 1, 1), "coins_bet": 0, "earned_bet": 0, "total_earned": 0, "wagers_won": 0,
+                                         "last_8ball": datetime(2000, 1, 1), "last_fortune": datetime(2000, 1, 1)}
                     },
                     upsert = True
                 )

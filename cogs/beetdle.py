@@ -12,7 +12,7 @@ import numpy as np
 import json
 global_json = json.load(open('global.json'))
 
-global_vars = global_json["VARS"]
+global_consts = global_json["CONSTS"]
 
 # Setup database
 db = global_json["DB"]
@@ -112,7 +112,7 @@ class Beetdle(commands.Cog):
             newValues = {'$set': {"ended": True, "won": True, "guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
             beetdleCol.update_one(myQuery, newValues)
 
-            reward = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
+            reward = np.random.normal(loc=global_consts["DAILY_MEAN"], scale=global_consts["DAILY_STD"], size = (1))[0]
             reward = reward*(1 + (6-n_tries)/5) # increase by 20% per try left
 
             if(daily):
@@ -198,6 +198,7 @@ class Beetdle(commands.Cog):
                 newValues = {'$set': {"ended": True, "won": False, "guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
 
+                
                 if(daily):
                     emb_title = "[Daily Beetdle] Oh, you lost... The daily beetdle was '" + word + "'."
                     emb_description = "You didn't win any <:beets:1245409413284499587>..."
@@ -208,6 +209,9 @@ class Beetdle(commands.Cog):
                     emb_description = "<@" + str(ctx.author.id) + "> didn't win any <:beets:1245409413284499587>..."
                     emb_field_name = "Their tries:"
                     emb_ephemeral = False
+
+                if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
+                    emb_description = "<@" + str(ctx.author.id) + "> already completed 10 Beetdles today, so they didn't get more rewards."
             
             else: # Incorrect, but still has tries
                 myQuery= {"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False}

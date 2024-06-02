@@ -7,6 +7,7 @@ import asyncio
 
 from datetime import datetime, timedelta
 import math
+import random
 
 import json
 global_json = json.load(open('global.json'))
@@ -18,9 +19,11 @@ myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
 rewardsCol = myDB[db["REWARDS_COL"]]
 
+eight_ball_json = global_json["FUN"]["8BALL"]
+fortune_cookie_json = global_json["FUN"]["FORTUNE_COOKIE"]
+
 reason = "Jeraptha punishment"
 
-global_json = json.load(open('global.json'))
 perk_list = list(global_json["TIERED_REWARDS"].keys())
 punishment_list = list(global_json["PUNISHMENTS"].keys())
 for i in range(len(punishment_list)):
@@ -256,6 +259,189 @@ class Rewards(commands.Cog):
                 if(user_change.voice.mute == True):
                     await user_change.edit(mute=False, reason=reason)
                     await ctx.send(target_user + " has been unmuted.")
+
+
+
+
+    eightBall = discord.SlashCommandGroup("8ball", "Roll or add phrases to the 8-ball")
+    
+    # 8-BALL ROLL
+    @eightBall.command(name="roll", description="Roll the 8-Ball for its wisdom. (Costs " + eight_ball_json["ROLL_COST"] + ")")
+    @discord.option("question", description="Ask it a Yes or No question. (Costs " + eight_ball_json["ROLL_COST"] + ")", required=True)
+    async def roll(self, ctx: discord.ApplicationContext, question: str):
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_8ball": 1})
+        if(userCheck is None):
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            return
+
+        # Don't roll if user already did less than 1 hour ago
+        if(userCheck["last_8ball"] + timedelta(hours=1) >  datetime.now()):
+            timeLeft = userCheck["last_8ball"] + timedelta(hours=1) - datetime.now()
+            minutesLeft = math.floor(timeLeft.seconds/60)
+            secondsLeft = timeLeft.seconds - minutesLeft*60
+            await ctx.respond("You rolled the 8-Ball less than an hour ago, please trust its prediction!\nTime left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
+            return
+        
+        # Reset roll time
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$set': {'last_8ball': datetime.now()}}
+        usersCol.update_one(myQuery, newValues)
+
+        # Remove coins from the roller
+        remove_coins = 0 - eight_ball_json["ROLL_COST"]
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$inc': {'coins': int(remove_coins)}}
+        usersCol.update_one(myQuery, newValues)
+
+        answer_list = []
+        with open(eight_ball_json["FILE"], 'r') as file:
+            for line in file:
+                phrase = line.strip()
+                if phrase:
+                    answer_list.append(phrase)
+        
+        answer = random.choice(answer_list)
+
+        embed = discord.Embed(title="",
+                      description="<@" + ctx.author.id + "> asked the 8-Ball: \n**" + question + "**\n\nTo which it responded:\n```" + answer + "```",
+                      colour=0x009900,
+                      timestamp=datetime.now())
+
+
+        embed.set_footer(text="8-Ball",
+                         icon_url="https://t4.ftcdn.net/jpg/02/13/01/79/360_F_213017967_z1SLHuRCxHNpCBxUlid4lxuq7q6n16Qr.jpg")
+
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
+
+    
+    # 8-BALL ADD
+    @eightBall.command(name="add", description="Add an answer to the 8-Ball. (Costs " + eight_ball_json["ADD_COST"] + ")")
+    @discord.option("answer", description="Give an answer to a yes or no question. (Costs " + eight_ball_json["ADD_COST"] + ")", required=True)
+    async def add(self, ctx: discord.ApplicationContext, answer: str):
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_8ball": 1})
+        if(userCheck is None):
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            return
+
+        answer_list = []
+        with open(eight_ball_json["FILE"], 'r') as file:
+            for line in file:
+                phrase = line.strip()
+                if phrase:  
+                    answer_list.append(phrase)
+        
+        if phrase in answer_list:
+            await ctx.respond("That answer already exists!", ephemeral=True)
+            return
+        
+        with open(eight_ball_json["FILE"], 'a') as file:
+            file.write(phrase + '\n')
+
+        # Remove coins from the adder
+        remove_coins = 0 - eight_ball_json["ADD_COST"]
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$inc': {'coins': int(remove_coins)}}
+        usersCol.update_one(myQuery, newValues)
+
+        embed = discord.Embed(title="",
+                      description="<@" + ctx.author.id + "> added a new answer to the 8-Ball.",
+                      colour=0x009900,
+                      timestamp=datetime.now())
+
+        embed.set_footer(text="8-Ball",
+                         icon_url="https://t4.ftcdn.net/jpg/02/13/01/79/360_F_213017967_z1SLHuRCxHNpCBxUlid4lxuq7q6n16Qr.jpg")
+
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
+
+
+
+    fortune = discord.SlashCommandGroup("fortune_cookie", "Get wisdom or add phrases to the fortune cookie.")
+
+    # FORTUNE COOKIE WISDOM
+    @fortune.command(name="wisdom", description="As the fortune cookie for wisdom. (Costs " + fortune_cookie_json["FORTUNE_COST"] + ")")
+    async def wisdom(self, ctx: discord.ApplicationContext):
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_fortune": 1})
+        if(userCheck is None):
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            return
+
+        # Don't ask for wisdom if user already did less than 1 hour ago
+        if(userCheck["last_fortune"] + timedelta(hours=1) >  datetime.now()):
+            timeLeft = userCheck["last_fortune"] + timedelta(hours=1) - datetime.now()
+            minutesLeft = math.floor(timeLeft.seconds/60)
+            secondsLeft = timeLeft.seconds - minutesLeft*60
+            await ctx.respond("You used the fortune cookie less than an hour ago, please trust its wisdom!\nTime left: " + str(minutesLeft) + "m:" + str(secondsLeft) + "s.", ephemeral=True)
+            return
+        
+        # Reset roll time
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$set': {'last_fortune': datetime.now()}}
+        usersCol.update_one(myQuery, newValues)
+
+        # Remove coins from the roller
+        remove_coins = 0 - fortune_cookie_json["ROLL_COST"]
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$inc': {'coins': int(remove_coins)}}
+        usersCol.update_one(myQuery, newValues)
+
+        answer_list = []
+        with open(fortune_cookie_json["FILE"], 'r') as file:
+            for line in file:
+                phrase = line.strip()
+                if phrase:
+                    answer_list.append(phrase)
+        
+        answer = random.choice(answer_list)
+
+        embed = discord.Embed(title="",
+                      description="<@" + ctx.author.id + "> asked the fortune cookie for wisdom.\n\nIt responded:\n```" + answer + "```",
+                      colour=0x009900,
+                      timestamp=datetime.now())
+
+
+        embed.set_footer(text="Fortune",
+                         icon_url="https://images.emojiterra.com/google/noto-emoji/unicode-15.1/color/1024px/1f960.png")
+
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
+
+    # FORTUNE COOKIE ADD
+    @fortune.command(name="add", description="Add wisdom to the fortune cookie. (Costs " + fortune_cookie_json["ADD_COST"] + ")")
+    @discord.option("wisdom", description="Give wisdom to the fortune cookie. (Costs " + fortune_cookie_json["ADD_COST"] + ")", required=True)
+    async def add(self, ctx: discord.ApplicationContext, wisdom: str):
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_fortune": 1})
+        if(userCheck is None):
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            return
+
+        answer_list = []
+        with open(fortune_cookie_json["FILE"], 'r') as file:
+            for line in file:
+                phrase = line.strip()
+                if phrase:  
+                    answer_list.append(phrase)
+        
+        if phrase in answer_list:
+            await ctx.respond("That wisdom already exists!", ephemeral=True)
+            return
+        
+        with open(fortune_cookie_json["FILE"], 'a') as file:
+            file.write(phrase + '\n')
+
+        # Remove coins from the adder
+        remove_coins = 0 - fortune_cookie_json["ADD_COST"]
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$inc': {'coins': int(remove_coins)}}
+        usersCol.update_one(myQuery, newValues)
+
+        embed = discord.Embed(title="",
+                      description="<@" + ctx.author.id + "> added a new wisdom to the fortune cookie.",
+                      colour=0x009900,
+                      timestamp=datetime.now())
+
+        embed.set_footer(text="Fortune",
+                         icon_url="https://images.emojiterra.com/google/noto-emoji/unicode-15.1/color/1024px/1f960.png")
+
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
 
 
 

@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, date
 import json
 global_json = json.load(open('global.json'))
 
-global_vars = global_json["VARS"]
+global_consts = global_json["CONSTS"]
 
 # Setup database
 db = global_json["DB"]
@@ -49,7 +49,7 @@ class Economy(commands.Cog):
 
         # Check didn't do /daily today
         if(date.today() >= checkUser["last_daily"].date() + timedelta(days=1)):
-            daily_coins = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
+            daily_coins = np.random.normal(loc=global_consts["DAILY_MEAN"], scale=global_consts["DAILY_STD"], size = (1))[0]
 
             daily_boost_tier = global_json["TIERED_REWARDS"]["DAILY_BOOST"][checkRewards["daily_boost_tier"]]
             daily_crit_tier = global_json["TIERED_REWARDS"]["DAILY_CRIT"][checkRewards["daily_crit_tier"]]

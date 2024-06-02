@@ -18,7 +18,7 @@ rewardsCol = myDB[db["REWARDS_COL"]]
 
 AdminRole = global_json["ROLES"]["ADMIN_ROLE"]
 
-global_vars = global_json["VARS"]
+global_consts = global_json["CONSTS"]
 
 
 class Admin(commands.Cog):
@@ -89,8 +89,9 @@ class Admin(commands.Cog):
                 "member_id": member.id, "guild_id": member.guild.id
             }, 
             {
-                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_vars["INIT_COINS"], "last_daily": datetime(2000, 1, 1), 
-                                 "last_punish": datetime(2000, 1, 1), "coins_bet": 0, "earned_bet": 0, "total_earned": 0, "wagers_won": 0}
+                "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_consts["INIT_COINS"], "last_daily": datetime(2000, 1, 1), 
+                                 "last_punish": datetime(2000, 1, 1), "coins_bet": 0, "earned_bet": 0, "total_earned": 0, "wagers_won": 0,
+                                "last_8ball": datetime(2000, 1, 1), "last_fortune": datetime(2000, 1, 1)}
             },
             upsert = True
         )
