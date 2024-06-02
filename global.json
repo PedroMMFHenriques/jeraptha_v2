@@ -49,20 +49,32 @@
 
             "TIER_1":
             {
-                "COST": 2000,
+                "COST": 1500,
                 "MULT": 1.2
             },
 
             "TIER_2":
             {
-                "COST": 5000,
+                "COST": 4000,
                 "MULT": 1.4
             },
 
             "TIER_3":
             {
-                "COST": 13000,
+                "COST": 10000,
                 "MULT": 1.6
+            },
+
+            "TIER_4":
+            {
+                "COST": 24000,
+                "MULT": 1.8
+            },
+
+            "TIER_5":
+            {
+                "COST": 58000,
+                "MULT": 2
             }
         },
 
@@ -72,28 +84,42 @@
             {
                 "COST": 0,
                 "CHANCE": 5,
-                "MULT": 1    
+                "MULT": 3    
             },
 
             "TIER_1":
             {
-                "COST": 2000,
+                "COST": 1500,
                 "CHANCE": 15,
-                "MULT": 1
+                "MULT": 3
             },
 
             "TIER_2":
             {
-                "COST": 5000,
+                "COST": 4000,
                 "CHANCE": 15,
-                "MULT": 1.5
+                "MULT": 4.5
             },
 
             "TIER_3":
             {
-                "COST": 13000,
+                "COST": 10000,
                 "CHANCE": 25,
-                "MULT": 1.5
+                "MULT": 4.5
+            },
+
+            "TIER_4":
+            {
+                "COST": 24000,
+                "CHANCE": 25,
+                "MULT": 6
+            },
+
+            "TIER_5":
+            {
+                "COST": 58000,
+                "CHANCE": 35,
+                "MULT": 6
             }
         }
     }
