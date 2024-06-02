@@ -113,7 +113,7 @@ class Beetdle(commands.Cog):
             beetdleCol.update_one(myQuery, newValues)
 
             reward = np.random.normal(loc=global_vars["DAILY_MEAN"], scale=global_vars["DAILY_STD"], size = (1))[0]
-            reward = reward*(1 + (6-n_tries)/10) # increase by 10% per try left
+            reward = reward*(1 + (6-n_tries)/5) # increase by 20% per try left
 
             if(daily):
                 if(n_tries == 1):
@@ -130,16 +130,22 @@ class Beetdle(commands.Cog):
             else:
                 reward = reward / 10
                 if(n_tries == 1):
-                    emb_title = "[Non-Daily Beetdle] WHAAAAT! You got the daily beetdle correctly in the first try! It is '" + word + "'."
+                    emb_title = "[Non-Daily Beetdle] WHAAAAT! You got the beetdle correctly in the first try! It is '" + word + "'."
                     emb_description = "You won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 elif(n_tries == 6):
-                    emb_title = "[Non-Daily Beetdle] PHEW! You got the daily beetdle correctly in the last try! It is '" + word + "'."  
+                    emb_title = "[Non-Daily Beetdle] PHEW! You got the beetdle correctly in the last try! It is '" + word + "'."  
                     emb_description = "You won " + str(int(reward)) + "<:beets:1245409413284499587>!"              
                 else:
-                    emb_title = "[Non-Daily Beetdle] You got it! The daily beetdle is '" + word + "'!"
+                    emb_title = "[Non-Daily Beetdle] You got it! The beetdle is '" + word + "'!"
                     emb_description = "It took you **" + str(n_tries) + "** tries.\nYou won " + str(int(reward)) + "<:beets:1245409413284499587>!"
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
+                
+                # Check maximum games per day
+                myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
+                if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
+                    emb_description = "You already completed 10 Beetdles today, so you get no more rewards."
+                    reward = 0
 
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
             newValues = {'$inc': {'coins': int(reward), 'total_earned': int(reward)}}
