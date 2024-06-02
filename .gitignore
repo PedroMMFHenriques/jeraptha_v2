@@ -1,3 +1,5 @@
 .env
 /bot_env
 /cogs/__pycache__
+data/8_ball.txt
+data/fortune_cookie.txt
