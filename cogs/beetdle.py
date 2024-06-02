@@ -141,16 +141,16 @@ class Beetdle(commands.Cog):
                 emb_field_name = "Their tries:"
                 emb_ephemeral = False
                 
-                # Check maximum games per day
-                myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
-                if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
-                    emb_description = "You already completed 10 Beetdles today, so you get no more rewards."
-                    reward = 0
-
-            myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-            newValues = {'$inc': {'coins': int(reward), 'total_earned': int(reward)}}
-            usersCol.update_one(myQuery, newValues)
-        
+            # Check maximum games per day
+            myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
+            if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
+                emb_description = "You already completed 10 Beetdles today, so you get no more rewards."
+                reward = 0
+            else:
+                myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+                newValues = {'$inc': {'coins': int(reward), 'total_earned': int(reward)}}
+                usersCol.update_one(myQuery, newValues)
+            
 
         else: # Incorrect word, continue game
             word_count = {}
@@ -213,12 +213,16 @@ class Beetdle(commands.Cog):
                 myQuery= {"member_id": ctx.author.id, "date": datetime_today, "ended": False}
                 newValues = {'$set': {"guesses": guesses, "guesses_print": guesses_print}, '$inc': {"tries": 1}}
                 beetdleCol.update_one(myQuery, newValues)
+                
+                emb_description = ""
+                if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
+                    emb_description += "*You already completed 10 Beetdles today, so you get no more rewards.*\n"
 
                 if(daily):
                     emb_title = "[Daily Beetdle] Try " + str(n_tries) + " '" + your_guess + "' wasn't correct."
                 else:
                     emb_title = "[Non-Daily Beetdle] Try " + str(n_tries) + " '" + your_guess + "' wasn't correct."
-                emb_description = "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n"
+                emb_description += "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n"
                 if(n_tries == 5):
                     emb_description += "You only have **one last try**!"
                 else:
