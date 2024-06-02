@@ -218,13 +218,13 @@ class Beetdle(commands.Cog):
                 # Check if already reach maximum number of rewarded games
                 myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
                 if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
-                    emb_description += "*You already completed 10 Beetdles today, so you get no more rewards.*\n"
+                    emb_description += "*You already completed 10 Beetdles today, so you get no more rewards.*\n\n"
 
                 if(daily):
                     emb_title = "[Daily Beetdle] Try " + str(n_tries) + " '" + your_guess + "' wasn't correct."
                 else:
                     emb_title = "[Non-Daily Beetdle] Try " + str(n_tries) + " '" + your_guess + "' wasn't correct."
-                emb_description += "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n"
+                emb_description += "**Bold** is correct letter in correct space, __underline__ is correct letter in wrong space and ~~strikethrough~~ is incorrect.\n\n"
                 if(n_tries == 5):
                     emb_description += "You only have **one last try**!"
                 else:
