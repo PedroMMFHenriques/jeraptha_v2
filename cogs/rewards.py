@@ -35,7 +35,7 @@ class Rewards(commands.Cog):
         self.bot = bot
 
     
-    perks = discord.SlashCommandGroup("perks", "Perk info and upgrades.")
+    """perks = discord.SlashCommandGroup("perks", "Perk info and upgrades.")
 
 
     # PERKS_INFO
@@ -153,7 +153,7 @@ class Rewards(commands.Cog):
         newValues = {'$set': {reward_db: next_tier}}
         rewardsCol.update_one(myQuery, newValues)
 
-        await ctx.respond("[Perk] <@" + str(ctx.author.id) + "> upgraded **" + perk + "** to **" + next_tier + "**!")
+        await ctx.respond("[Perk] <@" + str(ctx.author.id) + "> upgraded **" + perk + "** to **" + next_tier + "**!")"""
 
 
     # PUNISH
