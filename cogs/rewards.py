@@ -34,9 +34,13 @@ class Rewards(commands.Cog):
     def __init__(self, bot): 
         self.bot = bot
 
+    
+    perks = discord.SlashCommandGroup("perks", "Perk info and upgrades.")
+
+
     # PERKS_INFO
-    @discord.slash_command(name="perks_info", description="Info about the perks and their upgrades.")
-    async def perks_info(self, ctx: discord.ApplicationContext):
+    @perks.command(name="info", description="Info about the perks and their upgrades.")
+    async def info(self, ctx: discord.ApplicationContext):
         userCheck = rewardsCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "daily_boost_tier": 1, "daily_crit_tier": 1})
         if(userCheck is None): 
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
@@ -101,8 +105,8 @@ class Rewards(commands.Cog):
 
 
     
-    # UPGRADE
-    @discord.slash_command(name="upgrade", description="Upgrade your perks.")
+    # PERKS UPGRADE
+    @perks.command(name="upgrade", description="Upgrade your perks.")
     @discord.option("perk", description="Choose what perk to upgrade.", required=True, choices=perk_list)
     async def upgrade(self, ctx: discord.ApplicationContext, perk: str):
         rewardsCheck = rewardsCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "daily_boost_tier": 1, "daily_crit_tier": 1})
