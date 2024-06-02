@@ -144,7 +144,7 @@ class Beetdle(commands.Cog):
             # Check maximum games per day
             myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
             if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
-                emb_description = "You already completed 10 Beetdles today, so you get no more rewards."
+                emb_description = "You already completed 10 Beetdles today, so you won't get more rewards."
                 reward = 0
             else:
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
@@ -218,7 +218,7 @@ class Beetdle(commands.Cog):
                 # Check if already reach maximum number of rewarded games
                 myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
                 if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
-                    emb_description += "*You already completed 10 Beetdles today, so you get no more rewards.*\n\n"
+                    emb_description += "*You already completed 10 Beetdles today, so you won't get more rewards.*\n\n"
 
                 if(daily):
                     emb_title = "[Daily Beetdle] Try " + str(n_tries) + " '" + your_guess + "' wasn't correct."
