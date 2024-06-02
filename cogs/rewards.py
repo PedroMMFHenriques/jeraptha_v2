@@ -266,8 +266,8 @@ class Rewards(commands.Cog):
     eightBall = discord.SlashCommandGroup("8ball", "Roll or add phrases to the 8-ball")
     
     # 8-BALL ROLL
-    @eightBall.command(name="roll", description="Roll the 8-Ball for its wisdom. (Costs " + eight_ball_json["ROLL_COST"] + ")")
-    @discord.option("question", description="Ask it a Yes or No question. (Costs " + eight_ball_json["ROLL_COST"] + ")", required=True)
+    @eightBall.command(name="roll", description="Roll the 8-Ball for its wisdom. (Costs " + str(eight_ball_json["ROLL_COST"]) + ")")
+    @discord.option("question", description="Ask it a Yes or No question. (Costs " + str(eight_ball_json["ROLL_COST"]) + ")", required=True)
     async def roll(self, ctx: discord.ApplicationContext, question: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_8ball": 1})
         if(userCheck is None):
@@ -315,8 +315,8 @@ class Rewards(commands.Cog):
 
     
     # 8-BALL ADD
-    @eightBall.command(name="add", description="Add an answer to the 8-Ball. (Costs " + eight_ball_json["ADD_COST"] + ")")
-    @discord.option("answer", description="Give an answer to a yes or no question. (Costs " + eight_ball_json["ADD_COST"] + ")", required=True)
+    @eightBall.command(name="add", description="Add an answer to the 8-Ball. (Costs " + str(eight_ball_json["ADD_COST"]) + ")")
+    @discord.option("answer", description="Give an answer to a yes or no question. (Costs " + str(eight_ball_json["ADD_COST"]) + ")", required=True)
     async def add(self, ctx: discord.ApplicationContext, answer: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_8ball": 1})
         if(userCheck is None):
@@ -358,7 +358,7 @@ class Rewards(commands.Cog):
     fortune = discord.SlashCommandGroup("fortune_cookie", "Get wisdom or add phrases to the fortune cookie.")
 
     # FORTUNE COOKIE WISDOM
-    @fortune.command(name="wisdom", description="As the fortune cookie for wisdom. (Costs " + fortune_cookie_json["FORTUNE_COST"] + ")")
+    @fortune.command(name="wisdom", description="As the fortune cookie for wisdom. (Costs " + str(fortune_cookie_json["FORTUNE_COST"]) + ")")
     async def wisdom(self, ctx: discord.ApplicationContext):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_fortune": 1})
         if(userCheck is None):
@@ -405,8 +405,8 @@ class Rewards(commands.Cog):
         await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
 
     # FORTUNE COOKIE ADD
-    @fortune.command(name="add", description="Add wisdom to the fortune cookie. (Costs " + fortune_cookie_json["ADD_COST"] + ")")
-    @discord.option("wisdom", description="Give wisdom to the fortune cookie. (Costs " + fortune_cookie_json["ADD_COST"] + ")", required=True)
+    @fortune.command(name="add", description="Add wisdom to the fortune cookie. (Costs " + str(fortune_cookie_json["ADD_COST"]) + ")")
+    @discord.option("wisdom", description="Give wisdom to the fortune cookie. (Costs " + str(fortune_cookie_json["ADD_COST"]) + ")", required=True)
     async def add(self, ctx: discord.ApplicationContext, wisdom: str):
         userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_fortune": 1})
         if(userCheck is None):
