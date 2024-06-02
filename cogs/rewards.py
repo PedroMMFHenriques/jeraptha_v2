@@ -379,7 +379,7 @@ class Rewards(commands.Cog):
         usersCol.update_one(myQuery, newValues)
 
         # Remove coins from the roller
-        remove_coins = 0 - fortune_cookie_json["ROLL_COST"]
+        remove_coins = 0 - fortune_cookie_json["FORTUNE_COST"]
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)
