@@ -215,6 +215,8 @@ class Beetdle(commands.Cog):
                 beetdleCol.update_one(myQuery, newValues)
                 
                 emb_description = ""
+                # Check if already reach maximum number of rewarded games
+                myQuery = {"member_id": ctx.author.id, "date": datetime_today, "ended": True}
                 if(beetdleCol.count_documents(myQuery, limit=10) >= 10):
                     emb_description += "*You already completed 10 Beetdles today, so you get no more rewards.*\n"
 
