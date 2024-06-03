@@ -342,6 +342,9 @@ class Rewards(commands.Cog):
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)
 
+        await ctx.respond("[8-Ball] You added a new answer:\n**" + answer + "**", ephemeral=True)
+
+
         embed = discord.Embed(title="",
                       description="<@" + str(ctx.author.id) + "> added a new answer to the 8-Ball.",
                       colour=0x009900,
@@ -350,7 +353,7 @@ class Rewards(commands.Cog):
         embed.set_footer(text="8-Ball",
                          icon_url="https://t4.ftcdn.net/jpg/02/13/01/79/360_F_213017967_z1SLHuRCxHNpCBxUlid4lxuq7q6n16Qr.jpg")
 
-        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
+        await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions())
 
 
 
@@ -431,6 +434,8 @@ class Rewards(commands.Cog):
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)
+        
+        await ctx.respond("[Fortune Cookie] You added new wisdom:\n**" + wisdom + "**", ephemeral=True)
 
         embed = discord.Embed(title="",
                       description="<@" + str(ctx.author.id) + "> added a new wisdom to the fortune cookie.",
@@ -440,7 +445,7 @@ class Rewards(commands.Cog):
         embed.set_footer(text="Fortune",
                          icon_url="https://images.emojiterra.com/google/noto-emoji/unicode-15.1/color/1024px/1f960.png")
 
-        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
+        await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions())
 
 
 
