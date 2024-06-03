@@ -21,6 +21,46 @@ usersCol = myDB[db["USERS_COL"]]
 chinchiroGameCol = myDB["ChinchirorinGame"] #ONLY 1 GAME AT A TIME IN THE GUILD (for now)
 chinchiroUserCol = myDB["ChinchirorinUser"]
 
+
+def evaluate_hand(dice):
+    hand = dice.get
+
+    #RULESET: Underground Chinchirorin https://games.porg.es/games/cee-lo/
+    #1-1-1 = 999 points (5x payout)
+    #Triple = 7 points + dice value (3x payout)
+    #4-5-6 = 7 points (2x payout)
+    #Double with any other valur = point of the 3rd dice (1x payout)
+    #Not a hand = 0 points (1x loss)
+    #1-2-3 = = -1 points (2x loss)
+
+    #Triples
+    if hand[0] == hand[1] and hand[1] == hand[2]:
+        #1-1-1
+        if hand[0] == 1:
+            return 999
+        #Other triple
+        else:
+            return 7 + hand[0]
+
+    #4-5-6
+    if hand[0] == 4 and hand[1] == 5 and hand[2] == 6:
+        return 7
+
+    #Doubles
+    if hand[0] == hand[1]:
+        return hand[2]
+    elif hand[1] == hand[2]:
+        return hand[0]
+    elif hand[0] == hand[2]:
+        return hand[1]
+
+    #1-2-3
+    if (hand[0] == 1) and (hand[1] == 2) and (hand[2] == 3):
+        return -1
+    
+    #Not a hand
+    return 0
+
 class Die:
     def __init__(self, sides=6):
         self.sides = sides
@@ -50,17 +90,17 @@ class Dice:
         return results
 
 class Player:
-    def __init__(self, betAmmount):
+    def __init__(self, betAmmount, playerName):
         self.betAmmount = betAmmount
+        self.playerName = playerName
         self.dice = Dice(3)
 
-    def set_score(self):
+    def play(self):
         self.dice.roll
-        # FAZER FUNC DE AVALIAR A HAND
+        self.score = evaluate_hand(self.dice)
 
-
-    def get(self):
-        return 1
+    def get_score(self):
+        return self.score
 
 class Chinchirorin(commands.Cog):
     """
@@ -74,7 +114,35 @@ class Chinchirorin(commands.Cog):
     chinchirorin = discord.SlashCommandGroup("chinchirorin", "Chinchirorin related commands.")
 
     # CHINCHIRORIN START
-    @chinchirorin.command(name="play", description="Play a game of Cee-lo.")
-    async def start(self, ctx: discord.ApplicationContext):
-        chinchiroGameCheck = chinchiroGameCol.find_one({"guild_id": ctx.guild.id, "author_id": ctx.author.id, "running": True, "rolling": False})
+    @chinchirorin.command(name="play", description="Play a game of Cee-lo (Underground Chinchirorin ruleset).")
+    @discord.option("bet_amount", description="Your bet amount against the bank", required=True)
+    async def play(self, ctx: discord.ApplicationContext, bet_amount: int):
+        #Verify bet amount
+        if(bet_amount <= 0):
+            await ctx.respond("<@" + str(ctx.author.id) + "Nice try! However, Zǎoshang hǎo zhōngguó xiànzài wǒ yǒu BING CHILLING 🥶🍦 wǒ hěn xǐhuān BING CHILLING 🥶🍦 dànshì sùdù yǔ jīqíng 9 bǐ BING CHILLING 🥶🍦 sùdù yǔ jīqíng sùdù yǔ jīqíng 9 wǒ zuì xǐhuān suǒyǐ…xiànzài shì yīnyuè shíjiān zhǔnbèi 1 2 3 liǎng gè lǐbài yǐhòu sùdù yǔ jīqíng 9 ×3 bùyào wàngjì bùyào cu òguò jìdé qù diànyǐngyuàn kàn sùdù yǔ jīqíng 9 yīn wéi fēicháng hǎo diànyǐng dòngzuò fēicháng hǎo chàbùduō yīyàng BING CHILLING 🥶🍦zàijiàn 🥶🍦")
+            try:
+                await ctx.author.edit(nick=ctx.author.display_name + " 🤡", reason="Tried to cheat Jeraptha")
+            except:
+                pass
+            return
+
+        #Check wallet
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+        if(userCheck is None): 
+            await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+            return
+
+        if(userCheck["coins"] < bet_amount): 
+            await ctx.respond("You intend to pay with your kneecaps or <:beets:1245409413284499587>? Because you seem to be out of <:beets:1245409413284499587>.", ephemeral=True)
+            return
+        elif(userCheck["coins"] < 2*bet_amount): 
+            await ctx.respond("This game has a 1/216 chance of losing double the amount of <:beets:1245409413284499587> bet, so we need you at least that amount of liquidity.", ephemeral=True)
         
+        bank = Player(betAmmount=bet_amount,playerName="Jeraptha")
+        player = Player(betAmmount=bet_amount,playerName=ctx.author.id)
+
+        #Update wallet 
+        # removeCoins = 
+        # myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        # newValues = {'$inc': {'coins': int(removeCoins), 'coins_bet': int(bet_amount)}}
+        # usersCol.update_one(myQuery, newValues)
