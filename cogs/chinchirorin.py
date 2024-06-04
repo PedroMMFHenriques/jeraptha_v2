@@ -23,7 +23,7 @@ chinchiroUserCol = myDB["ChinchirorinUser"]
 
 
 def evaluate_hand(dice):
-    hand = dice.get
+    hand = dice.get()
 
     #RULESET: Underground Chinchirorin https://games.porg.es/games/cee-lo/
     #1-1-1 = 999 points (5x payout)
@@ -64,6 +64,7 @@ def evaluate_hand(dice):
 class Die:
     def __init__(self, sides=6):
         self.sides = sides
+        self.roll_value = 0
 
     def roll(self):
         self.roll_value = random.randint(1,self.sides)
@@ -79,12 +80,12 @@ class Dice:
 
     def roll(self):
         for x in self.set:
-            x.roll
+            x.roll()
 
     def get(self):
         results = []
         for x in self.set:
-            results.append = x.get
+            results.append(x.get())
 
         results.sort()
         return results
@@ -93,10 +94,11 @@ class Player:
     def __init__(self, betAmmount, playerName):
         self.betAmmount = betAmmount
         self.playerName = playerName
+        self.score = 0
         self.dice = Dice(3)
 
     def play(self):
-        self.dice.roll
+        self.dice.roll()
         self.score = evaluate_hand(self.dice)
 
     def get_score(self):
@@ -146,3 +148,13 @@ class Chinchirorin(commands.Cog):
         # myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
         # newValues = {'$inc': {'coins': int(removeCoins), 'coins_bet': int(bet_amount)}}
         # usersCol.update_one(myQuery, newValues)
+
+# bank = Player(betAmmount=100,playerName="Jeraptha")
+# player = Player(betAmmount=100,playerName="Asdrubal")
+
+# bank.play()
+# print(bank.get_score())
+
+# player.play()
+# print(player.get_score())
+
