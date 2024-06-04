@@ -18,8 +18,8 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
-chinchiroGameCol = myDB["ChinchirorinGame"] #ONLY 1 GAME AT A TIME IN THE GUILD (for now)
-chinchiroUserCol = myDB["ChinchirorinUser"]
+# chinchiroGameCol = myDB["ChinchirorinGame"] 
+# chinchiroUserCol = myDB["ChinchirorinUser"]
 
 
 def evaluate_hand(dice):
@@ -101,6 +101,9 @@ class Player:
         self.dice.roll()
         self.score = evaluate_hand(self.dice)
 
+    def get_roll(self):
+        return self.dice.get()
+
     def get_score(self):
         return self.score
 
@@ -138,16 +141,66 @@ class Chinchirorin(commands.Cog):
             await ctx.respond("You intend to pay with your kneecaps or <:beets:1245409413284499587>? Because you seem to be out of <:beets:1245409413284499587>.", ephemeral=True)
             return
         elif(userCheck["coins"] < 2*bet_amount): 
-            await ctx.respond("This game has a 1/216 chance of losing double the amount of <:beets:1245409413284499587> bet, so we need you at least that amount of liquidity.", ephemeral=True)
+            await ctx.respond("This game has a 1/216 chance of losing double the amount of <:beets:1245409413284499587> bet, so we need you to have at least that amount of liquidity.", ephemeral=True)
         
+        #Update wallet before game
+        removeCoins = 0 - bet_amount
+        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        newValues = {'$inc': {'coins': int(removeCoins), 'coins_bet': int(bet_amount)}}
+        usersCol.update_one(myQuery, newValues)
+
         bank = Player(betAmmount=bet_amount,playerName="Jeraptha")
         player = Player(betAmmount=bet_amount,playerName=ctx.author.id)
 
-        #Update wallet 
-        # removeCoins = 
-        # myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-        # newValues = {'$inc': {'coins': int(removeCoins), 'coins_bet': int(bet_amount)}}
-        # usersCol.update_one(myQuery, newValues)
+        # BANK'S TURN
+        for i in range(3):
+            bank.play()
+            #INSERT DISCORD EMBEDS FOR ROLLS HERE
+            if bank.get_score() != 0:
+                break
+
+        # PLAYER'S TURN
+        for i in range(3):
+            player.play()
+            #INSERT DISCORD EMBED FOR ROLLS HERE
+            if player.get_score() != 0:
+                break
+
+        # Win protocol
+        if player.get_score() > bank.get_score() :
+            winnings = bet_amount
+            if player.get_score() == 99:
+                winnings += bet_amount*5
+            elif player.get_score() > 7:
+                winnings += bet_amount*3
+            elif(player.get_score() == 7):
+                winnings += bet_amount*2
+            else:
+                winnings += bet_amount
+
+            myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+            newValues = {'$inc': {'coins': winnings, 'earned_bet': winnings, 'total_earned': winnings}}
+            usersCol.update_one(myQuery, newValues)
+            #INSERT DISCORD EMBED FOR WINNINGS HERE
+
+        # Tie protocol
+        elif player.get_score() == bank.get_score() :
+            winnings = bet_amount
+            myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+            newValues = {'$inc': {'coins': winnings, 'earned_bet': winnings, 'total_earned': winnings}}
+            usersCol.update_one(myQuery, newValues)
+            #INSERT DISCORD EMBED FOR TIES HERE
+
+        # Loss protocol
+        else :
+            if player.get_score() == -1:
+                extraLoss = 0 - bet_amount
+                myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+                newValues = {'$inc': {'coins': int(extraLoss)}}
+                usersCol.update_one(myQuery, newValues)
+                #INSERT DISCORD EMBED FOR FAT L
+            
+            #INSERT DISCORD EMBED FOR NORMAL L
 
 # bank = Player(betAmmount=100,playerName="Jeraptha")
 # player = Player(betAmmount=100,playerName="Asdrubal")
