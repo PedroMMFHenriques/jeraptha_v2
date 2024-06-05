@@ -169,7 +169,7 @@ class Chinchirorin(commands.Cog):
         # Win protocol
         if player.get_score() > bank.get_score() :
             winnings = bet_amount
-            if player.get_score() == 99:
+            if player.get_score() == 999:
                 winnings += bet_amount*5
             elif player.get_score() > 7:
                 winnings += bet_amount*3
