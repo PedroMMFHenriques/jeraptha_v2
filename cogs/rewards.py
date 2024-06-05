@@ -499,7 +499,7 @@ class Rewards(commands.Cog):
                 newValues = {'$inc': {'coins': int(remove_coins), 'coins_bet': int(lootbox_json["COST"])}}
                 usersCol.update_one(myQuery, newValues)
 
-                await ctx.send(f"[Lootbox] <@{ctx.author.id}> is opening a lootbox for {int(lootbox_json["COST"])}<:beets:1245409413284499587>!")
+                await ctx.send("[Lootbox] <@" + str(ctx.author.id) + "> is opening a lootbox for "+ str(lootbox_json["COST"]) + "<:beets:1245409413284499587>!")
                 await ctx.respond(f"Time left for your free lootbox: {hoursLeft}h:{minutesLeft}m:{secondsLeft}s.", ephemeral=True)
         
 
