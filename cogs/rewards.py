@@ -555,7 +555,7 @@ class Rewards(commands.Cog):
 
             elif(reward == "Refund"): # Refund
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-                newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(lootbox_json["COST"])}}
+                newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(lootbox_json["COST"]), 'earned_bet': int(lootbox_json["COST"])}}
                 usersCol.update_one(myQuery, newValues)
                 reward_msg = ", earning " + str(lootbox_json["COST"]) + "<:beets:1245409413284499587> back"
             
@@ -589,7 +589,7 @@ class Rewards(commands.Cog):
                 daily_coins = np.random.normal(loc=global_consts["DAILY_MEAN"], scale=global_consts["DAILY_STD"], size = (1))[0]
 
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-                newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins)}}
+                newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins), 'earned_bet': int(daily_coins)}}
                 usersCol.update_one(myQuery, newValues)
                 reward_msg = ", earning " + str(int(daily_coins)) + "<:beets:1245409413284499587>"
             

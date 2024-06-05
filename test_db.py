@@ -50,7 +50,7 @@ beetdleCol.drop()"""
 
 
 usersCol.update_many({},
-                {"$set" : {"last_lootbox": datetime(2000, 1, 1)}},
+                {"$inc" : {"earned_bet": 751}},
                 upsert = False
               )
 
