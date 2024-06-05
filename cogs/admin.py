@@ -91,7 +91,7 @@ class Admin(commands.Cog):
             {
                 "$setOnInsert": {"member_id": member.id, "guild_id": member.guild.id, "coins": global_consts["INIT_COINS"], "last_daily": datetime(2000, 1, 1), 
                                  "last_punish": datetime(2000, 1, 1), "coins_bet": 0, "earned_bet": 0, "total_earned": 0, "wagers_won": 0,
-                                "last_8ball": datetime(2000, 1, 1), "last_fortune": datetime(2000, 1, 1)}
+                                "last_8ball": datetime(2000, 1, 1), "last_fortune": datetime(2000, 1, 1), "last_lootbox": datetime(2000, 1, 1)}
             },
             upsert = True
         )

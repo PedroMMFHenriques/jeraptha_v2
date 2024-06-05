@@ -35,6 +35,11 @@
             "FORTUNE_COST": 10,
             "ADD_COST": 50,
             "FILE": "data/fortune_cookie.txt"
+        },
+
+        "LOOTBOX":
+        {   
+            "COST": 250
         }
     },
 

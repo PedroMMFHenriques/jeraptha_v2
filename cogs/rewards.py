@@ -1,16 +1,20 @@
 import discord
 from discord.ext import commands
 
+import numpy as np
+
 import pymongo
 
 import asyncio
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import math
 import random
 
 import json
 global_json = json.load(open('global.json'))
+
+global_consts = global_json["CONSTS"]
 
 # Setup database
 db = global_json["DB"]
@@ -21,6 +25,7 @@ rewardsCol = myDB[db["REWARDS_COL"]]
 
 eight_ball_json = global_json["FUN"]["8BALL"]
 fortune_cookie_json = global_json["FUN"]["FORTUNE_COOKIE"]
+lootbox_json = global_json["FUN"]["LOOTBOX"]
 
 reason = "Jeraptha punishment"
 
@@ -273,6 +278,10 @@ class Rewards(commands.Cog):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
 
+        if(userCheck["coins"] < eight_ball_json["ROLL_COST"]): 
+            await ctx.respond("You don't have enough <:beets:1245409413284499587>, scrub!", ephemeral=True)
+            return
+        
         # Don't roll if user already did less than 1 hour ago
         if(userCheck["last_8ball"] + timedelta(minutes=30) >  datetime.now()):
             timeLeft = userCheck["last_8ball"] + timedelta(minutes=30) - datetime.now()
@@ -322,6 +331,10 @@ class Rewards(commands.Cog):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
 
+        if(userCheck["coins"] < eight_ball_json["ADD_COST"]): 
+            await ctx.respond("You don't have enough <:beets:1245409413284499587>, scrub!", ephemeral=True)
+            return
+
         answer_list = []
         with open(eight_ball_json["FILE"], 'r') as file:
             for line in file:
@@ -367,6 +380,10 @@ class Rewards(commands.Cog):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
 
+        if(userCheck["coins"] < fortune_cookie_json["FORTUNE_COST"]): 
+            await ctx.respond("You don't have enough <:beets:1245409413284499587>, scrub!", ephemeral=True)
+            return
+        
         # Don't ask for wisdom if user already did less than 30 mins ago
         if(userCheck["last_fortune"] + timedelta(minutes=30) >  datetime.now()):
             timeLeft = userCheck["last_fortune"] + timedelta(minutes=30) - datetime.now()
@@ -414,6 +431,10 @@ class Rewards(commands.Cog):
         if(userCheck is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
+        
+        if(userCheck["coins"] < fortune_cookie_json["ADD_COST"]): 
+            await ctx.respond("You don't have enough <:beets:1245409413284499587>, scrub!", ephemeral=True)
+            return
 
         answer_list = []
         with open(fortune_cookie_json["FILE"], 'r') as file:
@@ -447,6 +468,134 @@ class Rewards(commands.Cog):
 
         await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions())
 
+
+
+    # LOOTBOX 
+    @discord.slash_command(name="lootbox", description="Open a lootbox. The first daily is free, the rest costs " + str(lootbox_json["COST"]) + ".")
+    async def start(self, ctx: discord.ApplicationContext):
+        checkUser = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_lootbox": 1})
+        if(checkUser is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
+
+        # Check didn't do /lootbox today, it's free
+        if(date.today() >= checkUser["last_lootbox"].date() + timedelta(days=1)):
+            myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+            newValues = {"$set": {"last_lootbox": datetime.now()}}
+            usersCol.update_one(myQuery, newValues)
+            await ctx.respond(f"[Lootbox] <@{ctx.author.id}> is opening their daily free lootbox!")
+
+        else:
+            timeLeft = (datetime.combine(date.today() + timedelta(days=1), datetime.min.time()) - datetime.now())
+            hoursLeft = math.floor(timeLeft.seconds/3600)
+            minutesLeft = math.floor((timeLeft.seconds-hoursLeft*3600)/60)
+            secondsLeft = timeLeft.seconds - hoursLeft*3600 - minutesLeft*60
+
+            if(checkUser["coins"] < lootbox_json["COST"]): 
+                await ctx.respond(f"You don't have enough <:beets:1245409413284499587>, scrub! Time left for your free lootbox: {hoursLeft}h:{minutesLeft}m:{secondsLeft}s.", ephemeral=True)
+                return
+            else:
+                # Remove coins from the lootbox opener
+                remove_coins = 0 - lootbox_json["COST"]
+                myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+                newValues = {'$inc': {'coins': int(remove_coins), 'coins_bet': int(lootbox_json["COST"])}}
+                usersCol.update_one(myQuery, newValues)
+
+                await ctx.send(f"[Lootbox] <@{ctx.author.id}> is opening a lootbox!")
+                await ctx.respond(f"Time left for your free lootbox: {hoursLeft}h:{minutesLeft}m:{secondsLeft}s.", ephemeral=True)
+        
+
+
+        cycle = True
+        while(cycle):
+            cycle = False
+            
+            rng = random.SystemRandom().randint(1, 100) 
+
+            if(rng <= 15): # Trash
+                file = "images/lootbox/lootbox_trash"
+                reward = "Trash"
+            
+            elif(16 <= rng and rng <= 30): # Refund
+                file = "images/lootbox/lootbox_refund"
+                reward = "Refund"
+            
+            elif(31 <= rng and rng <= 65): # Fortune
+                file = "images/lootbox/lootbox_fortune"
+                reward = "Fortune"
+            
+            elif(66 <= rng and rng <= 100): # Beets
+                file = "images/lootbox/lootbox_beets"
+                reward = "Beets"
+
+
+            extra_print = ""
+            extra_crate = random.SystemRandom().randint(1, 100)
+            if(extra_crate <= 15): 
+                file += "_extra"
+                extra_print = "... and an extra lootbox"
+                cycle = True
+
+
+            with open(file + ".gif", 'rb') as f:
+                    picture = discord.File(f)
+                    await ctx.send(file=picture)
+
+
+            # Suspense
+            await asyncio.sleep(6)
+
+
+            reward_msg = ""
+            # Distribute rewards
+            if(reward == "Trash"): # Trash
+                #NOTHING OMEGALUL
+                nothing = True
+            
+
+            elif(reward == "Refund"): # Refund
+                myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+                newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(lootbox_json["COST"])}}
+                usersCol.update_one(myQuery, newValues)
+                reward_msg = ", getting " + str(lootbox_json["COST"]) + "<:beets:1245409413284499587> back"
+            
+
+            elif(reward == "Fortune"): # Fortune
+                file = "images/lootbox/lootbox_fortune"
+                reward = "Fortune"
+
+                answer_list = []
+                with open(fortune_cookie_json["FILE"], 'r') as file:
+                    for line in file:
+                        phrase = line.strip()
+                        if phrase:
+                            answer_list.append(phrase)
+                
+                answer = random.choice(answer_list)
+
+                embed = discord.Embed(title="",
+                            description="<@" + str(ctx.author.id) + "> got a fortune cookie reading:\n```" + answer + "```",
+                            colour=0x009900,
+                            timestamp=datetime.now())
+
+
+                embed.set_footer(text="Fortune",
+                                icon_url="https://images.emojiterra.com/google/noto-emoji/unicode-15.1/color/1024px/1f960.png")
+
+                await ctx.send(embed=embed, allowed_mentions=discord.AllowedMentions())
+            
+
+            elif(reward == "Beets"): # Beets
+                daily_coins = np.random.normal(loc=global_consts["DAILY_MEAN"], scale=global_consts["DAILY_STD"], size = (1))[0]
+
+                myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+                newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins)}}
+                usersCol.update_one(myQuery, newValues)
+                reward_msg = ", getting " + str(daily_coins) + "<:beets:1245409413284499587>"
+            
+            
+            await ctx.send(f"[Lootbox] <@{ctx.author.id}> got " + reward + reward_msg + extra_print + "!")
+
+
+        
 
 
 def setup(bot):
