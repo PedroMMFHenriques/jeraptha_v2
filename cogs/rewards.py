@@ -273,7 +273,7 @@ class Rewards(commands.Cog):
     @eightBall.command(name="roll", description="Roll the 8-Ball for its wisdom. (Costs " + str(eight_ball_json["ROLL_COST"]) + ")")
     @discord.option("question", description="Ask it a Yes or No question. (Costs " + str(eight_ball_json["ROLL_COST"]) + ")", required=True)
     async def roll(self, ctx: discord.ApplicationContext, question: str):
-        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_8ball": 1})
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_8ball": 1})
         if(userCheck is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
@@ -326,7 +326,7 @@ class Rewards(commands.Cog):
     @eightBall.command(name="add", description="Add an answer to the 8-Ball. (Costs " + str(eight_ball_json["ADD_COST"]) + ")")
     @discord.option("answer", description="Give an answer to a yes or no question. (Costs " + str(eight_ball_json["ADD_COST"]) + ")", required=True)
     async def add(self, ctx: discord.ApplicationContext, answer: str):
-        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_8ball": 1})
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_8ball": 1})
         if(userCheck is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
@@ -375,7 +375,7 @@ class Rewards(commands.Cog):
     # FORTUNE COOKIE WISDOM
     @fortune.command(name="wisdom", description="As the fortune cookie for wisdom. (Costs " + str(fortune_cookie_json["FORTUNE_COST"]) + ")")
     async def wisdom(self, ctx: discord.ApplicationContext):
-        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_fortune": 1})
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_fortune": 1})
         if(userCheck is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
@@ -427,7 +427,7 @@ class Rewards(commands.Cog):
     @fortune.command(name="add", description="Add wisdom to the fortune cookie. (Costs " + str(fortune_cookie_json["ADD_COST"]) + ")")
     @discord.option("wisdom", description="Give wisdom to the fortune cookie. (Costs " + str(fortune_cookie_json["ADD_COST"]) + ")", required=True)
     async def add(self, ctx: discord.ApplicationContext, wisdom: str):
-        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "last_fortune": 1})
+        userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_fortune": 1})
         if(userCheck is None):
             await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
             return
