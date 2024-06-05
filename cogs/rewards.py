@@ -476,8 +476,10 @@ class Rewards(commands.Cog):
         checkUser = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1, "last_lootbox": 1})
         if(checkUser is None): await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
 
+        free = False
         # Check didn't do /lootbox today, it's free
         if(date.today() >= checkUser["last_lootbox"].date() + timedelta(days=1)):
+            free = True
             myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
             newValues = {"$set": {"last_lootbox": datetime.now()}}
             usersCol.update_one(myQuery, newValues)
@@ -555,7 +557,10 @@ class Rewards(commands.Cog):
 
             elif(reward == "Refund"): # Refund
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-                newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(lootbox_json["COST"]), 'earned_bet': int(lootbox_json["COST"])}}
+                if(free):
+                    newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(lootbox_json["COST"])}}
+                else:
+                    newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(lootbox_json["COST"]), 'earned_bet': int(lootbox_json["COST"])}}
                 usersCol.update_one(myQuery, newValues)
                 reward_msg = ", earning " + str(lootbox_json["COST"]) + "<:beets:1245409413284499587> back"
             
@@ -589,7 +594,10 @@ class Rewards(commands.Cog):
                 daily_coins = np.random.normal(loc=global_consts["DAILY_MEAN"], scale=global_consts["DAILY_STD"], size = (1))[0]
 
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
-                newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins), 'earned_bet': int(daily_coins)}}
+                if(free):
+                    newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(daily_coins)}}
+                else:
+                    newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins), 'earned_bet': int(daily_coins)}}
                 usersCol.update_one(myQuery, newValues)
                 reward_msg = ", earning " + str(int(daily_coins)) + "<:beets:1245409413284499587>"
             
