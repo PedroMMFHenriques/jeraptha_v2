@@ -510,15 +510,15 @@ class Rewards(commands.Cog):
 
             rng = random.SystemRandom().randint(1, 100) 
 
-            if(rng <= 20): # Trash
+            if(rng <= 23): # Trash
                 file = "images/lootbox/lootbox_trash"
                 reward = "Trash"
             
-            elif(21 <= rng and rng <= 35): # Refund
+            elif(24 <= rng and rng <= 40): # Refund
                 file = "images/lootbox/lootbox_refund"
                 reward = "Refund"
             
-            elif(35 <= rng and rng <= 70): # Fortune
+            elif(41 <= rng and rng <= 70): # Fortune
                 file = "images/lootbox/lootbox_fortune"
                 reward = "Fortune"
             
