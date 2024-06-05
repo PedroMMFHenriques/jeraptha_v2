@@ -534,7 +534,7 @@ class Rewards(commands.Cog):
                 file += "_extra"
                 extra_print = "... and an extra lootbox"
                 cycle = True
-                extra_time = 6
+                extra_time = 3
 
 
             with open(file + ".gif", 'rb') as f:
