@@ -49,8 +49,8 @@ rewardsCol.drop()
 beetdleCol.drop()"""
 
 
-usersCol.update_many({},
-                {"$inc" : {"earned_bet": -751}},
+usersCol.update_many({"member_id": 226800940668289025, "guild_id": 565223709699211275},
+                {"$inc" : {"earned_bet": 751}},
                 upsert = False
               )
 
