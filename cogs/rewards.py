@@ -311,7 +311,7 @@ class Rewards(commands.Cog):
         answer = random.choice(answer_list)
 
         embed = discord.Embed(title="",
-                      description="<@" + str(ctx.author.id) + "> asked the 8-Ball: \n**" + question + "**\n\nTo which it responded:\n```" + answer + "```",
+                      description="<@" + str(ctx.author.id) + ">  payed " + str(eight_ball_json["ROLL_COST"]) + "<:beets:1245409413284499587> to ask the 8-Ball: \n**" + question + "**\n\nTo which it responded:\n```" + answer + "```",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -359,7 +359,7 @@ class Rewards(commands.Cog):
 
 
         embed = discord.Embed(title="",
-                      description="<@" + str(ctx.author.id) + "> added a new answer to the 8-Ball.",
+                      description="<@" + str(ctx.author.id) + "> added a new answer to the 8-Ball for " + str(eight_ball_json["ADD_COST"]) + "<:beets:1245409413284499587>.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -413,7 +413,7 @@ class Rewards(commands.Cog):
         answer = random.choice(answer_list)
 
         embed = discord.Embed(title="",
-                      description="<@" + str(ctx.author.id) + "> asked the fortune cookie for wisdom.\n\nIt responded:\n```" + answer + "```",
+                      description="<@" + str(ctx.author.id) + "> asked the fortune cookie for wisdom for " + str(fortune_cookie_json["FORTUNE_COST"]) + "<:beets:1245409413284499587>.\n\nIt responded:\n```" + answer + "```",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -456,7 +456,7 @@ class Rewards(commands.Cog):
         newValues = {'$inc': {'coins': int(remove_coins)}}
         usersCol.update_one(myQuery, newValues)
         
-        await ctx.respond("[Fortune Cookie] You added new wisdom:\n**" + wisdom + "**", ephemeral=True)
+        await ctx.respond("[Fortune Cookie] You added new wisdom for " + str(fortune_cookie_json["ADD_COST"]) + "<:beets:1245409413284499587>:\n**" + wisdom + "**", ephemeral=True)
 
         embed = discord.Embed(title="",
                       description="<@" + str(ctx.author.id) + "> added a new wisdom to the fortune cookie.",
@@ -499,7 +499,7 @@ class Rewards(commands.Cog):
                 newValues = {'$inc': {'coins': int(remove_coins), 'coins_bet': int(lootbox_json["COST"])}}
                 usersCol.update_one(myQuery, newValues)
 
-                await ctx.send(f"[Lootbox] <@{ctx.author.id}> is opening a lootbox!")
+                await ctx.send(f"[Lootbox] <@{ctx.author.id}> is opening a lootbox for {int(lootbox_json["COST"])}<:beets:1245409413284499587>!")
                 await ctx.respond(f"Time left for your free lootbox: {hoursLeft}h:{minutesLeft}m:{secondsLeft}s.", ephemeral=True)
         
 
