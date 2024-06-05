@@ -507,32 +507,34 @@ class Rewards(commands.Cog):
         cycle = True
         while(cycle):
             cycle = False
-            
+
             rng = random.SystemRandom().randint(1, 100) 
 
-            if(rng <= 15): # Trash
+            if(rng <= 20): # Trash
                 file = "images/lootbox/lootbox_trash"
                 reward = "Trash"
             
-            elif(16 <= rng and rng <= 30): # Refund
+            elif(21 <= rng and rng <= 35): # Refund
                 file = "images/lootbox/lootbox_refund"
                 reward = "Refund"
             
-            elif(31 <= rng and rng <= 65): # Fortune
+            elif(35 <= rng and rng <= 70): # Fortune
                 file = "images/lootbox/lootbox_fortune"
                 reward = "Fortune"
             
-            elif(66 <= rng and rng <= 100): # Beets
+            elif(71 <= rng and rng <= 100): # Beets
                 file = "images/lootbox/lootbox_beets"
                 reward = "Beets"
 
 
+            extra_time = 0
             extra_print = ""
             extra_crate = random.SystemRandom().randint(1, 100)
             if(extra_crate <= 15): 
                 file += "_extra"
                 extra_print = "... and an extra lootbox"
                 cycle = True
+                extra_time = 6
 
 
             with open(file + ".gif", 'rb') as f:
@@ -541,7 +543,7 @@ class Rewards(commands.Cog):
 
 
             # Suspense
-            await asyncio.sleep(6)
+            await asyncio.sleep(6 + extra_time)
 
 
             reward_msg = ""
@@ -555,7 +557,7 @@ class Rewards(commands.Cog):
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
                 newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(lootbox_json["COST"])}}
                 usersCol.update_one(myQuery, newValues)
-                reward_msg = ", getting " + str(lootbox_json["COST"]) + "<:beets:1245409413284499587> back"
+                reward_msg = ", earning " + str(lootbox_json["COST"]) + "<:beets:1245409413284499587> back"
             
 
             elif(reward == "Fortune"): # Fortune
@@ -589,7 +591,7 @@ class Rewards(commands.Cog):
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
                 newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins)}}
                 usersCol.update_one(myQuery, newValues)
-                reward_msg = ", getting " + str(daily_coins) + "<:beets:1245409413284499587>"
+                reward_msg = ", earning " + str(int(daily_coins)) + "<:beets:1245409413284499587>"
             
             
             await ctx.send(f"[Lootbox] <@{ctx.author.id}> got " + reward + reward_msg + extra_print + "!")
