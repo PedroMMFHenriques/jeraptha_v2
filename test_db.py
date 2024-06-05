@@ -50,7 +50,7 @@ beetdleCol.drop()"""
 
 
 usersCol.update_many({},
-                {"$inc" : {"earned_bet": 751}},
+                {"$inc" : {"earned_bet": -751}},
                 upsert = False
               )
 
