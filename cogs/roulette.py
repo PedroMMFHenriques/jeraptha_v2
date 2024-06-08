@@ -12,6 +12,7 @@ import random
 
 import json
 global_json = json.load(open('global.json'))
+img_json = json.load(open("img_2_link.json"))
 
 # Setup database
 db = global_json["DB"]
@@ -76,13 +77,12 @@ class Roulette(commands.Cog):
                       colour=0x009900,
                       timestamp=datetime.now())
 
-        file = discord.File("images/roulette/roulette_info.png", filename="roulette_info.png")
-        embed.set_image(url="attachment://roulette_info.png")
+        embed.set_image(url=img_json["ROULETTE"]["INFO"])
 
         embed.set_footer(text="Roulette",
                          icon_url="https://www.pamp.com/sites/pamp/files/2023-02/roulette_rev.png")
 
-        await ctx.respond(embed=embed, file=file, allowed_mentions=discord.AllowedMentions())
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
 
         # Waiting for bets
         await asyncio.sleep(betting_time)
@@ -94,9 +94,9 @@ class Roulette(commands.Cog):
         
         winning_number = random.SystemRandom().randint(0, 36)
 
-        with open("images/roulette/roulette_" + str(winning_number) + ".gif", 'rb') as f:
-                picture = discord.File(f)
-                await ctx.send(file=picture)
+        img_link = img_json["ROULETTE"][str(winning_number)]
+        
+        await ctx.send(img_link)
         
         # Suspense
         await asyncio.sleep(8)
