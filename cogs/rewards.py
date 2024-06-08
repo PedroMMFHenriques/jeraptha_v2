@@ -13,6 +13,7 @@ import random
 
 import json
 global_json = json.load(open('global.json'))
+img_json = json.load(open("img_2_link.json"))
 
 global_consts = global_json["CONSTS"]
 
@@ -513,19 +514,19 @@ class Rewards(commands.Cog):
             rng = random.SystemRandom().randint(1, 100) 
 
             if(rng <= 23): # Trash
-                file = "images/lootbox/lootbox_trash"
+                img_link = img_json["LOOTBOX"]["TRASH"]
                 reward = "Trash"
             
             elif(24 <= rng and rng <= 40): # Refund
-                file = "images/lootbox/lootbox_refund"
+                img_link = img_json["LOOTBOX"]["REFUND"]
                 reward = "Refund"
             
             elif(41 <= rng and rng <= 70): # Fortune
-                file = "images/lootbox/lootbox_fortune"
+                img_link = img_json["LOOTBOX"]["FORTUNE"]
                 reward = "Fortune"
             
             elif(71 <= rng and rng <= 100): # Beets
-                file = "images/lootbox/lootbox_beets"
+                img_link = img_json["LOOTBOX"]["BEETS"]
                 reward = "Beets"
 
 
@@ -533,15 +534,15 @@ class Rewards(commands.Cog):
             extra_print = ""
             extra_crate = random.SystemRandom().randint(1, 100)
             if(extra_crate <= 15): 
-                file += "_extra"
+                img_link = img_link["EXTRA"]
                 extra_print = "... and an extra lootbox"
                 cycle = True
                 extra_time = 3
+            else:
+                img_link = img_link["NORMAL"]
 
 
-            with open(file + ".gif", 'rb') as f:
-                    picture = discord.File(f)
-                    await ctx.send(file=picture)
+            await ctx.send(img_link)
 
 
             # Suspense

@@ -1,0 +1,67 @@
+{
+    "ROULETTE":
+    {
+        "0": "https://imgur.com/a/ltDtx41",
+        "1": "https://imgur.com/FJ6Abm4",
+        "2": "https://imgur.com/1rqUd42",
+        "3": "https://imgur.com/rVqw3fg",
+        "4": "https://imgur.com/bLRTou7",
+        "5": "https://imgur.com/GFErpo0",
+        "6": "https://imgur.com/6W2Q20t",
+        "7": "https://imgur.com/Uxbcjzd",
+        "8": "https://imgur.com/vVQTTn0",
+        "9": "https://imgur.com/KMx8N3F",
+        "10": "https://imgur.com/0JJga75",
+        "11": "https://imgur.com/FdGgCKH",
+        "12": "https://imgur.com/OdnOBWf",
+        "13": "https://imgur.com/ECnhiTS",
+        "14": "https://imgur.com/ey82etU",
+        "15": "https://imgur.com/sPFW4xq",
+        "16": "https://imgur.com/FQj5CCa",
+        "17": "https://imgur.com/8TVv5dm",
+        "18": "https://imgur.com/tkeQjMV",
+        "19": "https://imgur.com/bQ2aXAw",
+        "20": "https://imgur.com/egeEHHx",
+        "21": "https://imgur.com/kuLTuWY",
+        "22": "https://imgur.com/4K8DJwP",
+        "23": "https://imgur.com/bEF9ogH",
+        "24": "https://imgur.com/exuhRSM",
+        "25": "https://imgur.com/HuRZ9AZ",
+        "26": "https://imgur.com/aeGvZJC",
+        "27": "https://imgur.com/eZcrtfX",
+        "28": "https://imgur.com/3rMzVkU",
+        "29": "https://imgur.com/bhpcxkL",
+        "30": "https://imgur.com/SWQrHW0",
+        "31": "https://imgur.com/dBcPkHX",
+        "32": "https://imgur.com/rEUuZjI",
+        "33": "https://imgur.com/iNNuspo",
+        "34": "https://imgur.com/UyBNXmL",
+        "35": "https://imgur.com/dg03Yf5",
+        "36": "https://imgur.com/CMWnHwY",
+        "INFO": "https://imgur.com/GF8xii9"
+    },
+
+    "LOOTBOX":
+    {
+        "BEETS": 
+        {
+            "NORMAL": "https://imgur.com/Kxflrxj",
+            "EXTRA": "https://imgur.com/E5LKCEL"
+        },
+        "TRASH": 
+        {
+            "NORMAL": "https://imgur.com/EDPuugd",
+            "EXTRA": "https://imgur.com/NKfCdWe"
+        },
+        "REFUND": 
+        {
+            "NORMAL": "https://imgur.com/aA1kLrr",
+            "EXTRA": "https://imgur.com/EWtnEwY"
+        },
+        "FORTUNE": 
+        {
+            "NORMAL": "https://imgur.com/TAd5kCu",
+            "EXTRA": "https://imgur.com/FDn4iO3"
+        }
+    }
+}
