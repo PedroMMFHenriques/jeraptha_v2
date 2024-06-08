@@ -93,10 +93,10 @@ class Roulette(commands.Cog):
         rouletteGameCol.update_one(myQuery, newValues)
         
         winning_number = random.SystemRandom().randint(0, 36)
+
+        img_link = img_json["ROULETTE"][str(winning_number)]
         
-        embed = discord.Embed(colour=0x009900)
-        embed.set_image(url=img_json["ROULETTE"][str(winning_number)])
-        await ctx.send(embed=embed)
+        await ctx.send(img_link)
         
         # Suspense
         await asyncio.sleep(8)
