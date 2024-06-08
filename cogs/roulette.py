@@ -77,8 +77,7 @@ class Roulette(commands.Cog):
                       colour=0x009900,
                       timestamp=datetime.now())
 
-        #embed.set_image(url=img_json["ROULETTE"]["INFO"])
-        embed.set_image(url="https://imgur.com/a/M9rOqDk")
+        embed.set_image(url=img_json["ROULETTE"]["INFO"])
 
         embed.set_footer(text="Roulette",
                          icon_url="https://www.pamp.com/sites/pamp/files/2023-02/roulette_rev.png")
