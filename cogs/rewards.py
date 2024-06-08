@@ -542,8 +542,9 @@ class Rewards(commands.Cog):
                 img_link = img_link["NORMAL"]
 
 
-            await ctx.send(img_link)
-
+            embed = discord.Embed(colour=0x009900)
+            embed.set_image(url=img_link)
+            await ctx.send(embed=embed)
 
             # Suspense
             await asyncio.sleep(6 + extra_time)
