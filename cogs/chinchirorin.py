@@ -13,6 +13,9 @@ import random
 import json
 global_json = json.load(open('global.json'))
 
+# Global variables
+dieFaceEmoji = ["⚀","⚁","⚂","⚃","⚄","⚅"]
+
 # Setup database
 db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
@@ -152,17 +155,81 @@ class Chinchirorin(commands.Cog):
         bank = Player(betAmmount=bet_amount,playerName="Jeraptha")
         player = Player(betAmmount=bet_amount,playerName=ctx.author.id)
 
+        # START GAME EMBED
+
+
         # BANK'S TURN
+        embedDescription = ""
         for i in range(3):
             bank.play()
-            #INSERT DISCORD EMBEDS FOR ROLLS HERE
+            dice = bank.get_roll()
+
+            embedTitle = "[Cee-lo] Bank's turn" + str(i+1)
+
+            embedDescription += dieFaceEmoji[dice[0]-1] + dieFaceEmoji[dice[1]-1] + dieFaceEmoji[dice[2]-1] 
+
+            embed = discord.Embed(title=embedTitle,
+                                  description=embedDescription,
+                                  colour=0xf44336,
+                                  timestamp=datetime.now())
+            
+            if bank.get_score() == 0:
+                embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
+            else:
+                if bank.get_score() == 999:
+                    embedFieldDesc = "4-5-6, wrap it up you have no chance :dragon:"
+                elif bank.get_score() > 7:
+                    embedFieldDesc = "Triple! Seems like your bet money will be mine :pirate_flag:"
+                elif bank.get_score() > 0:
+                    embedFieldDesc = "Double! Surely you can do better, human?"
+                elif bank.get_score() == -1:
+                    embedFieldDesc = "1-2-3, if I speak..."
+
+            embed.add_field(name="This turn's roll:",
+                            value=embedFieldDesc,
+                            inline=False)
+
+            # Suspense
+            await asyncio.sleep(3)
+            await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
+            
             if bank.get_score() != 0:
                 break
 
         # PLAYER'S TURN
         for i in range(3):
             player.play()
+            dice = player.get_roll()
             #INSERT DISCORD EMBED FOR ROLLS HERE
+            embedTitle = "[Cee-lo] Player's turn" + str(i+1)
+
+            embedDescription += dieFaceEmoji[dice[0]-1] + dieFaceEmoji[dice[1]-1] + dieFaceEmoji[dice[2]-1] 
+
+            embed = discord.Embed(title=embedTitle,
+                                  description=embedDescription,
+                                  colour=0xf44336,
+                                  timestamp=datetime.now())
+            
+            if player.get_score() == 0:
+                embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
+            else:
+                if player.get_score() == 999:
+                    embedFieldDesc = "CRITICAL HIT!!! Strongest hand acquired 🐉"
+                elif player.get_score() > 7:
+                    embedFieldDesc = "Triple! Lady Luck sure is smiling"
+                elif player.get_score() > 0:
+                    embedFieldDesc = "Double! Will it be enough?"
+                elif player.get_score() == -1:
+                    embedFieldDesc = "1-2-3, ouch..."
+
+            embed.add_field(name="This turn's roll:",
+                            value=embedFieldDesc,
+                            inline=False)
+
+            # Suspense
+            await asyncio.sleep(3)
+            await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
+            
             if player.get_score() != 0:
                 break
 
