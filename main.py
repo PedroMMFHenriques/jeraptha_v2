@@ -12,6 +12,8 @@ import pymongo
 
 import json
 
+from api import run_api_thread
+
 # Load vars
 global_json = json.load(open('global.json'))
 load_dotenv() 
@@ -66,5 +68,5 @@ for filename in os.listdir('./cogs'):
       if filename.endswith('.py'):
             bot.load_extension(f"cogs.{filename[:-3]}")
 
-
+run_api_thread()
 bot.run(os.getenv("TOKEN")) #Run the bot
