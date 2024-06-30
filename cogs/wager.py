@@ -285,12 +285,12 @@ class Wager(commands.Cog):
         elif(wagerCheck["end_wager"] < math.floor(time.time())): description_embed = "Betting ended <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         else: description_embed = "Betting will end <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         
-        description_embed += "**" + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + "<:beets:1245409413284499587>, " + str(option_a_odds) + " odds\n"
-        description_embed += "**" + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + "<:beets:1245409413284499587>, " + str(option_b_odds) + " odds\n"
+        description_embed += "**A: " + wagerCheck["option_a"] + "**: " + str(option_wager["option_a"]) + "<:beets:1245409413284499587>, " + str(option_a_odds) + " odds\n"
+        description_embed += "**B: " + wagerCheck["option_b"] + "**: " + str(option_wager["option_b"]) + "<:beets:1245409413284499587>, " + str(option_b_odds) + " odds\n"
         if(wagerCheck["option_c"] != ""):
-            description_embed += "**" + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + "<:beets:1245409413284499587>, " + str(option_c_odds) + " odds\n"
+            description_embed += "**C: " + wagerCheck["option_c"] + "**: " + str(option_wager["option_c"]) + "<:beets:1245409413284499587>, " + str(option_c_odds) + " odds\n"
         if(wagerCheck["option_d"] != ""):
-            description_embed += "**" + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + "<:beets:1245409413284499587>, " + str(option_d_odds) + " odds\n"
+            description_embed += "**D: " + wagerCheck["option_d"] + "**: " + str(option_wager["option_d"]) + "<:beets:1245409413284499587>, " + str(option_d_odds) + " odds\n"
 
         embed = discord.Embed(title="Bet Info: " + wagerCheck["title"],
                       description=description_embed,
