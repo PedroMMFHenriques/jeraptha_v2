@@ -46,14 +46,25 @@ class Wager(commands.Cog):
         if(duration_hours < 0 or duration_minutes < 0 or duration_seconds):
             await ctx.respond("I can't travel back in time!", ephemeral=True)
             return
-
         
         if(duration_hours == 0 and duration_minutes == 0 and duration_seconds == 0):
             duration_minutes = 10
 
+        if(duration_seconds > 60):
+            await ctx.respond("There are only 60 seconds in a minute...", ephemeral=True)
+            return
+        elif(duration_minutes > 60):
+            await ctx.respond("There are only 60 minutes in a hour...", ephemeral=True)
+            return
+        
+        if(duration_seconds < 0 or duration_minutes < 0 or duration_hours < 0):
+            await ctx.respond("Negative time, really? Are you Doc Brown?", ephemeral=True)
+            return
+            
         duration_s = duration_hours*3600 + duration_minutes*60 + duration_seconds
-        if(duration_s < 0):
-            await ctx.respond("I can't travel back in time!", ephemeral=True)
+
+        if(duration_s < 30):
+            await ctx.respond("Minimum duration is 30 seconds!", ephemeral=True)
             return
         end_wager_time = duration_s + math.floor(time.time())
         
