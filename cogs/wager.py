@@ -388,5 +388,43 @@ class Wager(commands.Cog):
         await ctx.respond(content="<@&" + str(wagerRoleId) + ">\n", embed=embed, allowed_mentions=discord.AllowedMentions())
 
 
+
+    @wager.command(name="list", description="Get list of the wagers.")
+    @discord.option("option", description="Choose what type of list.", required=True, choices=['All', 'Open', 'Settled', 'Canceled'])
+    async def list(self, ctx: discord.ApplicationContext, option: str):
+        if(option == "All"): wagerCheck = wagersCol.find_many({},{"_id": 1, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1})
+        elif(option == "Open"): wagerCheck = wagersCol.find_many({"settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
+        elif(option == "Settled"): wagerCheck = wagersCol.find_many({"settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1})
+        else: wagerCheck = wagersCol.find_many({"settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
+        
+        if(wagerCheck is None): 
+            await ctx.respond("There aren't wagers of that type yet!", ephemeral=True)
+            return
+        
+
+        description_embed = ""
+        for wager in wagerCheck:
+            description_embed += "[ID " + wager["_id"] + "] **" + wager["title"] + "** by " + wager["author"]
+            if(option == "All"):
+                if(not wager["settled"] and not wager["canceled"]): description_embed += ", [OPEN]"
+                elif(wager["settled"]): description_embed += ", [SETTLED]: " + wager["winning_option"]
+                else: description_embed += ", [CANCELED]"
+            elif(option == "Settled"):
+                description_embed += ", [WINNER]: " + wager["winning_option"]
+            description_embed += "/n"
+
+        embed = discord.Embed(title="List of " + option + " wagers:",
+                      description=description_embed,
+                      colour=0x009900,
+                      timestamp=datetime.now())
+
+
+        embed.set_footer(text="Wager list",
+                         icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
+
+        await ctx.respond(embed=embed)
+
+
+
 def setup(bot):
     bot.add_cog(Wager(bot))
