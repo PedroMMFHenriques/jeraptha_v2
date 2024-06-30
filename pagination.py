@@ -33,13 +33,6 @@ class Pagination(discord.ui.View):
         await interaction.response.edit_message(embed=emb, view=self)
 
 
-    def update_buttons(self):
-        self.children[0].disabled = self.index == 1
-        self.children[1].disabled = self.index == 1
-        self.children[2].disabled = self.index == self.total_pages
-        self.children[3].disabled = self.index == self.total_pages
-
-
     @discord.ui.button(emoji="⏮️", style=discord.ButtonStyle.blurple)
     async def end(self, button: discord.Button, interaction: discord.Interaction):
         self.index = 1
@@ -59,6 +52,12 @@ class Pagination(discord.ui.View):
     async def end(self, button: discord.Button, interaction: discord.Interaction):
         self.index = self.total_pages
         await self.edit_page(interaction)
+
+    def update_buttons(self):
+        self.children[0].disabled = self.index == 1
+        self.children[1].disabled = self.index == 1
+        self.children[2].disabled = self.index == self.total_pages
+        self.children[3].disabled = self.index == self.total_pages
 
 
     async def on_timeout(self):
