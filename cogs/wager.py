@@ -43,7 +43,8 @@ class Wager(commands.Cog):
     @discord.option("duration_minutes", description="Duration of the wager in minutes.", required=False, default=0)
     @discord.option("duration_hours", description="Duration of the wager in hours.", required=False, default=0)
     async def start(self, ctx: discord.ApplicationContext, title: str, option_a: str, option_b: str, option_c: str, option_d: str, duration_seconds: int, duration_minutes: int, duration_hours: int):
-        if(duration_hours < 0 or duration_minutes < 0 or duration_seconds):
+        # Check duration
+        if(duration_hours < 0 or duration_minutes < 0 or duration_seconds < 0):
             await ctx.respond("I can't travel back in time!", ephemeral=True)
             return
         
@@ -56,10 +57,6 @@ class Wager(commands.Cog):
         elif(duration_minutes > 60):
             await ctx.respond("There are only 60 minutes in a hour...", ephemeral=True)
             return
-        
-        if(duration_seconds < 0 or duration_minutes < 0 or duration_hours < 0):
-            await ctx.respond("Negative time, really? Are you Doc Brown?", ephemeral=True)
-            return
             
         duration_s = duration_hours*3600 + duration_minutes*60 + duration_seconds
 
@@ -68,6 +65,18 @@ class Wager(commands.Cog):
             return
         end_wager_time = duration_s + math.floor(time.time())
         
+        #Check options
+        if(option_c == "" and option_d != ""):
+            await ctx.respond("Choose 'option c' before 'option d'!", ephemeral=True)
+            return
+
+        option_list = [option_a, option_b]
+        if(option_c != ""): 
+            option_list.append(option_c)
+            if(option_d != ""): option_list.append(option_d)
+        if(len(option_list) != len(set(option_list))):
+            await ctx.respond("There can't be duplicate options!", ephemeral=True)
+            return
 
         # wager: wager id, guild id, quem criou, duração, title, descrição das opções
         wager_id = wagersCol.count_documents({})
