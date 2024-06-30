@@ -167,9 +167,10 @@ class Economy(commands.Cog):
             offset = (page-1) * entries_per_page
 
             idx = 0
+            embedString = ""
             for user in user_list[offset:offset+entries_per_page]:
                 idx += 1
-                embedString = str(offset + idx) + "<@" + user["user_name"] + ">: " + user["user_value"] + "\n"
+                embedString += str(offset + idx) + ". <@" + user["user_name"] + ">: " + user["user_value"] + "\n"
             
             emb.add_field(name=embed_subtitle,
                         value=embedString,
