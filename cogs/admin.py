@@ -110,7 +110,7 @@ class Admin(commands.Cog):
                 )
 
     @discord.slash_command(name="show")
-    async def show(self, ctx: discord.ApplicationContext):
+    async def show(self, ctx: discord.ApplicationContext, interaction: discord.Interaction):
         users = [f"User {i}" for i in range(1, 10000)]
         # This is a long list of results
         # I'm going to use pagination to display the data
@@ -121,12 +121,12 @@ class Admin(commands.Cog):
             offset = (page-1) * L
             for user in users[offset:offset+L]:
                 emb.description += f"{user}\n"
-            emb.set_author(name=f"Requested by {ctx.author.id}")
+            emb.set_author(name=f"Requested by {interaction.user}")
             n = Pagination.compute_total_pages(len(users), L)
             emb.set_footer(text=f"Page {page} from {n}")
             return emb, n
 
-        await Pagination(ctx.interaction, get_page).navegate()
+        await Pagination(interaction, get_page).navegate()
 
 def setup(bot):
     bot.add_cog(Admin(bot))
