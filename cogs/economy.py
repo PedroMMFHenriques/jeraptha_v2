@@ -9,6 +9,10 @@ import numpy as np
 
 import pymongo
 
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
+from pagination import Pagination
+
 from datetime import datetime, timedelta, date
 
 import json
@@ -121,16 +125,12 @@ class Economy(commands.Cog):
                 embed_subtitle = "Most wagers won:"
                 myLeaderboard = usersCol.find({"guild_id": ctx.guild.id},{"member_id": 1, check_value: 1}).sort(check_value, -1)
 
-
-            if(myLeaderboard is None):
-                await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
-
             # Get leaderboard
-            embedString = ""
+            user_list = []
             for user in myLeaderboard:
                 user_name = str(user["member_id"])
                 user_value = str(user[check_value])
-                embedString += "<@" + user_name + ">: " + user_value + "\n"
+                user_list.append({"user_name": user_name, "user_value": user_value})
 
 
         elif(option == "Beetdle Daily" or option == "Beetdle Total"):
@@ -152,27 +152,34 @@ class Economy(commands.Cog):
             win_count = dict(sorted(win_count.items(), key=lambda item: item[1], reverse=True))
 
             # Get leaderboard
-            embedString = ""
+            user_list = []
             for user in win_count:
                 user_name = str(user)
                 user_value = str(win_count[user])
-                embedString += "<@" + user_name + ">: " + user_value + "\n"
+                user_list.append({"user_name": user_name, "user_value": user_value})
 
-                
-        # Generate embed
-        embed = discord.Embed(title= option + " Leaderboard",
-                              description=embed_title,
-                      colour=0x009900)
         
-        """embed.set_author(name="Leaderboard",
-                        icon_url="https://cdn3d.iconscout.com/3d/premium/thumb/wallet-with-money-5200708-4357253.png")"""
-        
-        
-        embed.add_field(name=embed_subtitle,
+        entries_per_page = 10
+        async def get_page(page: int):
+            emb = discord.Embed(title= option + " Leaderboard", 
+                                description=embed_title,
+                                colour=0x009900)
+            offset = (page-1) * entries_per_page
+
+            idx = 0
+            for user in user_list[offset:offset+entries_per_page]:
+                idx += 1
+                embedString = str(offset + idx) + "<@" + user["user_name"] + ">: " + user["user_value"] + "\n"
+            
+            emb.add_field(name=embed_subtitle,
                         value=embedString,
                         inline=False)
 
-        await ctx.respond(embed=embed)
+            n = Pagination.compute_total_pages(len(user_list), entries_per_page)
+            emb.set_footer(text=f"Page {page}/{n}")
+            return emb, n
+
+        await Pagination(ctx.interaction, get_page).navigate()
 
 
 def setup(bot): # this is called by Pycord to setup the cog
