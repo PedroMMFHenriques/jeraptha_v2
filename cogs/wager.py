@@ -7,6 +7,10 @@ from datetime import datetime
 
 import pymongo
 
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
+from pagination import Pagination
+
 import json
 global_json = json.load(open('global.json'))
 
@@ -416,32 +420,41 @@ class Wager(commands.Cog):
         elif(option == "Open"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
         elif(option == "Settled"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
         else: wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
-
-        description_embed = ""
+        
+        wager_list = []
         for wager in wagerCheck:
-            description_embed += "[ID " + str(wager["_id"]) + "] **" + wager["title"] + "** by <@" + str(wager["author_id"]) + ">"
-            if(option == "All"):
-                if(not wager["settled"] and not wager["canceled"]): description_embed += ", [OPEN]"
-                elif(wager["settled"]): description_embed += ", [SETTLED]: " + wager[wager["winning_option"]]
-                else: description_embed += ", [CANCELED]"
-            elif(option == "Settled"):
-                description_embed += ", [WINNER]: " + wager[wager["winning_option"]]
-            description_embed += "\n"
+            wager_list.append(wager)
 
-        if(description_embed == ""):
+        if(wager_list is None):
             await ctx.respond("There aren't any wagers of that type yet!", ephemeral=True)
             return
+        
+        entries_per_page = 10
+        async def get_page(page: int):
+            emb = discord.Embed(title="List of " + option + " Wagers:", 
+                                description="",
+                                colour=0x009900,
+                                timestamp=datetime.now())
+            offset = (page-1) * entries_per_page
 
-        embed = discord.Embed(title="List of " + option + " Wagers:",
-                      description=description_embed,
-                      colour=0x009900,
-                      timestamp=datetime.now())
+            for wager in wager_list[offset:offset+entries_per_page]:
+                description_embed = "[ID " + str(wager["_id"]) + "] **" + wager["title"] + "** by <@" + str(wager["author_id"]) + ">"
+                if(option == "All"):
+                    if(not wager["settled"] and not wager["canceled"]): description_embed += ", [OPEN]"
+                    elif(wager["settled"]): description_embed += ", [SETTLED]: " + wager[wager["winning_option"]]
+                    else: description_embed += ", [CANCELED]"
+                elif(option == "Settled"):
+                    description_embed += ", [WINNER]: " + wager[wager["winning_option"]]
+                description_embed += "\n"
 
+                emb.description = description_embed
 
-        embed.set_footer(text="Wager list",
-                         icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
+            n = Pagination.compute_total_pages(len(wager_list), entries_per_page)
+            emb.set_footer(text=f"Page {page} from {n}",
+                           icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
+            return emb, n
 
-        await ctx.respond(embed=embed)
+        await Pagination(ctx.interaction, get_page).navigate()
 
 
 
