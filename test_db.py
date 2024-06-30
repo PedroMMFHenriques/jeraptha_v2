@@ -49,11 +49,27 @@ rewardsCol.drop()
 beetdleCol.drop()"""
 
 
-"""usersCol.update_many({"member_id": 226800940668289025, "guild_id": 565223709699211275},
+"""wagersCol.update_many({"member_id": 226800940668289025, "guild_id": 565223709699211275},
                 {"$inc" : {"earned_bet": 751}},
                 upsert = False
               )"""
 
+wagersCol.update({"_id": 0}, {"$set": {"wager_id": 0, "guild_id": 565223709699211275}})
+wagersCol.update({"_id": 1}, {"$set": {"wager_id": 1, "guild_id": 565223709699211275}})
+wagersCol.update({"_id": 2}, {"$set": {"wager_id": 2, "guild_id": 565223709699211275}})
+wagersCol.update({"_id": 3}, {"$set": {"wager_id": 3, "guild_id": 565223709699211275}})
+wagersSubCol.update({"wager_id": 0}, {"$set": {"guild_id": 565223709699211275}})
+wagersSubCol.update({"wager_id": 1}, {"$set": {"guild_id": 565223709699211275}})
+wagersSubCol.update({"wager_id": 2}, {"$set": {"guild_id": 565223709699211275}})
+wagersSubCol.update({"wager_id": 3}, {"$set": {"guild_id": 565223709699211275}})
+
+
+wagersCol.delete_many({"_id": 4})
+wagersCol.delete_many({"_id": 5})
+wagersCol.delete_many({"_id": 6})
+wagersSubCol.delete_many({"wager_id": 4})
+wagersSubCol.delete_many({"wager_id": 5})
+wagersSubCol.delete_many({"wager_id": 6})
 
 """for x in wagersCol.find({},{}):
   print(x)"""
