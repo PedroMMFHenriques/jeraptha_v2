@@ -392,10 +392,10 @@ class Wager(commands.Cog):
     @wager.command(name="list", description="Get list of the wagers.")
     @discord.option("option", description="Choose what type of list.", required=True, choices=['All', 'Open', 'Settled', 'Canceled'])
     async def list(self, ctx: discord.ApplicationContext, option: str):
-        if(option == "All"): wagerCheck = wagersCol.find_many({},{"_id": 1, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1})
-        elif(option == "Open"): wagerCheck = wagersCol.find_many({"settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
-        elif(option == "Settled"): wagerCheck = wagersCol.find_many({"settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1})
-        else: wagerCheck = wagersCol.find_many({"settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
+        if(option == "All"): wagerCheck = wagersCol.find({},{"_id": 1, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1})
+        elif(option == "Open"): wagerCheck = wagersCol.find({"settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
+        elif(option == "Settled"): wagerCheck = wagersCol.find({"settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1})
+        else: wagerCheck = wagersCol.find({"settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
         
         if(wagerCheck is None): 
             await ctx.respond("There aren't wagers of that type yet!", ephemeral=True)
