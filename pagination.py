@@ -18,21 +18,6 @@ class Pagination(discord.ui.View):
             await interaction.response.send_message(content="Only the author of the command can perform this action!", ephemeral=True)
             return False"""
 
-    async def navigate(self):
-        emb, self.total_pages = await self.get_page(self.index)
-        if self.total_pages == 1:
-            await self.interaction.response.send_message(embed=emb)
-        elif self.total_pages > 1:
-            self.update_buttons()
-            await self.interaction.response.send_message(embed=emb, view=self)
-
-
-    async def edit_page(self, interaction: discord.Interaction):
-        emb, self.total_pages = await self.get_page(self.index)
-        self.update_buttons()
-        await interaction.response.edit_message(embed=emb, view=self)
-
-
     @discord.ui.button(emoji="⏮️", style=discord.ButtonStyle.blurple)
     async def end(self, button: discord.Button, interaction: discord.Interaction):
         self.index = 1
@@ -52,6 +37,22 @@ class Pagination(discord.ui.View):
     async def end(self, button: discord.Button, interaction: discord.Interaction):
         self.index = self.total_pages
         await self.edit_page(interaction)
+
+
+    async def navigate(self):
+        emb, self.total_pages = await self.get_page(self.index)
+        if self.total_pages == 1:
+            await self.interaction.response.send_message(embed=emb)
+        elif self.total_pages > 1:
+            self.update_buttons()
+            await self.interaction.response.send_message(embed=emb, view=self)
+
+
+    async def edit_page(self, interaction: discord.Interaction):
+        emb, self.total_pages = await self.get_page(self.index)
+        self.update_buttons()
+        await interaction.response.edit_message(embed=emb, view=self)
+
 
     def update_buttons(self):
         self.children[0].disabled = self.index == 1
