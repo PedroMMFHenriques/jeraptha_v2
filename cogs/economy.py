@@ -157,11 +157,10 @@ class Economy(commands.Cog):
                 user_name = str(user)
                 user_value = str(win_count[user])
                 user_list.append({"user_name": user_name, "user_value": user_value})
-        
 
-        if(user_list is None):
-                await ctx.respond("That leaderboard is empty!", ephemeral=True)
-                return
+        if(not user_list):
+            await ctx.respond("That leaderboard is empty!", ephemeral=True)
+            return
         
         entries_per_page = 10
         async def get_page(page: int):

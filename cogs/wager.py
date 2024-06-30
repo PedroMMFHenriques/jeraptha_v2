@@ -425,7 +425,7 @@ class Wager(commands.Cog):
         for wager in wagerCheck:
             wager_list.append(wager)
 
-        if(wager_list is None):
+        if(not wager_list):
             await ctx.respond("There aren't any wagers of that type yet!", ephemeral=True)
             return
         
