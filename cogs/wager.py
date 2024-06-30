@@ -396,11 +396,6 @@ class Wager(commands.Cog):
         elif(option == "Open"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
         elif(option == "Settled"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1})
         else: wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
-        
-        if(wagerCheck is None): 
-            await ctx.respond("There aren't wagers of that type yet!", ephemeral=True)
-            return
-        
 
         description_embed = ""
         for wager in wagerCheck:
@@ -413,7 +408,11 @@ class Wager(commands.Cog):
                 description_embed += ", [WINNER]: " + wager["winning_option"]
             description_embed += "/n"
 
-        embed = discord.Embed(title="List of " + option + " wagers:",
+        if(description_embed == ""):
+            await ctx.respond("There aren't wagers of that type yet!", ephemeral=True)
+            return
+
+        embed = discord.Embed(title="List of " + option + " Wagers:",
                       description=description_embed,
                       colour=0x009900,
                       timestamp=datetime.now())
