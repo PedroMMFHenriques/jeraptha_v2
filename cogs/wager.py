@@ -259,7 +259,7 @@ class Wager(commands.Cog):
         option_d_embed = ""
         for bettor in wagersSub_bettors:
             option_wager[bettor["bet_option"]] += bettor["total_bet"]
-            string_embed = "<@" + str(bettor["member_id"]) + "> bet " +  str(bettor["total_bet"]) + "<:beets:1245409413284499587>."
+            string_embed = "<@" + str(bettor["member_id"]) + "> bet " +  str(bettor["total_bet"]) + "<:beets:1245409413284499587>"
             if(bettor["bet_option"] == "option_a"): option_a_embed += string_embed
             elif(bettor["bet_option"] == "option_b"): option_b_embed += string_embed
             elif(bettor["bet_option"] == "option_c"): option_c_embed += string_embed
