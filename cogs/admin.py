@@ -2,6 +2,10 @@ import os
 import discord
 from discord.ext import commands
 
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
+from pagination import Pagination
+
 import pymongo
 
 from datetime import datetime
@@ -105,6 +109,24 @@ class Admin(commands.Cog):
                     upsert = True
                 )
 
+    @discord.slash_command(name="show")
+    async def show(interaction: discord.Interaction):
+        users = [f"User {i}" for i in range(1, 10000)]
+        # This is a long list of results
+        # I'm going to use pagination to display the data
+        L = 10    # elements per page
+
+        async def get_page(page: int):
+            emb = discord.Embed(title="The Users", description="")
+            offset = (page-1) * L
+            for user in users[offset:offset+L]:
+                emb.description += f"{user}\n"
+            emb.set_author(name=f"Requested by {interaction.user}")
+            n = Pagination.compute_total_pages(len(users), L)
+            emb.set_footer(text=f"Page {page} from {n}")
+            return emb, n
+
+        await Pagination(interaction, get_page).navegate()
 
 def setup(bot):
     bot.add_cog(Admin(bot))
