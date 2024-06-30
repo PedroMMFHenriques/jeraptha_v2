@@ -138,7 +138,7 @@ class Wager(commands.Cog):
             await ctx.respond("That option isn't available!", ephemeral=True)
             return
         
-        wagerSubCheck = wagersSubCol.find_one({"wager_id": wager_id, "guild_id": ctx.guild.id, "member_id": ctx.author.id},{"_id": 0, "bet_option": 1})
+        wagerSubCheck = wagersSubCol.find_one({"wager_id": wager_id, "member_id": ctx.author.id},{"_id": 0, "bet_option": 1})
         if(wagerSubCheck is not None):
             if(wagerSubCheck["bet_option"] is not None and wagerSubCheck["bet_option"] != bet_option): 
                 await ctx.respond("You already bet in another option!", ephemeral=True)
@@ -176,7 +176,7 @@ class Wager(commands.Cog):
             newValues = {'$inc': {'total_bet': int(bet_amount)}}
             wagersSubCol.update_one(myQuery, newValues)
             
-            total_bet = wagersSubCol.find_one({"wager_id": wager_id, "guild_id": ctx.guild.id, "member_id": ctx.author.id},{"_id": 0, "total_bet": 1})["total_bet"]
+            total_bet = wagersSubCol.find_one({"wager_id": wager_id, "member_id": ctx.author.id},{"_id": 0, "total_bet": 1})["total_bet"]
             await ctx.respond("<@"+ str(ctx.author.id) + "> increased their bet on **" + wagerCheck["title"] + "** in option **" + wagerCheck[bet_option] + "**, totalling **" + str(total_bet) + "** <:beets:1245409413284499587>!")
         
         # New bet
@@ -222,7 +222,7 @@ class Wager(commands.Cog):
         newValues = {'$set': {"settled": True, "winning_option": winning_option}}
         wagersCol.update_one(myQuery, newValues)
         
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
+        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
 
         option_wager = {"option_a": 0, "option_b": 0, "option_c": 0, "option_d": 0}
         winners_list = []
@@ -274,7 +274,7 @@ class Wager(commands.Cog):
             await ctx.respond("That wager doesn't exist!", ephemeral=True)
             return
         
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
+        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
 
         option_wager = {"option_a": 0, "option_b": 0, "option_c": 0, "option_d": 0}
         option_a_embed = ""
@@ -392,7 +392,7 @@ class Wager(commands.Cog):
         newValues = {'$set': {"canceled": True,}}
         wagersCol.update_one(myQuery, newValues)
         
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
+        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
 
         for bettor in wagersSub_bettors:
             myQuery= {"member_id": int(bettor["member_id"]), "guild_id": ctx.guild.id}
