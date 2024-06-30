@@ -49,19 +49,19 @@ rewardsCol.drop()
 beetdleCol.drop()"""
 
 
-"""wagersCol.update_many({"member_id": 226800940668289025, "guild_id": 565223709699211275},
+"""wagersCol.update_many({"member_id": x, "guild_id": x},
                 {"$inc" : {"earned_bet": 751}},
                 upsert = False
               )"""
 
-"""wagersCol.update_many({"_id": 0}, {"$set": {"wager_id": 0, "guild_id": 565223709699211275}})
-wagersCol.update_many({"_id": 1}, {"$set": {"wager_id": 1, "guild_id": 565223709699211275}})
-wagersCol.update_many({"_id": 2}, {"$set": {"wager_id": 2, "guild_id": 565223709699211275}})
-wagersCol.update_many({"_id": 3}, {"$set": {"wager_id": 3, "guild_id": 565223709699211275}})
-wagersSubCol.update_many({"wager_id": 0}, {"$set": {"guild_id": 565223709699211275}})
-wagersSubCol.update_many({"wager_id": 1}, {"$set": {"guild_id": 565223709699211275}})
-wagersSubCol.update_many({"wager_id": 2}, {"$set": {"guild_id": 565223709699211275}})
-wagersSubCol.update_many({"wager_id": 3}, {"$set": {"guild_id": 565223709699211275}})
+"""wagersCol.update_many({"_id": 0}, {"$set": {"wager_id": 0, "guild_id": x}})
+wagersCol.update_many({"_id": 1}, {"$set": {"wager_id": 1, "guild_id": x}})
+wagersCol.update_many({"_id": 2}, {"$set": {"wager_id": 2, "guild_id": x}})
+wagersCol.update_many({"_id": 3}, {"$set": {"wager_id": 3, "guild_id": x}})
+wagersSubCol.update_many({"wager_id": 0}, {"$set": {"guild_id": x}})
+wagersSubCol.update_many({"wager_id": 1}, {"$set": {"guild_id": x}})
+wagersSubCol.update_many({"wager_id": 2}, {"$set": {"guild_id": x}})
+wagersSubCol.update_many({"wager_id": 3}, {"$set": {"guild_id": x}})
 
 
 wagersCol.delete_many({"_id": 4})
