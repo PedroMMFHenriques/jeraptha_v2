@@ -19,7 +19,7 @@ class Pagination(discord.ui.View):
             return False"""
 
     @discord.ui.button(emoji="⏮️", style=discord.ButtonStyle.blurple)
-    async def end(self, button: discord.Button, interaction: discord.Interaction):
+    async def start(self, button: discord.Button, interaction: discord.Interaction):
         self.index = 1
         await self.edit_page(interaction)
 
