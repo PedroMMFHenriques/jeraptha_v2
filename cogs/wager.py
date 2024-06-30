@@ -94,7 +94,7 @@ class Wager(commands.Cog):
     async def bet(self, ctx: discord.ApplicationContext, wager_id: int, bet_option: str, bet_amount: int):
 
         # Checks
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "settled": 1, "canceled": 1, "end_wager": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        wagerCheck = wagersCol.find_one({"_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "title": 1, "settled": 1, "canceled": 1, "end_wager": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
         if(wagerCheck is None): 
             await ctx.respond("That wager doesn't exist!", ephemeral=True)
             return
@@ -114,7 +114,7 @@ class Wager(commands.Cog):
             await ctx.respond("That option isn't available!", ephemeral=True)
             return
         
-        wagerSubCheck = wagersSubCol.find_one({"wager_id": wager_id, "member_id": ctx.author.id},{"_id": 0, "bet_option": 1})
+        wagerSubCheck = wagersSubCol.find_one({"wager_id": wager_id, "guild_id": ctx.guild.id, "member_id": ctx.author.id},{"_id": 0, "bet_option": 1})
         if(wagerSubCheck is not None):
             if(wagerSubCheck["bet_option"] is not None and wagerSubCheck["bet_option"] != bet_option): 
                 await ctx.respond("You already bet in another option!", ephemeral=True)
@@ -152,7 +152,7 @@ class Wager(commands.Cog):
             newValues = {'$inc': {'total_bet': int(bet_amount)}}
             wagersSubCol.update_one(myQuery, newValues)
             
-            total_bet = wagersSubCol.find_one({"wager_id": wager_id, "member_id": ctx.author.id},{"_id": 0, "total_bet": 1})["total_bet"]
+            total_bet = wagersSubCol.find_one({"wager_id": wager_id, "guild_id": ctx.guild.id, "member_id": ctx.author.id},{"_id": 0, "total_bet": 1})["total_bet"]
             await ctx.respond("<@"+ str(ctx.author.id) + "> increased their bet on **" + wagerCheck["title"] + "** in option **" + wagerCheck[bet_option] + "**, totalling **" + str(total_bet) + "** <:beets:1245409413284499587>!")
         
         # New bet
@@ -169,7 +169,7 @@ class Wager(commands.Cog):
     async def settle(self, ctx: discord.ApplicationContext, wager_id: int, winning_option: str):
 
         # Checks
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        wagerCheck = wagersCol.find_one({"_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
         
         if(wagerCheck is None): 
             await ctx.respond("That wager doesn't exist!", ephemeral=True)
@@ -198,7 +198,7 @@ class Wager(commands.Cog):
         newValues = {'$set': {"settled": True, "winning_option": winning_option}}
         wagersCol.update_one(myQuery, newValues)
         
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
+        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
 
         option_wager = {"option_a": 0, "option_b": 0, "option_c": 0, "option_d": 0}
         winners_list = []
@@ -244,13 +244,13 @@ class Wager(commands.Cog):
     @discord.option("wager_id", description="ID of the wager.", required=True)
     async def start(self, ctx: discord.ApplicationContext, wager_id: int):
 
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1, "end_wager": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        wagerCheck = wagersCol.find_one({"_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1, "end_wager": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
         
         if(wagerCheck is None): 
             await ctx.respond("That wager doesn't exist!", ephemeral=True)
             return
         
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
+        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
 
         option_wager = {"option_a": 0, "option_b": 0, "option_c": 0, "option_d": 0}
         option_a_embed = ""
@@ -343,7 +343,7 @@ class Wager(commands.Cog):
     async def cancel(self, ctx: discord.ApplicationContext, wager_id: int):
 
         # Checks
-        wagerCheck = wagersCol.find_one({"_id": wager_id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        wagerCheck = wagersCol.find_one({"_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
         
         if(wagerCheck is None): 
             await ctx.respond("That wager doesn't exist!", ephemeral=True)
@@ -368,7 +368,7 @@ class Wager(commands.Cog):
         newValues = {'$set': {"canceled": True,}}
         wagersCol.update_one(myQuery, newValues)
         
-        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
+        wagersSub_bettors = wagersSubCol.find({"wager_id": wager_id, "guild_id": ctx.guild.id},{"_id": 0, "member_id": 1, "bet_option": 1, "total_bet": 1})
 
         for bettor in wagersSub_bettors:
             myQuery= {"member_id": int(bettor["member_id"]), "guild_id": ctx.guild.id}
@@ -392,10 +392,10 @@ class Wager(commands.Cog):
     @wager.command(name="list", description="Get list of the wagers.")
     @discord.option("option", description="Choose what type of list.", required=True, choices=['All', 'Open', 'Settled', 'Canceled'])
     async def list(self, ctx: discord.ApplicationContext, option: str):
-        if(option == "All"): wagerCheck = wagersCol.find({},{"_id": 1, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1})
-        elif(option == "Open"): wagerCheck = wagersCol.find({"settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
-        elif(option == "Settled"): wagerCheck = wagersCol.find({"settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1})
-        else: wagerCheck = wagersCol.find({"settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
+        if(option == "All"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id},{"_id": 1, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1})
+        elif(option == "Open"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
+        elif(option == "Settled"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1})
+        else: wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
         
         if(wagerCheck is None): 
             await ctx.respond("There aren't wagers of that type yet!", ephemeral=True)
@@ -404,7 +404,7 @@ class Wager(commands.Cog):
 
         description_embed = ""
         for wager in wagerCheck:
-            description_embed += "[ID " + wager["_id"] + "] **" + wager["title"] + "** by " + wager["author"]
+            description_embed += "[ID " + str(wager["_id"]) + "] **" + wager["title"] + "** by " + wager["author"]
             if(option == "All"):
                 if(not wager["settled"] and not wager["canceled"]): description_embed += ", [OPEN]"
                 elif(wager["settled"]): description_embed += ", [SETTLED]: " + wager["winning_option"]
