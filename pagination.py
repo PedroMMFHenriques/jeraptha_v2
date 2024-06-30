@@ -43,17 +43,17 @@ class Pagination(discord.ui.View):
         self.children[1].disabled = self.index == self.total_pages
 
     @discord.ui.button(emoji="◀️", style=discord.ButtonStyle.blurple)
-    async def previous(self, interaction: discord.Interaction, button: discord.Button):
+    async def previous(self, button: discord.Button, interaction: discord.Interaction):
         self.index -= 1
         await self.edit_page(interaction)
 
     @discord.ui.button(emoji="▶️", style=discord.ButtonStyle.blurple)
-    async def next(self, interaction: discord.Interaction, button: discord.Button):
+    async def next(self, button: discord.Button, interaction: discord.Interaction):
         self.index += 1
         await self.edit_page(interaction)
 
     @discord.ui.button(emoji="⏭️", style=discord.ButtonStyle.blurple)
-    async def end(self, interaction: discord.Interaction, button: discord.Button):
+    async def end(self, button: discord.Button, interaction: discord.Interaction):
         if self.index <= self.total_pages//2:
             self.index = self.total_pages
         else:
