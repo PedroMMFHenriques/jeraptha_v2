@@ -409,7 +409,7 @@ class Wager(commands.Cog):
             description_embed += "/n"
 
         if(description_embed == ""):
-            await ctx.respond("There aren't wagers of that type yet!", ephemeral=True)
+            await ctx.respond("There aren't any wagers of that type yet!", ephemeral=True)
             return
 
         embed = discord.Embed(title="List of " + option + " Wagers:",
