@@ -447,10 +447,10 @@ class Wager(commands.Cog):
                     description_embed += ", [WINNER]: " + wager[wager["winning_option"]]
                 description_embed += "\n"
 
-                emb.description = description_embed
+                emb.description += description_embed
 
             n = Pagination.compute_total_pages(len(wager_list), entries_per_page)
-            emb.set_footer(text=f"Page {page} from {n}",
+            emb.set_footer(text=f"Page {page}/{n}",
                            icon_url="https://toppng.com/uploads/thumbnail/hands-holding-playing-cards-royalty-free-vector-clip-hand-holding-playing-cards-clipart-11563240429mbkjvlaujb.png")
             return emb, n
 
