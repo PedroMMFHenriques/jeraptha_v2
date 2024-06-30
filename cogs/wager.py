@@ -419,7 +419,7 @@ class Wager(commands.Cog):
 
         description_embed = ""
         for wager in wagerCheck:
-            description_embed += "[ID " + str(wager["_id"]) + "] **" + wager["title"] + "** by " + wager["author"]
+            description_embed += "[ID " + str(wager["_id"]) + "] **" + wager["title"] + "** by " + wager["author_id"]
             if(option == "All"):
                 if(not wager["settled"] and not wager["canceled"]): description_embed += ", [OPEN]"
                 elif(wager["settled"]): description_embed += ", [SETTLED]: " + wager["winning_option"]
