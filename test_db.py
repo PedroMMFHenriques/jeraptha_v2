@@ -54,7 +54,7 @@ beetdleCol.drop()"""
                 upsert = False
               )"""
 
-wagersCol.update_many({"_id": 0}, {"$set": {"wager_id": 0, "guild_id": 565223709699211275}})
+"""wagersCol.update_many({"_id": 0}, {"$set": {"wager_id": 0, "guild_id": 565223709699211275}})
 wagersCol.update_many({"_id": 1}, {"$set": {"wager_id": 1, "guild_id": 565223709699211275}})
 wagersCol.update_many({"_id": 2}, {"$set": {"wager_id": 2, "guild_id": 565223709699211275}})
 wagersCol.update_many({"_id": 3}, {"$set": {"wager_id": 3, "guild_id": 565223709699211275}})
@@ -69,7 +69,7 @@ wagersCol.delete_many({"_id": 5})
 wagersCol.delete_many({"_id": 6})
 wagersSubCol.delete_many({"wager_id": 4})
 wagersSubCol.delete_many({"wager_id": 5})
-wagersSubCol.delete_many({"wager_id": 6})
+wagersSubCol.delete_many({"wager_id": 6})"""
 
 """for x in wagersCol.find({},{}):
   print(x)"""

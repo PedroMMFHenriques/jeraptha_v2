@@ -416,10 +416,10 @@ class Wager(commands.Cog):
     @wager.command(name="list", description="Get list of the wagers.")
     @discord.option("option", description="Choose what type of list.", required=True, choices=['All', 'Open', 'Settled', 'Canceled'])
     async def list(self, ctx: discord.ApplicationContext, option: str):
-        if(option == "All"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id},{"_id": 1, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
-        elif(option == "Open"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": False},{"_id": 1, "title": 1, "author_id": 1})
-        elif(option == "Settled"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": True, "canceled": False},{"_id": 1, "title": 1, "author_id": 1, "winning_option": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
-        else: wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": True},{"_id": 1, "title": 1, "author_id": 1})
+        if(option == "All"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id},{"wager_id": 1, "title": 1, "author_id": 1, "settled": 1, "canceled": 1, "winning_option": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        elif(option == "Open"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": False},{"wager_id": 1, "title": 1, "author_id": 1})
+        elif(option == "Settled"): wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": True, "canceled": False},{"wager_id": 1, "title": 1, "author_id": 1, "winning_option": 1, "option_a": 1, "option_b": 1, "option_c": 1, "option_d": 1})
+        else: wagerCheck = wagersCol.find({"guild_id": ctx.guild.id, "settled": False, "canceled": True},{"wager_id": 1, "title": 1, "author_id": 1})
         
         wager_list = []
         for wager in wagerCheck:
