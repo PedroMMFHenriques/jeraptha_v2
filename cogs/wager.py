@@ -248,7 +248,7 @@ class Wager(commands.Cog):
         # Embed
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Settled: " + wagerCheck["title"],
-                      description="<@&" + str(wagerRoleId) + ">\nWinning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "**<:beets:1245409413284499587>!",
+                      description="Winning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "**<:beets:1245409413284499587>!",
                       colour=0x009900,
                       timestamp=datetime.now())
 
@@ -402,7 +402,7 @@ class Wager(commands.Cog):
         # Embed
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Canceled: " + wagerCheck["title"],
-                      description="<@&" + str(wagerRoleId) + ">\n<@" + str(ctx.author.id) + "> canceled the bet!\nThe <:beets:1245409413284499587> have been returned.",
+                      description="<@" + str(ctx.author.id) + "> canceled the bet!\nThe <:beets:1245409413284499587> have been returned.",
                       colour=0x009900,
                       timestamp=datetime.now())
 
