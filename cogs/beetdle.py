@@ -161,7 +161,6 @@ class Beetdle(commands.Cog):
                             'V': 1, 'W': 1, 'X': 1, 'Y': 1, 'Z': 1}
             # Saves the correct letters so far, to facilitate guessing
             correct_letters = ["\_", "\_", "\_", "\_", "\_"]
-            wrong_place_letters = ""
             
             word_count = {}
             for letter in word:
@@ -267,22 +266,24 @@ class Beetdle(commands.Cog):
                         correct_letters[iterator] = temp_letter
                     elif(temp_letter[0] == "_"):
                         unused_letters[temp_letter[2]] = 2
-                        wrong_place_letters += temp_letter + " "
                     elif(temp_letter[0] == "~"):
                         unused_letters[temp_letter[2]] = 0
-        temp_letters_print = ""
-
+        
+        unused_letters_print = ""
+        wrong_place_letters_print = ""
         for key, value in unused_letters.items():
-            if value != 0:
-                temp_letters_print += key + " "
+            if value == 1:
+                unused_letters_print += key + " "
+            elif value == 2:
+                wrong_place_letters_print += key + " "
                     
 
         embed.add_field(name="Unused Letters:",
-                        value=temp_letters_print,
+                        value=unused_letters_print,
                         inline=False)
         
         embed.add_field(name="Wrong Place Letters:",
-                        value=wrong_place_letters,
+                        value=wrong_place_letters_print,
                         inline=False)
         
         embed.add_field(name="Correct Letters:",
