@@ -40,6 +40,25 @@ wagersSubCol = myDB["WagersSub"]
 rewardsCol = myDB["Rewards"]
 beetdleCol = myDB["Beetdle"]
 
+myQuery= {"member_id": 226800940668289025, "guild_id": 565223709699211275}
+newValues = {'$set': {'wagers_won': 4}}
+usersCol.update_one(myQuery, newValues)
+
+myQuery= {"member_id": 119870049996636161, "guild_id": 565223709699211275}
+newValues = {'$set': {'wagers_won': 2}}
+usersCol.update_one(myQuery, newValues)
+
+myQuery= {"member_id": 191675966332993536, "guild_id": 565223709699211275}
+newValues = {'$set': {'wagers_won': 2}}
+usersCol.update_one(myQuery, newValues)
+
+myQuery= {"member_id": 220963716718395393, "guild_id": 565223709699211275}
+newValues = {'$set': {'wagers_won': 1}}
+usersCol.update_one(myQuery, newValues)
+
+myQuery= {"member_id": 127469742163230721, "guild_id": 565223709699211275}
+newValues = {'$set': {'wagers_won': 1}}
+usersCol.update_one(myQuery, newValues)
 
 """usersCol.drop()
 beetdleCol.drop()
