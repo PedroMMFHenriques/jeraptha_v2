@@ -258,8 +258,9 @@ class Beetdle(commands.Cog):
         temp_guess_list = guesses_print.split("\n")
         for words_formatted in temp_guess_list:
             letters_formatted = words_formatted.split(" ")
+            print(letters_formatted)
             for iterator in range(5):
-                print(temp_letter)
+                print(letters_formatted[iterator])
                 temp_letter = letters_formatted[iterator]
                 if(len(temp_letter) == 5):
                     if(temp_letter[0] == "*"):
