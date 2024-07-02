@@ -21,8 +21,10 @@ def get_test():
 def get_check_pp():
     checkPP = usersCol.find_one({"guild_id": 565223709699211275, "member_id": 138052322306555906},{"_id": 0, "coins": 1})
     pp_coins = checkPP["coins"]
-    return jsonify({"coins": pp_coins}), 200
+    response = jsonify({"coins": pp_coins})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 def run_api_thread():
-    threading.Thread(target=lambda: api.run(port=5000)).start()
+    threading.Thread(target=lambda: api.run(port=36633, host='0.0.0.0')).start()
