@@ -259,15 +259,15 @@ class Beetdle(commands.Cog):
         for words_formatted in temp_guess_list:
             letters_formatted = words_formatted.split(" ")
             for iterator in range(5):
+                print(temp_letter)
                 temp_letter = letters_formatted[iterator]
                 if(len(temp_letter) == 5):
-                    match temp_letter[0]:
-                        case "*":
-                            unused_letters[temp_letter[2]] = 3
-                            correct_letters[iterator] = temp_letter
-                        case "_":
+                    if(temp_letter[0] == "*"):
+                        unused_letters[temp_letter[2]] = 3
+                        correct_letters[iterator] = temp_letter
+                    elif(temp_letter[0] == "_"):
                             unused_letters[temp_letter[2]] = 2
-                        case "~": 
+                    elif(temp_letter[0] == "~"):
                             unused_letters[temp_letter[2]] = 0
         temp_letters_print = ""
 
