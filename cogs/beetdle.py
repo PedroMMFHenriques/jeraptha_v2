@@ -85,7 +85,7 @@ class Beetdle(commands.Cog):
                 beetdleCol.insert_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "daily": False, "word": wotd.upper(), "tries": 0, "ended": False, "won": False, "guesses": "", "guesses_print": ""})
 
         checkBeetdle = beetdleCol.find_one({"guild_id": ctx.guild.id, "member_id": ctx.author.id, "date": datetime_today, "ended": False},{"_id": 0, "daily": 1, "word": 1, "tries": 1, "guesses": 1, "guesses_print": 1})
-
+        
         daily = checkBeetdle["daily"]
         prev_guesses = checkBeetdle["guesses"]
         prev_guesses_print = checkBeetdle["guesses_print"]
@@ -95,6 +95,7 @@ class Beetdle(commands.Cog):
             await ctx.respond("You already guessed that!", ephemeral=True)
             return
 
+        
         game_won = False
         game_over = False
         n_tries = checkBeetdle["tries"] + 1
@@ -153,6 +154,14 @@ class Beetdle(commands.Cog):
             
 
         else: # Incorrect word, continue game
+            # Stores the list of unused letters (0: wrong; 1: unused; 2: wrong place; 3: correct)
+            unused_letters = {'a': 1, 'b': 1, 'c': 1, 'd': 1, 'e': 1, 'f': 1, 'g': 1,
+                            'h': 1, 'i': 1, 'j': 1, 'k': 1, 'l': 1, 'm': 1, 'n': 1,
+                            'o': 1, 'p': 1, 'q': 1, 'r': 1, 's': 1, 't': 1, 'u': 1,
+                            'v': 1, 'w': 1, 'x': 1, 'y': 1, 'z': 1}
+            # Saves the correct letters so far, to facilitate guessing
+            correct_letters=["_", "_", "_", "_", "_"]
+            
             word_count = {}
             for letter in word:
                 if(not letter in word_count): # First occurence of letter
@@ -244,7 +253,39 @@ class Beetdle(commands.Cog):
         embed.add_field(name=emb_field_name,
                         value=guesses_print,
                         inline=False)
+        
+        # embed for the unused letters
+        temp_guess_list = guesses_print.split("\n")
+        for words_formatted in temp_guess_list:
+            letters_formatted = words_formatted.split(" ")
+            for iterator in range(5):
+                temp_letter = letters_formatted(iterator)
+                if(len(temp_letter) == 5):
+                    match temp_letter[0]:
+                        case "*":
+                            unused_letters[temp_letter[2]] = 3
+                            correct_letters[iterator] = temp_letter
+                        case "_":
+                            unused_letters[temp_letter[2]] = 2
+                        case "~": 
+                            unused_letters[temp_letter[2]] = 0
+        temp_letters_print = ""
 
+        for key, value in unused_letters.items():
+            if value != 0:
+                temp_letters_print += key + " "
+                    
+
+        unused_letters_field_name = "Unused Letters:"
+        embed.add_field(name=unused_letters_field_name,
+                        value=temp_letters_print,
+                        inline=False)
+        
+        correct_letters_field_name = "Correct Letters:"
+        embed.add_field(name=correct_letters_field_name,
+                        value=correct_letters[0] + " " + correct_letters[1] + " "+ correct_letters[2] + " " + correct_letters[3] + " " + correct_letters[4],
+                        inline=False)
+        
         embed.set_footer(text="Beetdle",
                          icon_url="https://png.pngtree.com/png-vector/20220603/ourmid/pngtree-a-letter-b-for-beetle-chitinous-alphabet-capitalized-vector-png-image_36940140.png")
 
