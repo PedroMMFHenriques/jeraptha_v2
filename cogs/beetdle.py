@@ -245,6 +245,7 @@ class Beetdle(commands.Cog):
                 emb_field_name = "Your tries:"
                 emb_ephemeral = True
 
+
         embed = discord.Embed(title=emb_title,
                       description=emb_description,
                       colour=0x009900,
@@ -253,42 +254,45 @@ class Beetdle(commands.Cog):
         embed.add_field(name=emb_field_name,
                         value=guesses_print,
                         inline=False)
-        
-        # embed for the unused letters
-        temp_guess_list = guesses_print.split("\n")
-        for words_formatted in temp_guess_list[:-1]:
-            letters_formatted = words_formatted.split(" ")
-            for iterator in range(5):
-                temp_letter = letters_formatted[iterator]
-                if(len(temp_letter) == 5):
-                    if(temp_letter[0] == "*"):
-                        unused_letters[temp_letter[2]] = 3
-                        correct_letters[iterator] = temp_letter
-                    elif(temp_letter[0] == "_"):
-                        unused_letters[temp_letter[2]] = 2
-                    elif(temp_letter[0] == "~"):
-                        unused_letters[temp_letter[2]] = 0
-        
-        unused_letters_print = ""
-        wrong_place_letters_print = ""
-        for key, value in unused_letters.items():
-            if value == 1:
-                unused_letters_print += key + " "
-            elif value == 2:
-                wrong_place_letters_print += key + " "
                     
 
-        embed.add_field(name="Unused Letters:",
-                        value=unused_letters_print,
-                        inline=False)
+        if not game_over:
+            # embed for the unused letters
+            temp_guess_list = guesses_print.split("\n")
+            for words_formatted in temp_guess_list[:-1]:
+                letters_formatted = words_formatted.split(" ")
+                for iterator in range(5):
+                    temp_letter = letters_formatted[iterator]
+                    if(len(temp_letter) == 5):
+                        if(temp_letter[0] == "*"):
+                            unused_letters[temp_letter[2]] = 3
+                            correct_letters[iterator] = temp_letter
+                        elif(temp_letter[0] == "_"):
+                            unused_letters[temp_letter[2]] = 2
+                        elif(temp_letter[0] == "~"):
+                            unused_letters[temp_letter[2]] = 0
+            
+            unused_letters_print = ""
+            wrong_place_letters_print = ""
+            for key, value in unused_letters.items():
+                if value == 1:
+                    unused_letters_print += key + " "
+                elif value == 2:
+                    wrong_place_letters_print += key + " "
+
+            embed.add_field(name="Unused Letters:",
+                            value=unused_letters_print,
+                            inline=False)
+            
+            embed.add_field(name="Wrong Place Letters:",
+                            value=wrong_place_letters_print,
+                            inline=False)
+            
+            embed.add_field(name="Correct Letters:",
+                            value=correct_letters[0] + " " + correct_letters[1] + " " + correct_letters[2] + " " + correct_letters[3] + " " + correct_letters[4],
+                            inline=False)
         
-        embed.add_field(name="Wrong Place Letters:",
-                        value=wrong_place_letters_print,
-                        inline=False)
-        
-        embed.add_field(name="Correct Letters:",
-                        value=correct_letters[0] + " " + correct_letters[1] + " " + correct_letters[2] + " " + correct_letters[3] + " " + correct_letters[4],
-                        inline=False)
+
         
         embed.set_footer(text="Beetdle",
                          icon_url="https://png.pngtree.com/png-vector/20220603/ourmid/pngtree-a-letter-b-for-beetle-chitinous-alphabet-capitalized-vector-png-image_36940140.png")
