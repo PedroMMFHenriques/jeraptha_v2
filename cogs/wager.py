@@ -237,7 +237,7 @@ class Wager(commands.Cog):
             winnings = 0.99 * winner["bet"] * total_bet / winning_bet
 
             myQuery= {"member_id": int(winner["id"]), "guild_id": ctx.guild.id}
-            newValues = {'$inc': {'coins': math.floor(winnings), 'earned_bet': math.floor(winnings), 'total_earned': math.floor(winnings)}}
+            newValues = {'$inc': {'coins': math.floor(winnings), 'earned_bet': math.floor(winnings), 'total_earned': math.floor(winnings), 'wagers_won': 1}}
             usersCol.update_one(myQuery, newValues)
 
             winnings_embed += "<@" + str(winner["id"]) + "> won **" + str(math.floor(winnings)) + "**<:beets:1245409413284499587>!\n"
@@ -248,7 +248,7 @@ class Wager(commands.Cog):
         # Embed
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Settled: " + wagerCheck["title"],
-                      description="Winning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "**<:beets:1245409413284499587>!",
+                      description="Winning option: **" + wagerCheck[wagerCheck[winning_option]] + "**\nWinning pool: **" + str(total_bet) + "**<:beets:1245409413284499587>!",
                       colour=0x009900,
                       timestamp=datetime.now())
 
