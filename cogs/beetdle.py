@@ -96,6 +96,14 @@ class Beetdle(commands.Cog):
             return
 
         
+        # Stores the list of unused letters (0: wrong; 1: unused; 2: wrong place; 3: correct)
+        unused_letters = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1,
+                        'H': 1, 'I': 1, 'J': 1, 'K': 1, 'L': 1, 'M': 1, 'N': 1,
+                        'O': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1, 'T': 1, 'U': 1,
+                        'V': 1, 'W': 1, 'X': 1, 'Y': 1, 'Z': 1}
+        # Saves the correct letters so far, to facilitate guessing
+        correct_letters = ["\_", "\_", "\_", "\_", "\_"]
+
         game_won = False
         game_over = False
         n_tries = checkBeetdle["tries"] + 1
@@ -154,14 +162,6 @@ class Beetdle(commands.Cog):
             
 
         else: # Incorrect word, continue game
-            # Stores the list of unused letters (0: wrong; 1: unused; 2: wrong place; 3: correct)
-            unused_letters = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1,
-                            'H': 1, 'I': 1, 'J': 1, 'K': 1, 'L': 1, 'M': 1, 'N': 1,
-                            'O': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1, 'T': 1, 'U': 1,
-                            'V': 1, 'W': 1, 'X': 1, 'Y': 1, 'Z': 1}
-            # Saves the correct letters so far, to facilitate guessing
-            correct_letters = ["\_", "\_", "\_", "\_", "\_"]
-            
             word_count = {}
             for letter in word:
                 if(not letter in word_count): # First occurence of letter
