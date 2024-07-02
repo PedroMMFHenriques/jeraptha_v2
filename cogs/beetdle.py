@@ -256,7 +256,7 @@ class Beetdle(commands.Cog):
         
         # embed for the unused letters
         temp_guess_list = guesses_print.split("\n")
-        for words_formatted in temp_guess_list:
+        for words_formatted in temp_guess_list[:-1]:
             letters_formatted = words_formatted.split(" ")
             print(letters_formatted)
             for iterator in range(5):
@@ -267,9 +267,9 @@ class Beetdle(commands.Cog):
                         unused_letters[temp_letter[2]] = 3
                         correct_letters[iterator] = temp_letter
                     elif(temp_letter[0] == "_"):
-                            unused_letters[temp_letter[2]] = 2
+                        unused_letters[temp_letter[2]] = 2
                     elif(temp_letter[0] == "~"):
-                            unused_letters[temp_letter[2]] = 0
+                        unused_letters[temp_letter[2]] = 0
         temp_letters_print = ""
 
         for key, value in unused_letters.items():
