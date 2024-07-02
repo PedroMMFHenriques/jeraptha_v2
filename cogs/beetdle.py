@@ -259,7 +259,7 @@ class Beetdle(commands.Cog):
         for words_formatted in temp_guess_list:
             letters_formatted = words_formatted.split(" ")
             for iterator in range(5):
-                temp_letter = letters_formatted(iterator)
+                temp_letter = letters_formatted[iterator]
                 if(len(temp_letter) == 5):
                     match temp_letter[0]:
                         case "*":
