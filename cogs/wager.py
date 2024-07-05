@@ -305,7 +305,7 @@ class Wager(commands.Cog):
 
         description_embed = ""
         if(wagerCheck["canceled"]): description_embed = "**CANCELED**\n"
-        elif(wagerCheck["settled"]): description_embed = "**SETTLED**\nWinning option: **" + wagerCheck["winning_option"] + "**\n"
+        elif(wagerCheck["settled"]): description_embed = "**SETTLED**\nWinning option: **" + wagerCheck[wagerCheck["winning_option"]] + "**\n"
         elif(wagerCheck["end_wager"] < math.floor(time.time())): description_embed = "Betting ended <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         else: description_embed = "Betting will end <t:" + str(wagerCheck["end_wager"]) + ":R>\n"
         
