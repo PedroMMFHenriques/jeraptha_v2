@@ -248,7 +248,7 @@ class Wager(commands.Cog):
         # Embed
         wagerRoleId = discord.utils.get(ctx.guild.roles, name=WagerRole).id
         embed = discord.Embed(title="Bet Settled: " + wagerCheck["title"],
-                      description="Winning option: **" + wagerCheck[wagerCheck[winning_option]] + "**\nWinning pool: **" + str(total_bet) + "**<:beets:1245409413284499587>!",
+                      description="Winning option: **" + wagerCheck[winning_option] + "**\nWinning pool: **" + str(total_bet) + "**<:beets:1245409413284499587>!",
                       colour=0x009900,
                       timestamp=datetime.now())
 
