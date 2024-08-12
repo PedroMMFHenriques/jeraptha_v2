@@ -121,8 +121,33 @@ class Chinchirorin(commands.Cog):
 
     chinchirorin = discord.SlashCommandGroup("chinchirorin", "Chinchirorin related commands.")
 
+    @chinchirorin.command(name="ruleset", description="Quick overview of the ruleset.")
+    async def ruleset(self, ctx: discord.ApplicationContext):
+        embedTitle = "[Cee-lo] Underground Chinchirorin ruleset:"
+
+        embedDescription = "Inspired from the show *Kaiji: Against All Rules* (2011). \n \
+                           You have 3 rounds to roll 3 dice. You are trying to roll one of the following hands (top to bottom is strongest to weakest with corresponding payout):\n\n \
+                           **Triple 1** -------> win 5x bet\n \
+                           **Triple 2-6** ----> win 3x bet\n \
+                           **4-5-6** --------> win 2x bet\n \
+                           **Double 1-6** ---> win 1x bet\n \
+                           **Bust** ----------> reroll until round 3, win 1x bet\n \
+                           **1-2-3** ---------> if lose, **2x** loss\n\n \
+                           In your turn, you will roll until scoring a non-bust hand. **If after 3 turns you only draw busts, your scoring hand will be a bust.**\n\n \
+                           The better scoring hand wins the match, applying the multiplier above to your bet.\n\n \
+                           **NOTE**: The value of a Double hand is based on the value of the die not part of the pair.\n \
+                           Example: 2-2-6 has a value of 6, 5-5-1 has a value of 1, so **2-2-6 > 5-5-1**."
+
+        embed = discord.Embed(title=embedTitle,
+                              description=embedDescription,
+                              colour=0x2A4D3E,
+                              timestamp=datetime.now())
+        
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
+
+
     # CHINCHIRORIN START
-    @chinchirorin.command(name="play", description="Play a game of Cee-lo (Underground Chinchirorin ruleset).")
+    @chinchirorin.command(name="play", description="Play a game of Cee-lo (Underground Chinchirorin ruleset only).")
     @discord.option("bet_amount", description="Your bet amount against the bank", required=True)
     async def play(self, ctx: discord.ApplicationContext, bet_amount: int):
         #Verify bet amount
@@ -145,7 +170,7 @@ class Chinchirorin(commands.Cog):
             return
         elif(userCheck["coins"] < 2*bet_amount): 
             await ctx.respond("This game has a 1/216 chance of losing double the amount of <:beets:1245409413284499587> bet, so we need you to have at least that amount of liquidity.", ephemeral=True)
-        
+
         #Update wallet before game
         removeCoins = 0 - bet_amount
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
@@ -156,30 +181,44 @@ class Chinchirorin(commands.Cog):
         player = Player(betAmmount=bet_amount,playerName=ctx.author.id)
 
         # START GAME EMBED
+        embedTitle = "[Cee-lo] GAME START"
 
+        embedDescription = "You are playing with the Underground Chinchirorin ruleset. The bank will play first."
+
+        embed = discord.Embed(title=embedTitle,
+                              description=embedDescription,
+                              colour=0x2A4D3E,
+                              timestamp=datetime.now())
+        
+        await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
+        await asyncio.sleep(3)
 
         # BANK'S TURN
-        embedDescription = ""
         for i in range(3):
             bank.play()
             dice = bank.get_roll()
 
-            embedTitle = "[Cee-lo] Bank's turn" + str(i+1)
+            embedTitle = "[Cee-lo] Bank's roll " + str(i+1)
 
-            embedDescription += dieFaceEmoji[dice[0]-1] + dieFaceEmoji[dice[1]-1] + dieFaceEmoji[dice[2]-1] 
+            embedDescription = dieFaceEmoji[dice[0]-1] + dieFaceEmoji[dice[1]-1] + dieFaceEmoji[dice[2]-1] \
+                               + " ---> " + str(dice[0]) + "-" + str(dice[1]) + "-" + str(dice[2]) 
 
             embed = discord.Embed(title=embedTitle,
                                   description=embedDescription,
-                                  colour=0xf44336,
+                                  colour=0x000000,
                                   timestamp=datetime.now())
             
             if bank.get_score() == 0:
                 embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
+                if i is 2:
+                    embedFieldDesc = "Not a known hand! The bank will have a bust hand."
             else:
                 if bank.get_score() == 999:
-                    embedFieldDesc = "4-5-6, wrap it up you have no chance :dragon:"
+                    embedFieldDesc = "TRIPLE 1s, if you tie this you are a cheater :dragon:"
                 elif bank.get_score() > 7:
-                    embedFieldDesc = "Triple! Seems like your bet money will be mine :pirate_flag:"
+                    embedFieldDesc = "Triple! Looks like your beets will be mine :pirate_flag:"
+                elif bank.get_score() == 7:
+                    embedFieldDesc = "4-5-6! Let's see you beat that!"
                 elif bank.get_score() > 0:
                     embedFieldDesc = "Double! Surely you can do better, human?"
                 elif bank.get_score() == -1:
@@ -190,9 +229,8 @@ class Chinchirorin(commands.Cog):
                             inline=False)
 
             # Suspense
-            await asyncio.sleep(3)
             await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
-            
+            await asyncio.sleep(3)
             if bank.get_score() != 0:
                 break
 
@@ -201,9 +239,10 @@ class Chinchirorin(commands.Cog):
             player.play()
             dice = player.get_roll()
             #INSERT DISCORD EMBED FOR ROLLS HERE
-            embedTitle = "[Cee-lo] Player's turn" + str(i+1)
+            embedTitle = "[Cee-lo] Player's roll " + str(i+1)
 
-            embedDescription += dieFaceEmoji[dice[0]-1] + dieFaceEmoji[dice[1]-1] + dieFaceEmoji[dice[2]-1] 
+            embedDescription = dieFaceEmoji[dice[0]-1] + dieFaceEmoji[dice[1]-1] + dieFaceEmoji[dice[2]-1] \
+                               + " ---> " + str(dice[0]) + "-" + str(dice[1]) + "-" + str(dice[2]) 
 
             embed = discord.Embed(title=embedTitle,
                                   description=embedDescription,
@@ -212,13 +251,17 @@ class Chinchirorin(commands.Cog):
             
             if player.get_score() == 0:
                 embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
+                if i is 2:
+                    embedFieldDesc = "Not a known hand! Your hand will be a bust."
             else:
                 if player.get_score() == 999:
-                    embedFieldDesc = "CRITICAL HIT!!! Strongest hand acquired 🐉"
+                    embedFieldDesc = "CRITICAL HIT!!! Triple 1s secured 🐉"
                 elif player.get_score() > 7:
                     embedFieldDesc = "Triple! Lady Luck sure is smiling"
+                elif player.get_score() == 7:
+                    embedFieldDesc = "4-5-6! Nice throw!"
                 elif player.get_score() > 0:
-                    embedFieldDesc = "Double! Will it be enough?"
+                    embedFieldDesc = "Double! Not bad."
                 elif player.get_score() == -1:
                     embedFieldDesc = "1-2-3, ouch..."
 
@@ -227,9 +270,9 @@ class Chinchirorin(commands.Cog):
                             inline=False)
 
             # Suspense
-            await asyncio.sleep(3)
             await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
-            
+            await asyncio.sleep(3)
+
             if player.get_score() != 0:
                 break
 
@@ -249,6 +292,16 @@ class Chinchirorin(commands.Cog):
             newValues = {'$inc': {'coins': winnings, 'earned_bet': winnings, 'total_earned': winnings}}
             usersCol.update_one(myQuery, newValues)
             #INSERT DISCORD EMBED FOR WINNINGS HERE
+            embedTitle = "[Cee-lo] YOU WON"
+
+            embedDescription = "You earned " + str(winnings) + "<:beets:1245409413284499587>!"
+
+            embed = discord.Embed(title=embedTitle,
+                                description=embedDescription,
+                                colour=0x2A4D3E,
+                                timestamp=datetime.now())
+            
+            await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
 
         # Tie protocol
         elif player.get_score() == bank.get_score() :
@@ -257,6 +310,16 @@ class Chinchirorin(commands.Cog):
             newValues = {'$inc': {'coins': winnings, 'earned_bet': winnings, 'total_earned': winnings}}
             usersCol.update_one(myQuery, newValues)
             #INSERT DISCORD EMBED FOR TIES HERE
+            embedTitle = "[Cee-lo] DRAW"
+
+            embedDescription = "Refunding your " + str(bet_amount) + " <:beets:1245409413284499587>...\n\nMaybe try your luck again? ;)"
+
+            embed = discord.Embed(title=embedTitle,
+                                description=embedDescription,
+                                colour=0x2A4D3E,
+                                timestamp=datetime.now())
+            
+            await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
 
         # Loss protocol
         else :
@@ -266,8 +329,31 @@ class Chinchirorin(commands.Cog):
                 newValues = {'$inc': {'coins': int(extraLoss)}}
                 usersCol.update_one(myQuery, newValues)
                 #INSERT DISCORD EMBED FOR FAT L
-            
-            #INSERT DISCORD EMBED FOR NORMAL L
+                embedTitle = "[Cee-lo] YOU LOST (WITH A BIG L)"
+
+                embedDescription = "Sorry bud, the casino lynched from you " + str(bet_amount*2) + " <:beets:1245409413284499587>."
+
+                embed = discord.Embed(title=embedTitle,
+                                    description=embedDescription,
+                                    colour=0x2A4D3E,
+                                    timestamp=datetime.now())
+                
+                
+            else:
+                #INSERT DISCORD EMBED FOR NORMAL L
+                embedTitle = "[Cee-lo] YOU LOST"
+
+                embedDescription = "WOMP WOMP, better luck next time. We will keep your " + str(bet_amount) + " <:beets:1245409413284499587> safe waiting for you."
+
+                embed = discord.Embed(title=embedTitle,
+                                    description=embedDescription,
+                                    colour=0x2A4D3E,
+                                    timestamp=datetime.now())
+                
+            await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
+
+def setup(bot):
+    bot.add_cog(Chinchirorin(bot))
 
 # bank = Player(betAmmount=100,playerName="Jeraptha")
 # player = Player(betAmmount=100,playerName="Asdrubal")
