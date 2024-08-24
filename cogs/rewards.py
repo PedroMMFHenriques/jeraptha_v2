@@ -596,7 +596,7 @@ class Rewards(commands.Cog):
 
                 myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
                 if(free):
-                    newValues = {'$inc': {'coins': int(lootbox_json["COST"]), 'total_earned': int(daily_coins)}}
+                    newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins)}}
                 else:
                     newValues = {'$inc': {'coins': int(daily_coins), 'total_earned': int(daily_coins), 'earned_bet': int(daily_coins)}}
                 usersCol.update_one(myQuery, newValues)
