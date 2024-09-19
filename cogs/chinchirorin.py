@@ -170,7 +170,8 @@ class Chinchirorin(commands.Cog):
             return
         elif(userCheck["coins"] < 2*bet_amount): 
             await ctx.respond("This game has a 1/216 chance of losing double the amount of <:beets:1245409413284499587> bet, so we need you to have at least that amount of liquidity.", ephemeral=True)
-
+            return
+        
         #Update wallet before game
         removeCoins = 0 - bet_amount
         myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
