@@ -1,7 +1,22 @@
 import random
+from enum import Enum
 
 cardSuits = ["♦︎", "♣︎", "♥︎", "♠︎"]
-cardRanks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+cardRanks = {
+    "A": 1, 
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
+    "10": 10,
+    "J": 10,
+    "Q": 10,
+    "K": 10
+}
 
 class Card:
     def __init__(self, rank, suit):
@@ -13,8 +28,10 @@ class Card:
     
     def get_suit(self):
         return self.suit
+    
+    def get_value(self):
+        return cardRanks[self.rank]
 
-#standard deck of cards
 class Deck:
     def __init__(self):
         self.stack = []
@@ -27,6 +44,9 @@ class Deck:
     def draw(self):
         num = random.randint(0,self.total-1)
         self.total -= 1
+        if self.total < 0:
+            return -1
+
         card = self.stack[num]
         self.stack.pop(num)
 
