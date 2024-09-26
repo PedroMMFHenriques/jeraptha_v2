@@ -1,0 +1,4 @@
+Entrar no server: ssh cawilho@94.63.144.200 -p 7000
+pass: twlW!Qjp^2kio54&yu$I
+Correr: tmux attach -t 2 -> python3 main.py
+Sair: Ctrl+B -> D

@@ -4,7 +4,7 @@ from discord.ext import commands
 
 cogs_list = []
 for filename in os.listdir('./cogs'):
-      if filename.endswith('.py') and filename != "admin.py":
+      if filename.endswith('.py') and filename != "admin.py" and filename != "playing_cards.py":
             cogs_list.append(f"{filename[:-3]}")
 
 class Help(commands.Cog):

@@ -17,13 +17,14 @@ global_json = json.load(open('global.json'))
 load_dotenv() 
 
 # Init vars
-init_coins = global_json["VARS"]["INIT_COINS"]
+init_coins = global_json["CONSTS"]["INIT_COINS"]
 
 # Setup database
 db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
+rewardsCol = myDB[db["REWARDS_COL"]]
 
 
 bot = discord.Bot(intents = discord.Intents.all())
@@ -44,11 +45,21 @@ def setup_db(bot):
                     }, 
                     {
                         "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "coins": int(init_coins), "last_daily": datetime(2000, 1, 1), 
-                                         "last_punish": datetime(2000, 1, 1), "coins_bet": 0, "earned_bet": 0, "total_earned": 0}
+                                         "last_punish": datetime(2000, 1, 1), "coins_bet": 0, "earned_bet": 0, "total_earned": 0, "wagers_won": 0,
+                                         "last_8ball": datetime(2000, 1, 1), "last_fortune": datetime(2000, 1, 1), "last_lootbox": datetime(2000, 1, 1)}
                     },
                     upsert = True
                 )
 
+                rewardsCol.update_one(
+                    {
+                        "member_id": member.id, "guild_id": guild.id
+                    }, 
+                    {
+                        "$setOnInsert": {"member_id": member.id, "guild_id": guild.id, "daily_boost_tier": "TIER_0", "daily_crit_tier": "TIER_0"}
+                    },
+                    upsert = True
+                )
      
 # Load cogs
 for filename in os.listdir('./cogs'):

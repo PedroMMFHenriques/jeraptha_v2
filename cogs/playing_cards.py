@@ -1,5 +1,7 @@
 import random
 from enum import Enum
+import discord
+from discord.ext import commands
 
 cardSuits = ["♦︎", "♣︎", "♥︎", "♠︎"]
 cardRanks = {
@@ -42,10 +44,11 @@ class Deck:
                 self.total += 1
 
     def draw(self):
+        if self.total <= 0:
+            return -1
+        
         num = random.randint(0,self.total-1)
         self.total -= 1
-        if self.total < 0:
-            return -1
 
         card = self.stack[num]
         self.stack.pop(num)
@@ -54,3 +57,4 @@ class Deck:
 
     def shuffle(self):
         random.shuffle(self.stack)
+
