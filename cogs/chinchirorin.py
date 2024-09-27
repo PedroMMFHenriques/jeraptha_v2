@@ -21,9 +21,6 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
-# chinchiroGameCol = myDB["ChinchirorinGame"] 
-# chinchiroUserCol = myDB["ChinchirorinUser"]
-
 
 def evaluate_hand(dice):
     hand = dice.get()
