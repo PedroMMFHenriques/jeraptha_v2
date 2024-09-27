@@ -107,6 +107,7 @@ class Deck:
 def evaluate_hand(hand):
     handValue = 0
 
+    hand.reverse()
     for card in hand:
         cardRank = int(card["value"])
         if(cardRank == 1):
@@ -208,6 +209,9 @@ async def calculate_player_reward(ctx: discord.ApplicationContext, player, house
                               "> loses " + str(bet) + "<:beets:1245409413284499587>!")
 
 class Blackjack(commands.Cog):
+    """
+    Start a table of Blackjack to play and place your bets.
+    """
 
     def __init__(self, bot):
         self.bot = bot
@@ -216,23 +220,22 @@ class Blackjack(commands.Cog):
     blackjack = discord.SlashCommandGroup("blackjack", "Blackjack related commands.")
 
     @blackjack.command(name="start", description="Start a game of Blackjack")
-    @discord.option("wait_time", description="Time to wait before starting the game", required=False, default=30)
+    @discord.option("wait_time", description="Time to wait before starting the game (10-120)", required=False, default=30)
     async def start(self, ctx: discord.ApplicationContext, wait_time: int):
         # Check if there is already a game running in the server
         blackjackGameCheck = blackjackGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1})
         if(blackjackGameCheck is None):
             newGame = {
                 "guild_id": ctx.guild.id,
-                "author_id": ctx.author.id,
                 "running": True
             }
             blackjackGameCol.insert_one(newGame)
             self.queue.clear()
 
-        elif(blackjackGameCheck is not None and blackjackGameCheck["running"] == True):
+        elif(blackjackGameCheck["running"] == True):
             await ctx.respond("There is already a game running in this server!", ephemeral=True)
             return
-    
+            
         if(wait_time < 0):
             await ctx.respond("Blud must be using a time machine...", ephemeral=True)
             return
@@ -244,6 +247,10 @@ class Blackjack(commands.Cog):
         if(wait_time < 10):
             await ctx.respond("Min waiting time is 10 seconds!", ephemeral=True)
             return
+        
+        myQuery = {"guild_id": ctx.guild.id}
+        newValues = {'$set': {'running': True}}
+        blackjackGameCol.update_one(myQuery, newValues)
         
         end_betting_time = wait_time + math.floor(time.time())
         
@@ -307,7 +314,7 @@ class Blackjack(commands.Cog):
                 split = False
 
             if evaluate_hand(playerHand) == 21:
-                await ctx.respond("[Blackjack] <@" + str(player) + "> has a Blackjack! Lucky bastard", ephemeral=True)
+                await ctx.respond("[Blackjack] <@" + str(player) + "> has a Blackjack! Lucky bastard")
                 continue
             
             timeout = 30
@@ -316,7 +323,7 @@ class Blackjack(commands.Cog):
             houseHandDesc = print_house_hand(houseHand,1)
             
             embed = discord.Embed(title="[Blackjack] New player's turn!",
-                                  description="Now playing - <@" + str(ctx.author.id) + ">\n\n" + 
+                                  description="Now playing - <@" + str(player) + ">\n\n" + 
                                   playerHandDesc + "\n\n" + houseHandDesc + 
                                   "\n\nType your action: `hit`, `stand`, `double`, or `split`.\n\n\
                                   You have <t:" + str(end_action_time) + ":R> to make your move!",
@@ -343,7 +350,7 @@ class Blackjack(commands.Cog):
                         playerHandDesc = print_hand(playerHand)
                         houseHandDesc = print_house_hand(houseHand,1)
                         embed = discord.Embed(title="[Blackjack] Player used HIT!",
-                                              description="Now playing - <@" + str(ctx.author.id) + ">\n\n" + 
+                                              description="Now playing - <@" + str(player) + ">\n\n" + 
                                               playerHandDesc + "\n\n" + houseHandDesc + 
                                               "\n\nType your action: `hit`, `stand`, `double`, or `split`.\n\n\
                                               You have <t:" + str(end_action_time) + ":R> to make your move!",
@@ -354,6 +361,7 @@ class Blackjack(commands.Cog):
                     # STAND
                     elif message == "stand" or message == "st":
                         flag = 1
+                        await ctx.respond("Gotcha, passing your turn to the next person in queue...")
                     
                     # DOUBLE    
                     elif message == "double" or message == "d":
@@ -372,7 +380,7 @@ class Blackjack(commands.Cog):
                         playerHandDesc = print_hand(playerHand)
                         houseHandDesc = print_house_hand(houseHand,1)
                         embed = discord.Embed(title="[Blackjack] Player used DOUBLE!",
-                                              description="Player - <@" + str(ctx.author.id) + ">\n\n" + 
+                                              description="Player - <@" + str(player) + ">\n\n" + 
                                               playerHandDesc + "\n\n" + houseHandDesc +
                                               "\n\nType your action: `hit`, `stand`, `double`, or `split`.\n\n\
                                               You have <t:" + str(end_action_time) + ":R> to make your move!",
@@ -419,8 +427,10 @@ class Blackjack(commands.Cog):
                         playerHandDesc = print_hand(playerHand)
                         houseHandDesc = print_house_hand(houseHand,1)
                         embed = discord.Embed(title="[Blackjack] Player used SPLIT!",
-                                              description="Player - <@" + str(ctx.author.id) + ">\n\n" + 
-                                              playerHandDesc + "\n\n" + houseHandDesc,
+                                              description="Player - <@" + str(player) + ">\n\n" + 
+                                              playerHandDesc + "\n\n" + houseHandDesc +
+                                              "\n\nType your action: `hit`, `stand`, `double`, or `split`.\n\n\
+                                              You have <t:" + str(end_action_time) + ":R> to make your move!",
                                               colour=playerColor,
                                               timestamp=datetime.now())
                         await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions())
@@ -487,6 +497,17 @@ class Blackjack(commands.Cog):
     @blackjack.command(name="bet", description="Participate in a game of Blackjack.")
     @discord.option("amount", description="Your bet amount against the house.", required=True)
     async def bet(self, ctx: discord.ApplicationContext, amount: int):
+        # Check if there is a game running in the server
+        blackjackGameCheck = blackjackGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1})
+        if(blackjackGameCheck is None or blackjackGameCheck["running"] == False):
+            await ctx.respond("There is no game running in this server!", ephemeral=True)
+            return
+        
+        # Check if user is already in the queue
+        if ctx.author.id in self.queue:
+            await ctx.respond("You are already in the queue! Wait a sec lil bro", ephemeral=True)
+            return
+
         if(amount <= 0):
             await ctx.respond("<@" + str(ctx.author.id) + "Buddy, ya ain't slick.")
             try:
@@ -507,16 +528,16 @@ class Blackjack(commands.Cog):
             "split": False
         }
         blackjackUserCol.insert_one(newPlayer)
-        self.queue.append(ctx.author.id)
+        self.queue.insert(0, ctx.author.id)
 
         await ctx.respond("[Blackjack] <@" + str(ctx.author.id) + "> entered the table with a **" + str(amount) + "**<:beets:1245409413284499587> bet!")
 
     @blackjack.command(name="reset", description="[ADMIN] Reset Blackjack table.")
     async def reset(self, ctx: discord.ApplicationContext):
         role = discord.utils.get(ctx.author.roles, name=adminRole) #Check if user has the correct role
-        if role is None:
-            await ctx.respond("You don't have the necessary role!", ephemeral=True)
-            return
+        # if role is None:
+        #     await ctx.respond("You don't have the necessary role!", ephemeral=True)
+        #     return
         
         for player in blackjackUserCol.find({"guild_id": ctx.guild.id},{"_id": 0, "member_id": 1,
                                                                         "bet": 1, "split": 1}):
