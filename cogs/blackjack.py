@@ -23,6 +23,8 @@ blackjackUserCol = myDB["BLACKJACK_USER"]
 
 adminRole = global_json["ROLES"]["ADMIN_ROLE"]
 
+SPLIT_TEST = False
+
 playerColours = [0xfc0377, 0x03fceb, 0xe7fc03, 0xfc7703]
 
 cardSuits = [":diamond_suit:", ":club_suit:", ":heart_suit:", ":spade_suit:"]
@@ -147,9 +149,9 @@ def print_house_hand(hand, numHidden):
     handStr += "\nTotal value = **" + str(value) + "**"
     return handStr
 
-async def update_wallet(ctx: discord.ApplicationContext, amount: int, remove: bool):
+async def update_wallet(ctx: discord.ApplicationContext, memberId, amount: int, remove: bool):
     #Check wallet
-    userCheck = usersCol.find_one({"member_id": ctx.author.id, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
+    userCheck = usersCol.find_one({"member_id": memberId, "guild_id": ctx.guild.id},{"_id": 0, "coins": 1})
     if(userCheck is None): 
         await ctx.respond("OOPS! This user isn't in the database! Notify bot admin!", ephemeral=True)
         return -1
@@ -161,52 +163,48 @@ async def update_wallet(ctx: discord.ApplicationContext, amount: int, remove: bo
             return -1
             
         removeCoins = 0 - amount
-        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        myQuery= {"member_id": memberId, "guild_id": ctx.guild.id}
         newValues = {'$inc': {'coins': int(removeCoins), 'coins_bet': int(amount)}}
         usersCol.update_one(myQuery, newValues)
 
     # When adding coins to wallet
     else:
-        myQuery= {"member_id": ctx.author.id, "guild_id": ctx.guild.id}
+        myQuery= {"member_id": memberId, "guild_id": ctx.guild.id}
         newValues = {'$inc': {'coins': int(amount), 'earned_bet': int(amount), 'total_earned': int(amount)}}
         usersCol.update_one(myQuery, newValues)
 
 async def calculate_player_reward(ctx: discord.ApplicationContext, player, houseValue):
-    playerHands = []
-    playerHands.append(player["hand"])
-    if player["split"]:
-        playerHands.append(player["hand2"])
-
-    for hand in playerHands:
-        playerValue = evaluate_hand(hand)
-        bet = player["bet"]
+    hand = player["hand"]
+    bet = player["bet"]
+    
+    playerValue = evaluate_hand(hand)
+            
+    if playerValue > 21:
+        await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
+                          "> busted! You lost " + str(bet) + 
+                          "<:beets:1245409413284499587>!")
                 
-        if playerValue > 21:
+    elif houseValue > 21 or playerValue > houseValue:
+        if playerValue == 21:
             await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
-                              "> busted! You lost " + str(bet) + 
-                              "<:beets:1245409413284499587>!")
-                    
-        elif houseValue > 21 or playerValue > houseValue:
-            if playerValue == 21:
-                await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
-                                  "> had a **Blackjack**! You win **" + str(math.floor(bet*2.5)) + 
-                                  "**<:beets:1245409413284499587>!")
-                await update_wallet(ctx, math.floor(bet*2.5), False)
-
-            await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
-                              "> won **" + str(math.floor(bet*2)) + 
+                              "> had a **Blackjack**! You win **" + str(math.floor(bet*2.5)) + 
                               "**<:beets:1245409413284499587>!")
-            await update_wallet(ctx, math.floor(bet*2), False)
-                    
-        elif playerValue == houseValue:
-            await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
-                              "> ties with the house! You got back your " + 
-                              str(bet) + "<:beets:1245409413284499587>!")
-            await update_wallet(ctx, bet, False)
-                    
+            await update_wallet(ctx, player["member_id"], math.floor(bet*2.5), False)
         else:
             await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
-                              "> loses " + str(bet) + "<:beets:1245409413284499587>!")
+                            "> won **" + str(math.floor(bet*2)) + 
+                            "**<:beets:1245409413284499587>!")
+            await update_wallet(ctx, player["member_id"], math.floor(bet*2), False)
+                
+    elif playerValue == houseValue:
+        await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
+                          "> ties with the house! You got back your " + 
+                          str(bet) + "<:beets:1245409413284499587>!")
+        await update_wallet(ctx, player["member_id"], bet, False)
+                
+    else:
+        await ctx.respond("[Blackjack] <@" + str(player["member_id"]) + 
+                          "> loses " + str(bet) + "<:beets:1245409413284499587>!")
 
 class Blackjack(commands.Cog):
     """
@@ -227,12 +225,13 @@ class Blackjack(commands.Cog):
         if(blackjackGameCheck is None):
             newGame = {
                 "guild_id": ctx.guild.id,
-                "running": True
+                "running": True,
+                "rolling": False
             }
             blackjackGameCol.insert_one(newGame)
             self.queue.clear()
 
-        elif(blackjackGameCheck["running"] == True):
+        elif(blackjackGameCheck["running"] == True or blackjackGameCheck["rolling"] == True):
             await ctx.respond("There is already a game running in this server!", ephemeral=True)
             return
             
@@ -274,13 +273,17 @@ class Blackjack(commands.Cog):
             blackjackGameCol.update_one(myQuery, newValues)
             return
         
+        myQuery = {"guild_id": ctx.guild.id}
+        newValues = {'$set': {'rolling': True}}
+        blackjackGameCol.update_one(myQuery, newValues)
+        
         #INITIAL DRAW
         playDeck = []
         for i in range(6 + len(self.queue)%4):
             # playDeck.append(pc.Deck())
             playDeck.append(Deck())
             playDeck[i].shuffle()
-
+            
         houseHand = []
 
         # Draw house hand
@@ -294,24 +297,36 @@ class Blackjack(commands.Cog):
 
             for i in range(2):
                 playerHand.append(draw_card(playDeck).to_dict())
+                
+            if SPLIT_TEST:
+                playerHand.clear()
+                playerHand.append(Card("10",":diamond_suit:").to_dict())
+                playerHand.append(Card("10",":club_suit:").to_dict())
 
             blackjackUserCol.update_one({"member_id": player, "guild_id": ctx.guild.id}, 
                                         {"$set": {"hand": playerHand}})
         
+        await ctx.respond("[Blackjack] Game is starting now!")
         # PLAYER'S TURN (BY SEQUENCE OF JOINING)
+        colorPicker = 0
         while len(self.queue) > 0:
             player = self.queue.pop()
-            playerColor = playerColours[len(self.queue)%len(playerColours)]
+            playerColor = playerColours[colorPicker%len(playerColours)]
+            colorPicker += 1
+            
+            # Send message to player
+            await ctx.respond("[Blackjack] <@" + str(player) + "> is playing next!")
+            await asyncio.sleep(2)
             
             # Check if player has blackjack
-            query = blackjackUserCol.find_one({"member_id": player, "guild_id": ctx.guild.id},
-                                              {"_id": 0, "hand": 1, "hand2": 1, "split": 1})
-            if query["split"]:
-                playerHand = query["hand2"]
-                split = True
-            else:
-                playerHand = query["hand"]
-                split = False
+            for entry in blackjackUserCol.find({"member_id": player, "guild_id": ctx.guild.id},
+                                              {"_id": 1, "hand": 1, "playing": 1, "bet": 1}):
+                if entry["playing"]:
+                    playerHand = entry["hand"]
+                    playerId = entry["_id"]
+                    playerBet = entry["bet"]
+                else:
+                    continue
 
             if evaluate_hand(playerHand) == 21:
                 await ctx.respond("[Blackjack] <@" + str(player) + "> has a Blackjack! Lucky bastard")
@@ -343,7 +358,11 @@ class Blackjack(commands.Cog):
                     message = msg.content.strip().lower()
                     # HIT
                     if message == "hit" or message == "h":
-                        playerHand.append(draw_card(playDeck).to_dict())
+                        if SPLIT_TEST:
+                            playerHand.append(Card("10",":heart_suit:").to_dict())
+                        else:
+                            playerHand.append(draw_card(playDeck).to_dict())
+                        
                         
                         # PRINT NEW HAND
                         end_action_time = timeout + math.floor(time.time())
@@ -366,13 +385,12 @@ class Blackjack(commands.Cog):
                     # DOUBLE    
                     elif message == "double" or message == "d":
                         #Change bet to double if possible
-                        amount = blackjackUserCol.find_one({"member_id": player, "guild_id": ctx.guild.id},{"_id": 0, "bet": 1})["bet"]
-                        if await update_wallet(ctx, amount, True) == -1:
+                        if await update_wallet(ctx, player, playerBet, True) == -1:
                             await ctx.respond("You cannot double your bet! You don't have enough <:beets:1245409413284499587>!", ephemeral=True)
                             continue
                         
-                        blackjackUserCol.update_one({"member_id": player, "guild_id": ctx.guild.id},
-                                                    {"$set": {"bet": amount*2}})
+                        blackjackUserCol.update_one({"member_id": player, "guild_id": ctx.guild.id, "_id": playerId},
+                                                    {"$set": {"bet": playerBet*2}})
 
                         #Draw a card
                         playerHand.append(draw_card(playDeck).to_dict())
@@ -391,38 +409,42 @@ class Blackjack(commands.Cog):
 
                     # SPLIT    
                     elif message == "split" or message == "sp":
-                        #WHAT TO DO WHEN SPLIT
-                        if playerHand[0]["rank"] != playerHand[1]["rank"]:
-                            await ctx.respond("You cannot split your hand! Your cards are not of the same rank.", ephemeral=True)
+                        #Search if hand can be split
+                        split1 = -1
+                        split2 = -1
+                        if len(playerHand) >= 2:
+                            for i in range(len(playerHand)):
+                                for j in range(i+1, len(playerHand)):
+                                    if playerHand[i]["value"] == playerHand[j]["value"]:
+                                        split1 = i
+                                        split2 = j
+                                        break
+                        
+                        if split1 == -1:
+                            await ctx.respond("You cannot split your hand! You don't have a pair of cards with the same value.")
                             continue
 
-                        #Search for needed values
-                        query = blackjackUserCol.find_one({"member_id": player, 
-                                                            "guild_id": ctx.guild.id},
-                                                            {"_id": 0, "bet": 1, "split": 1})
-                        split = query["split"]
-                        if split:
-                            await ctx.respond("You are only allowed to split once. Make sure to spam RIGGED when you see this message.", ephemeral=True)
-                            continue
-
-                        amount = query["bet"]
-                        if await update_wallet(ctx, amount, True) == -1:
+                        #Search if player has enough beets to split
+                        if await update_wallet(ctx, player, playerBet, True) == -1:
                             await ctx.respond("You cannot split your hand! You don't have enough <:beets:1245409413284499587>!", ephemeral=True)
                             continue
 
-                        #Draw cards for both hands
-                        playerHand1 = [playerHand[0], draw_card(playDeck).to_dict()]
-                        playerHand2 = [playerHand[1], draw_card(playDeck).to_dict()]
+                        #Separate the hand into two
+                        playerHand2 = [playerHand[split2]]
+                        playerHand.pop(split2)
+                        
 
-                        myQuery= {"member_id": player, "guild_id": ctx.guild.id}
-                        newValues = {'$set': {'hand': playerHand1, 
-                                              'hand2': playerHand2,
-                                              'split': True}}
-                        blackjackUserCol.update_one(myQuery, newValues)
-                        playerHand = playerHand1
+                        newPlayer = {
+                            "member_id": player,
+                            "guild_id": ctx.guild.id,
+                            "bet": playerBet,
+                            "hand": playerHand2,
+                            "playing": True
+                        }
+                        blackjackUserCol.insert_one(newPlayer)
 
-                        #Add player back to queue so they can play their second hand
-                        self.queue.insert(0, player)
+                        #Add player back to queue so they can play their new hand
+                        self.queue.append(player)
 
                         playerHandDesc = print_hand(playerHand)
                         houseHandDesc = print_house_hand(houseHand,1)
@@ -447,19 +469,15 @@ class Blackjack(commands.Cog):
                 if playerScore >= 21:
                     flag = 1
                     if(playerScore == 21):
-                        await ctx.respond("[Blackjack] <@" + str(player) + "> finally has a Blackjack! \
-                                          Not even close :sunglasses:. Advancing to next player...")
+                        await ctx.respond("[Blackjack] <@" + str(player) + "> finally has a Blackjack! Not even close :sunglasses:. Advancing to next player...")
                         
                     elif(playerScore > 21):
                         await ctx.respond("[Blackjack] <@" + str(player) + "> busted! Advancing to next player...")
 
 
             # Update final hand to database
-            myQuery= {"member_id": player, "guild_id": ctx.guild.id}
-            if split:
-                newValues = {'$set': {'hand2': playerHand}}
-            else:
-                newValues = {'$set': {'hand': playerHand}}
+            myQuery= {"member_id": player, "guild_id": ctx.guild.id, "_id": playerId}
+            newValues = {'$set': {'hand': playerHand, 'playing': False}}
             blackjackUserCol.update_one(myQuery, newValues)
 
         embed = discord.Embed(title="[Blackjack] House's turn!",
@@ -483,13 +501,12 @@ class Blackjack(commands.Cog):
         await asyncio.sleep(1)
         houseValue = evaluate_hand(houseHand)
         for player in blackjackUserCol.find({"guild_id": ctx.guild.id},
-                                            {"_id": 0, "member_id": 1, "hand": 1, 
-                                             "hand2": 1, "bet": 1, "split": 1}):
+                                            {"_id": 0, "member_id": 1, "hand": 1, "bet": 1}):
             await calculate_player_reward(ctx, player, houseValue)
 
         # Clean up from database
         myQuery = {"guild_id": ctx.guild.id}
-        newValues = {'$set': {'running': False}}
+        newValues = {'$set': {'running': False, 'rolling': False}}
         blackjackGameCol.update_one(myQuery, newValues)
         blackjackUserCol.delete_many(myQuery)
 
@@ -498,9 +515,14 @@ class Blackjack(commands.Cog):
     @discord.option("amount", description="Your bet amount against the house.", required=True)
     async def bet(self, ctx: discord.ApplicationContext, amount: int):
         # Check if there is a game running in the server
-        blackjackGameCheck = blackjackGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1})
+        blackjackGameCheck = blackjackGameCol.find_one({"guild_id": ctx.guild.id},{"_id": 0, "running": 1, "rolling": 1})
         if(blackjackGameCheck is None or blackjackGameCheck["running"] == False):
-            await ctx.respond("There is no game running in this server!", ephemeral=True)
+            await ctx.respond("There is no game running in this server! Start one yourself :)", ephemeral=True)
+            return
+        
+        # Check if the game is already rolling
+        if(blackjackGameCheck["rolling"] == True):
+            await ctx.respond("The game is already rolling! Wait for the next round to bet.", ephemeral=True)
             return
         
         # Check if user is already in the queue
@@ -516,7 +538,7 @@ class Blackjack(commands.Cog):
                 pass
             return
         
-        if await update_wallet(ctx, amount, True) == -1:
+        if await update_wallet(ctx, ctx.author.id, amount, True) == -1:
             return
 
         newPlayer = {
@@ -524,8 +546,7 @@ class Blackjack(commands.Cog):
             "guild_id": ctx.guild.id,
             "bet": amount,
             "hand": [],
-            "hand2": [],
-            "split": False
+            "playing": True
         }
         blackjackUserCol.insert_one(newPlayer)
         self.queue.insert(0, ctx.author.id)
@@ -535,15 +556,13 @@ class Blackjack(commands.Cog):
     @blackjack.command(name="reset", description="[ADMIN] Reset Blackjack table.")
     async def reset(self, ctx: discord.ApplicationContext):
         role = discord.utils.get(ctx.author.roles, name=adminRole) #Check if user has the correct role
-        # if role is None:
-        #     await ctx.respond("You don't have the necessary role!", ephemeral=True)
-        #     return
+        if role is None:
+            await ctx.respond("You don't have the necessary role!", ephemeral=True)
+            return
         
         for player in blackjackUserCol.find({"guild_id": ctx.guild.id},{"_id": 0, "member_id": 1,
                                                                         "bet": 1, "split": 1}):
-            await update_wallet(ctx, player["bet"], False)
-            if player["split"]:
-                await update_wallet(ctx, player["bet"], False)
+            await update_wallet(ctx, player["member_id"], player["bet"], False)
 
         blackjackGameCol.delete_many({})
         blackjackUserCol.delete_many({})
