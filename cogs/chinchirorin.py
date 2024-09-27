@@ -152,7 +152,7 @@ class Chinchirorin(commands.Cog):
     async def play(self, ctx: discord.ApplicationContext, bet_amount: int):
         #Verify bet amount
         if(bet_amount <= 0):
-            await ctx.respond("<@" + str(ctx.author.id) + "Nice try! However, Zǎoshang hǎo zhōngguó xiànzài wǒ yǒu BING CHILLING 🥶🍦 wǒ hěn xǐhuān BING CHILLING 🥶🍦 dànshì sùdù yǔ jīqíng 9 bǐ BING CHILLING 🥶🍦 sùdù yǔ jīqíng sùdù yǔ jīqíng 9 wǒ zuì xǐhuān suǒyǐ…xiànzài shì yīnyuè shíjiān zhǔnbèi 1 2 3 liǎng gè lǐbài yǐhòu sùdù yǔ jīqíng 9 ×3 bùyào wàngjì bùyào cu òguò jìdé qù diànyǐngyuàn kàn sùdù yǔ jīqíng 9 yīn wéi fēicháng hǎo diànyǐng dòngzuò fēicháng hǎo chàbùduō yīyàng BING CHILLING 🥶🍦zàijiàn 🥶🍦")
+            await ctx.respond("<@" + str(ctx.author.id) + "> Nice try! However, Zǎoshang hǎo zhōngguó xiànzài wǒ yǒu BING CHILLING 🥶🍦 wǒ hěn xǐhuān BING CHILLING 🥶🍦 dànshì sùdù yǔ jīqíng 9 bǐ BING CHILLING 🥶🍦 sùdù yǔ jīqíng sùdù yǔ jīqíng 9 wǒ zuì xǐhuān suǒyǐ…xiànzài shì yīnyuè shíjiān zhǔnbèi 1 2 3 liǎng gè lǐbài yǐhòu sùdù yǔ jīqíng 9 ×3 bùyào wàngjì bùyào cu òguò jìdé qù diànyǐngyuàn kàn sùdù yǔ jīqíng 9 yīn wéi fēicháng hǎo diànyǐng dòngzuò fēicháng hǎo chàbùduō yīyàng BING CHILLING 🥶🍦zàijiàn 🥶🍦")
             try:
                 await ctx.author.edit(nick=ctx.author.display_name + " 🤡", reason="Tried to cheat Jeraptha")
             except:
@@ -303,6 +303,7 @@ class Chinchirorin(commands.Cog):
                                 timestamp=datetime.now())
             
             await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
+            await ctx.respond("[Chinchirorin] <@" + str(ctx.author.id) + "> is investing in their retirement and won " + str(winnings) + " <:beets:1245409413284499587>.")
 
         # Tie protocol
         elif player.get_score() == bank.get_score() :
@@ -338,6 +339,7 @@ class Chinchirorin(commands.Cog):
                                     description=embedDescription,
                                     colour=0x2A4D3E,
                                     timestamp=datetime.now())
+                await ctx.respond("[Chinchirorin] <@" + str(ctx.author.id) + "> is so unlucky they lost 2x their bet AKA " + str(bet_amount*2) + " <:beets:1245409413284499587>.")
                 
                 
             else:
@@ -350,18 +352,9 @@ class Chinchirorin(commands.Cog):
                                     description=embedDescription,
                                     colour=0x2A4D3E,
                                     timestamp=datetime.now())
-                
+                await ctx.respond("[Chinchirorin] <@" + str(ctx.author.id) + "> got scammed " + str(bet_amount) + " <:beets:1245409413284499587> by the casino.")
             await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
+
 
 def setup(bot):
     bot.add_cog(Chinchirorin(bot))
-
-# bank = Player(betAmmount=100,playerName="Jeraptha")
-# player = Player(betAmmount=100,playerName="Asdrubal")
-
-# bank.play()
-# print(bank.get_score())
-
-# player.play()
-# print(player.get_score())
-
