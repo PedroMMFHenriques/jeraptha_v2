@@ -1,6 +1,4 @@
-# [Your Bot's Name] 🎮
-
-![Bot Logo](path/to/your/image.png)
+# Jeraptha_V2 <img src="https://github.com/user-attachments/assets/fedcb240-d190-47c0-9be8-5c20cb2ce0ce" width="75" height="75">
 
 [![License](https://img.shields.io/github/license/yourusername/yourbot)](https://github.com/yourusername/yourbot/blob/main/LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0-blue)](https://github.com/yourusername/yourbot/releases)
@@ -19,58 +17,64 @@
 
 ## Introduction
 
-Welcome to **[Your Bot's Name]**, a Discord bot designed to make your server more engaging with a collection of fun games, alongside robust database-backed functionality. Built with [Node.js/Python] and using the [Discord API](https://discord.com/developers/docs/intro), this bot is perfect for adding interactive games and custom features to your community.
+Welcome to Jeraptha_V2, a Discord bot that adds a collection of fun games alongside a virtual economy. 
+
+Built with Python using the [Discord API](https://discord.com/developers/docs/intro).
 
 ## Features
 
-- 🎮 Multiple interactive games
-- 📊 Data stored with a robust database system
-- 🔨 Server management tools
-- 💬 Customizable commands for server admins
-- And much more!
+- 🎮 Daily games (Wordle-like Beetdle)
+- 🎲 Gambling games (Blackjack, Roulette, Chinchirorin)
+- 📊 Virtual economy with leaderboards and rewards
 
-## Games and Commands
+## Games
 
-This bot includes several mini-games that can be played directly in your Discord server. Each game has its own set of commands to start, play, and manage the game. Here's a breakdown:
+This bot includes several mini-games that can be played directly in your Discord server. Each game has its own set of commands to start, play, and manage it. Here's a breakdown:
 
-### 1. **Game 1: Trivia**
+### 1. **Beetdle**
 
-Test your knowledge with this trivia game!
+Test your English proficiency with this Wordle-like game!
 
-- `!trivia start`: Starts a new trivia session.
-- `!trivia answer [your answer]`: Submit an answer for the current question.
-- `!trivia leaderboard`: Check the current trivia leaderboard.
+Players will need to guess a word from a dictionary database. With each guess, the correct letters and positions will be displayed to the user in order to help find the selected word.
 
-**Description**: Players will receive questions from a trivia database. The bot tracks correct answers and maintains a leaderboard to encourage competition among server members.
+The first word of the day is the same for every user in the server, and is worth extra points. The bot tracks correct answers and maintains a leaderboard.
 
-### 2. **Game 2: Hangman**
+- `/beetdle guess [your_guess]`: Starts a new Beetdle game or continues the current game.
+- `/beetdle remind`: Remind yourself the previous guesses for the current word.
+- `/leaderboard Beetdle Daily`: Display the total daily wins for each user.
+- `/leaderboard Beetdle Total`: Display the total wins for each user.
 
-Classic hangman game where players guess letters to reveal a word.
+### 2. **Roulette**
 
-- `!hangman start`: Start a new hangman game.
-- `!hangman guess [letter]`: Guess a letter.
-- `!hangman stop`: End the current game.
+Classic european roulette game. Play alone or create a lobby with other users.
 
-**Description**: The bot generates a random word, and players try to guess the word by suggesting letters within a limited number of tries.
+- `/roulette start [betting_time]`: Start a new lobby of roulette. You may select the time for making bets.
+- `/roulette bet [amount] [option] [sub_option]`: Insert your bet amount, your bet option (color, dozen, number...) and corresponding sub option (red, 2nd dozen, 14...).
 
-### 3. **Game 3: Tic-Tac-Toe**
+### 3. **Blackjack**
 
-Play a friendly game of Tic-Tac-Toe with another player.
+Standard blackjack game. Play alone or create a lobby with other users.
+- `/blackjack start [wait_time]`: Start a new lobby of blackjack. You may select the time for making bets.
+- `/blackjack bet [amount]`: Insert your bet amount.
+- In your turn, you can make the following commands, if they are available: `hit`, `stand`, `double`, `split`.
 
-- `!tictactoe [@opponent]`: Challenge another player to Tic-Tac-Toe.
-- `!tictactoe move [position]`: Make a move on the grid (positions 1-9).
-- `!tictactoe end`: End the current game.
+### 4. **Chinchirorin**
 
-**Description**: Players take turns placing their marks (X or O) on a 3x3 grid. The first player to align three of their marks in a row wins.
+A dice game in which you roll 3 dice and try to get a scoring hand. 
 
-### 4. **Game 4: Rock-Paper-Scissors**
+- `/chinchirorin play [bet_amount]`: Play a round of Chinchirorin and place your bet.
+- `/chinchirorin ruleset`: Check the rules of the game.
 
-Challenge your friends to a quick game of Rock-Paper-Scissors.
+## Rewards, Leaderboards and other commands
 
-- `!rps [rock/paper/scissors]`: Play a round of Rock-Paper-Scissors.
-- `!rps stats`: View your win/loss stats.
+### Rewards
+ - Daily
+ - Lootbox
+ - Punishments
 
-**Description**: Simple and fun! The bot will announce a winner based on the choices of each player.
+### Leaderboards
+
+### Help
 
 ---
 
