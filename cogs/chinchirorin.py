@@ -21,6 +21,9 @@ db = global_json["DB"]
 myClient = pymongo.MongoClient(db["CLIENT"])
 myDB = myClient[db["DB"]]
 usersCol = myDB[db["USERS_COL"]]
+# chinchiroGameCol = myDB["ChinchirorinGame"] 
+# chinchiroUserCol = myDB["ChinchirorinUser"]
+
 
 def evaluate_hand(dice):
     hand = dice.get()
@@ -208,7 +211,7 @@ class Chinchirorin(commands.Cog):
             
             if bank.get_score() == 0:
                 embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
-                if i is 2:
+                if i == 2:
                     embedFieldDesc = "Not a known hand! The bank will have a bust hand."
             else:
                 if bank.get_score() == 999:
@@ -249,7 +252,7 @@ class Chinchirorin(commands.Cog):
             
             if player.get_score() == 0:
                 embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
-                if i is 2:
+                if i == 2:
                     embedFieldDesc = "Not a known hand! Your hand will be a bust."
             else:
                 if player.get_score() == 999:
@@ -300,7 +303,7 @@ class Chinchirorin(commands.Cog):
                                 timestamp=datetime.now())
             
             await ctx.respond(embed=embed, allowed_mentions=discord.AllowedMentions(), ephemeral=True)
-            await ctx.respond("[Chinchirorin] <@" + str(ctx.author.id) + "> is investing in their retirement and won " + str(winnings) + " <:beets:1245409413284499587>.")
+            await ctx.respond("[Chinchirorin] <@" + str(ctx.author.id) + "> is investing in their retirement and got " + str(winnings) + " <:beets:1245409413284499587>.")
 
         # Tie protocol
         elif player.get_score() == bank.get_score() :
@@ -355,3 +358,13 @@ class Chinchirorin(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Chinchirorin(bot))
+
+# bank = Player(betAmmount=100,playerName="Jeraptha")
+# player = Player(betAmmount=100,playerName="Asdrubal")
+
+# bank.play()
+# print(bank.get_score())
+
+# player.play()
+# print(player.get_score())
+
