@@ -208,7 +208,7 @@ class Chinchirorin(commands.Cog):
             
             if bank.get_score() == 0:
                 embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
-                if i is 2:
+                if i == 2:
                     embedFieldDesc = "Not a known hand! The bank will have a bust hand."
             else:
                 if bank.get_score() == 999:
@@ -249,7 +249,7 @@ class Chinchirorin(commands.Cog):
             
             if player.get_score() == 0:
                 embedFieldDesc = "Not a known hand! Rerolling... (" + str(2-i) + " tries remain)"
-                if i is 2:
+                if i == 2:
                     embedFieldDesc = "Not a known hand! Your hand will be a bust."
             else:
                 if player.get_score() == 999:
