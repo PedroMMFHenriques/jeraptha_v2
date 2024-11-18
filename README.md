@@ -10,8 +10,8 @@
 
 Welcome to Jeraptha_V2, a Discord bot that adds a virtual economy to your server! You can make wagers with other users, play fun games to earn more coins and use your coins to buy rewards. 
 
-The name is a reference to the Expeditionary Force book series by Craig Alanson: the Jeraptha are a beetle-like species that have a culture heavily focused on gambling.
-Built with Python using the [Discord API](https://discord.com/developers/docs/intro).
+Built with [Pycord](https://github.com/Pycord-Development/pycord) in Python using the [Discord API](https://discord.com/developers/docs/intro).
+The data is stored in a MongoDB database using the [PyMongo](https://pymongo.readthedocs.io/en/stable/) library.
 
 ## Features
 
