@@ -312,7 +312,7 @@ class Rewards(commands.Cog):
         answer = random.choice(answer_list)
 
         embed = discord.Embed(title="",
-                      description="<@" + str(ctx.author.id) + ">  payed " + str(eight_ball_json["ROLL_COST"]) + "<:beets:1245409413284499587> to ask the 8-Ball: \n**" + question + "**\n\nTo which it responded:\n```" + answer + "```",
+                      description="<@" + str(ctx.author.id) + ">  paid " + str(eight_ball_json["ROLL_COST"]) + "<:beets:1245409413284499587> to ask the 8-Ball: \n**" + question + "**\n\nTo which it responded:\n```" + answer + "```",
                       colour=0x009900,
                       timestamp=datetime.now())
 
